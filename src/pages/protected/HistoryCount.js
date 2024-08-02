@@ -1,18 +1,20 @@
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { setPageTitle } from '../../features/common/headerSlice'
-import Billing from '../../features/settings/billing'
+
+
+import HistoryCount from '../../features/assetmanagement/historyasset'
 
 function InternalPage(){
     const dispatch = useDispatch()
 
     useEffect(() => {
-        dispatch(setPageTitle({ title : "Bills"}))
+        dispatch(setPageTitle({ title : "Asset"}))
       }, [])
 
 
     return(
-        <Billing />
+        < HistoryCount/>
     )
 }
 

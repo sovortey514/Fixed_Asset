@@ -50,8 +50,9 @@ function Header(){
 
                 {/* Menu toogle for mobile view or small screen */}
                 <div className="flex-1">
-                    <label htmlFor="left-sidebar-drawer" className="btn btn-primary drawer-button lg:hidden">
-                    <Bars3Icon className="h-5 inline-block w-5"/></label>
+                    <label htmlFor="left-sidebar-drawer" className="btn  drawer-button lg:hidden bg-yellow-500 hover:bg-yellow-600 text-white">
+                        <Bars3Icon className="h-5 inline-block w-5" />
+                    </label>
                     <h1 className="text-2xl font-semibold ml-2">{pageTitle}</h1>
                 </div>
 
@@ -102,7 +103,7 @@ function Header(){
                             <span className="badge">New</span>
                             </Link>
                         </li>
-                        <li className=''><Link to={'/app/settings-billing'}>Bill History</Link></li>
+                       
                         <div className="divider mt-0 mb-0"></div>
                         <li><a onClick={logoutUser}>Logout</a></li>
                     </ul>

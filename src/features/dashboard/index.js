@@ -12,8 +12,7 @@ import BarChart from './components/BarChart'
 import DashboardTopBar from './components/DashboardTopBar'
 import { useDispatch } from 'react-redux'
 import {showNotification} from '../common/headerSlice'
-import DoughnutChart from './components/DoughnutChart'
-import { useState } from 'react'
+
 
 const statsData = [
     {title : "New Users", value : "34.7k", icon : <UserGroupIcon className='w-8 h-8'/>, description : "↗︎ 2300 (22%)"},
@@ -69,7 +68,7 @@ function Dashboard(){
         
             <div className="grid lg:grid-cols-2 mt-4 grid-cols-1 gap-6">
                 <UserChannels />
-                <DoughnutChart />
+                {/* <DoughnutChart /> */}
             </div>
         </>
     )
