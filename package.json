@@ -25,6 +25,7 @@
     "capitalize-the-first-letter": "^1.0.8",
     "chart.js": "^4.0.1",
     "dayjs": "^1.11.12",
+    "jwt-decode": "^4.0.0",
     "moment": "^2.30.1",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.0.1",

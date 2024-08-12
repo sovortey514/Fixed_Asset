@@ -52,7 +52,7 @@ function ForgotPassword() {
                 <p className="mt-4 mb-8 font-semibold text-center">Check your email to reset your password</p>
                 <div className="text-center mt-4">
                   <Link to="/login">
-                    <button className="btn btn-primary w-full">Login</button>
+                    <button className="btn btn-primary w-full">Logout</button>
                   </Link>
                 </div>
               </>

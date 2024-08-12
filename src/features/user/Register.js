@@ -51,15 +51,20 @@ function Register() {
     }
 
     setLoading(true);
-
     try {
-      const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
-      const result = await response.json();
+      // const result = await response.json();
       const response = await fetch('http://localhost:6060/auth/signup', {
         method: 'POST',
-        headers,
-        body: JSON.stringify(registerObj),
+        headers:  { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          name: registerObj.name,
+          email: registerObj.email,
+          password: registerObj.password,
+          role: registerObj.role
+        }),
       });
+
+      console.log({response})
 
       const responseData = await response.json();
       if (response.ok) {
@@ -81,8 +86,16 @@ function Register() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    console.log( "onchange", e);
     setRegisterObj((prev) => ({ ...prev, [name]: value }));
   };
+
+  const updateFormValue = ({ updateType, value }) => {
+    setErrorMessage("");
+    setRegisterObj({ ...registerObj, [updateType]: value });
+    console.log("registerObj ", registerObj )
+
+};
 
   return (
     <div className="min-h-screen bg-base-200 flex items-center">
@@ -97,32 +110,36 @@ function Register() {
               <div className="mb-4">
                 <InputText
                   name="name"
+                  updateType="name"
                   value={registerObj.name}
                   containerStyle="mt-4"
                   labelTitle="Name"
-                  updateFormValue={handleInputChange}
+                  updateFormValue={updateFormValue}
                 />
                 <InputText
                   name="email"
+                  updateType="email"
                   value={registerObj.email}
                   containerStyle="mt-4"
                   labelTitle="Email"
-                  updateFormValue={handleInputChange}
+                  updateFormValue={updateFormValue}
                 />
                 <InputText
                   name="password"
                   type="password"
+                  updateType="password"
                   value={registerObj.password}
                   containerStyle="mt-4"
                   labelTitle="Password"
-                  updateFormValue={handleInputChange}
+                  updateFormValue={updateFormValue}
                 />
                 <InputText
                   name="role"
+                  updateType="role"
                   value={registerObj.role}
                   containerStyle="mt-4"
                   labelTitle="Role"
-                  updateFormValue={handleInputChange}
+                  updateFormValue={updateFormValue}
                 />
               </div>
 

@@ -8,7 +8,7 @@ import ArrowRightOnRectangleIcon from '@heroicons/react/24/outline/ArrowRightOnR
 import UserIcon from '@heroicons/react/24/outline/UserIcon'
 import Cog6ToothIcon from '@heroicons/react/24/outline/Cog6ToothIcon'
 import KeyIcon from '@heroicons/react/24/outline/KeyIcon'
-
+import UsersIcon from '@heroicons/react/24/outline/UsersIcon'
 const iconClasses = `h-6 w-6`
 const submenuIconClasses = `h-5 w-5`
 
@@ -41,6 +41,18 @@ const routes = [
       },
     ]
   },
+  // {
+  //   path: '', // no url needed as this has submenu
+  //   icon: <UsersIcon className={`${iconClasses} inline` }/>, // icon component
+  //   name: 'User Management', // name that appears in Sidebar
+  //   submenu : [
+  //     {
+  //       path: '/app/usermanagement-users',
+  //       icon: <UserIcon className={submenuIconClasses}/>, // icon component
+  //       name: 'Manage Users', // name that appears in Sidebar
+  //     },
+  //   ]
+  // },
   {
     path: '', //no url needed as this has submenu
     icon: <Cog6ToothIcon className={`${iconClasses} inline` }/>, // icon component

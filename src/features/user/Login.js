@@ -67,6 +67,8 @@ function Login() {
     const updateFormValue = ({ updateType, value }) => {
         setErrorMessage("");
         setLoginObj({ ...loginObj, [updateType]: value });
+    console.log("registerObj ", loginObj )
+
     };
 
     return (

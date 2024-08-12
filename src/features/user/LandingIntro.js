@@ -1,4 +1,4 @@
-import TemplatePointers from "./components/TemplatePointers"
+// import TemplatePointers from "./components/TemplatePointers"
 
 
 
@@ -14,7 +14,7 @@ function LandingIntro(){
                 {/* <div className="text-center mt-12"><img src="./intro.png" alt="Dashwind Admin Template" className="w-48 inline-block"></img></div> */}
               
               {/* Importing pointers component */}
-              <TemplatePointers />
+              {/* <TemplatePointers /> */}
               
               </div>
 

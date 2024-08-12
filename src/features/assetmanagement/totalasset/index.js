@@ -7,9 +7,21 @@ import moment from 'moment';
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
-
-
-
+const TotalAsset = () => {
+  const [size, setSize] = useState('large');
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isViewModalVisible, setIsViewModalVisible] = useState(false);
+  const [modalType, setModalType] = useState(''); // 'fixedasset' or 'category'
+  const [editCategory, setEditCategory] = useState(null);
+  const [editKey, setEditKey] = useState(null);
+  const [form] = Form.useForm();
+  const [categories, setCategories] = useState([]);
+  const [data, setData] = useState([]);
+  const token = localStorage.getItem('token');
+  const [visibleAssets, setVisibleAssets] = useState([]);
+  const [viewAsset, setViewAsset] = useState(null);
+  const [item, setItem]=useState([])
+  
 
 // Define table columns
 const columns = (handleEdit, handleDelete, handleViewHide) => [
@@ -29,8 +41,7 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
     dataIndex: 'categoryId',
     key: 'categoryId',
     render: (_,categoryId) => {
-    
-      return categoryId.name
+      return categoryId.category.name
       
     },
   },
@@ -71,6 +82,24 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
     dataIndex: 'quantity',
     key: 'quantity',
   },
+  {
+    title: 'Status',
+    dataIndex: 'statustext',
+    key: 'statustext',
+    render: (statustext) => {
+      const status = statustext || 'Available';
+      
+      return (
+        <span 
+          className={`px-2 py-1 rounded ${
+            statustext === 'Avaliable' ? 'bg-green-200 text-green-800' :statustext ==='In Use'? 'bg-red-200 text-red-800':''
+          }`}
+        >
+          {statustext}
+        </span>
+      );
+    },
+  },
   
   {
     title: 'Action',
@@ -78,27 +107,20 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
     render: (_, record) => (
       <Space size="middle">
         <Button 
-
-          icon={<EditOutlined/>} 
-          onClick={() => handleEdit(record)}
+          icon={<EditOutlined />} 
+          onClick={() => (handleEdit(record), setItem(record))}
           className='bg-green-600 hover:bg-green-700 text-white border-none rounded-md p-2 shadow-md'
         />
-         <Dropdown 
+        <Dropdown 
           overlay={
             <Menu>
               <Menu.Item key="view">
-                <Button 
-                  type="link" 
-                  onClick={() => handleViewHide(record, 'view')}
-                >
+                <Button type="link" onClick={() => handleViewHide(record, 'view')}>
                   View
                 </Button>
               </Menu.Item>
               <Menu.Item key="hide">
-                <Button 
-                  type="link" 
-                  onClick={() => handleViewHide(record, 'hide')}
-                >
+                <Button type="link" onClick={() => (handleViewHide(record, 'hide'), setItem(record))}>
                   Remove
                 </Button>
               </Menu.Item>
@@ -110,32 +132,16 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
             className='bg-white hover:bg-yellow-500 text-yellow-500 border-none rounded-full p-2 shadow-md'
           />
         </Dropdown>
+        <Button 
+          icon={<DownloadOutlined />} 
+          // onClick={() => handleDownload(record)}
+          className='bg-white hover:bg-yellow-500 text-yellow-500 border-none rounded-full p-2 shadow-md'
+        />
       </Space>
     ),
   },
+
 ];
-
-
-
-
-
-
-
-
-
-
-const TotalAsset = () => {
-  const [size, setSize] = useState('large');
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [modalType, setModalType] = useState(''); // 'fixedasset' or 'category'
-  const [editCategory, setEditCategory] = useState(null);
-  const [editKey, setEditKey] = useState(null);
-  const [form] = Form.useForm();
-  const [categories, setCategories] = useState([]);
-  const [data, setData] = useState([]);
-  const token = localStorage.getItem('token');
-  const [visibleAssets, setVisibleAssets] = useState([]);
-  const [viewAsset, setViewAsset] = useState(null);
 
 
   // Fetch categories and assets on component mount
@@ -150,7 +156,6 @@ const TotalAsset = () => {
 
       const response = await fetch('http://localhost:6060/admin/categories',{headers});
       const result = await response.json();
-      console.log('Fetched Categories:', result);
       if (result.statusCode === 200) {
         setCategories(result.categories || []);
       } else {
@@ -167,7 +172,6 @@ const TotalAsset = () => {
   const fetchFixedAssets = async () => {
     try {
       const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
-      console.log(headers);
       const response = await fetch('http://localhost:6060/admin/getAllFixedAssets',{headers});
       const result = await response.json();
       if (result.statusCode === 200) {
@@ -189,13 +193,14 @@ const TotalAsset = () => {
     setEditCategory(null);
     setEditKey(null);
     setIsModalVisible(true);
+    setViewAsset(null);
   };
 
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
       const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
-
+  
       if (modalType === 'category') {
         if (editCategory) {
           // Edit existing category
@@ -204,13 +209,13 @@ const TotalAsset = () => {
             headers,
             body: JSON.stringify(values),
           });
-
+  
           setCategories((prevCategories) =>
             prevCategories.map((cat) =>
-              cat.id === editCategory.id ? values : cat
+              cat.id === editCategory.id ? { ...cat, ...values } : cat
             )
           );
-
+  
           notification.success({
             message: 'Category Updated',
             description: `Category "${values.name}" has been updated successfully.`,
@@ -222,73 +227,90 @@ const TotalAsset = () => {
             headers,
             body: JSON.stringify(values),
           });
-
+  
           const result = await response.json();
-          setCategories((prevCategories) => [...prevCategories, result.category]);
-
-          notification.success({
-            message: 'Category Created',
-            description: `Category "${values.name}" has been created successfully.`,
-          });
+  
+          if (response.ok) {
+            // Successfully created category
+            setCategories((prevCategories) => [...prevCategories, result.category]);
+  
+            notification.success({
+              message: 'Category Created',
+              description: `Category "${values.name}" has been created successfully.`,
+            });
+          } else {
+            // Handle error response from server
+            notification.error({
+              message: 'Can not create with the same name category',
+              description: result.message || 'Category with this name already exists.',
+            });
+          }
         }
-        await fetchCategories();
       } else if (modalType === 'fixedasset') {
         if (editKey !== null) {
           // Edit existing asset
-          await fetch(`http://localhost:6060/admin/fixedassets/${editKey}`, {
+          await fetch(`http://localhost:6060/admin/updateFixedAsset/${editKey.id}`, {
             method: 'PUT',
             headers,
-            body: JSON.stringify(values),
+            body: JSON.stringify({ ...values, status: '1' }),
           });
-
-          setData((prevData) =>
-            prevData.map((item) =>
-              item.key === editKey ? { ...item, ...values } : item
-            )
-          );
-
+  
+          fetchFixedAssets();
+  
           notification.success({
             message: 'Asset Updated',
             description: 'Fixed asset has been updated successfully.',
           });
         } else {
           // Create new asset
-          const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
           const response = await fetch('http://localhost:6060/admin/createFixedAsset', {
             method: 'POST',
             headers,
-            body: JSON.stringify(values),
+            body: JSON.stringify({ ...values, status: '1', statusText: 'Available' }),
           });
-
+  
           const result = await response.json();
-          setData((prevData) => [...prevData, result.fixedasset]);
-
-          notification.success({
-            message: 'Asset Created',
-            description: 'A new fixed asset has been created successfully.',
-          });
+  
+          if (response.ok) {
+            fetchFixedAssets();
+  
+            notification.success({
+              message: 'Asset Created',
+              description: 'A new fixed asset has been created successfully.',
+            });
+          } else {
+            // Handle error response from server
+            notification.error({
+              message: 'Creation Failed',
+              description: result.message || 'An error occurred while creating the asset.',
+            });
+          }
         }
-        await fetchFixedAssets();
       }
+  
+      // Close modal and reset form fields
       form.resetFields();
       setIsModalVisible(false);
+  
     } catch (info) {
       console.log('Validate Failed:', info);
     }
   };
+  
 
 
   const handleCancel = () => {
     setIsModalVisible(false);
+    setIsViewModalVisible(false);
   };
 
   const handleEdit = (record) => {
+    console.log(record.category.name)
     setModalType('fixedasset');
-    setEditKey(record.key);
-    form.setFieldsValue(record);
-    form.setFieldValue({
+    setEditKey(record);
+    form.setFieldsValue({
       name:record.name,
-      categoryId: record.categoryId,
+      categoryId: record.category.name,
       model:record.model,
       year:record.year,
       serialNumber: record.serialNumber,
@@ -359,20 +381,6 @@ const TotalAsset = () => {
     }
   };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   const menu = (
     <Menu>
       <Menu.Item key="1">
@@ -390,10 +398,11 @@ const TotalAsset = () => {
 
   const categoryMenu = (
     <Menu>
-      {categories.map((category) => (
-        <Menu.Item key={category.id}>
-          <Space>
-            <span>{category.name}</span>
+    {categories.map((category) => (
+      <Menu.Item key={category.id}>
+        <div className="flex justify-between items-center w-full">
+          <span>{category.name}</span>
+          <div className="flex gap-2">
             <Button
               type="link"
               onClick={() => handleCategoryEdit(category)}
@@ -404,54 +413,85 @@ const TotalAsset = () => {
               icon={<DeleteOutlined />}
               onClick={() => handleCategoryDelete(category)}
             />
-          </Space>
-        </Menu.Item>
-      ))}
-    </Menu>
+          </div>
+        </div>
+      </Menu.Item>
+    ))}
+  </Menu>
   );
-  const onDateChange = (dates, dateStrings) => {
-    console.log('Selected Dates:', dates);
-    console.log('Formatted Dates:', dateStrings);
-    // You can add your filter logic here using the selected dates
-  };
-  const handleGenerateReport = () => {
-    // Add your report generation logic here
-    console.log('Generating report...');
-  };
-  const handleViewHide = (record, action) => {
-    if (action === 'view') {
-      // Set the asset to be viewed
-      setViewAsset(record);
-      setIsModalVisible(true);
-    } else if (action === 'hide') {
-      // Implement hide logic here
-      setVisibleAssets((prevAssets) =>
-        prevAssets.filter((item) => item.key !== record.key)
-      );
-      notification.info({
-        message: 'Asset Hidden',
-        description: `Asset "${record.name}" has been hidden.`,
-      });
+
+  const handleViewHide = async (record, type) => {
+
+    if (type === 'view') {
+      try {
+        const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+        const response = await fetch(`http://localhost:6060/admin/getFixedAssetById/${record.id}`, {
+          method: 'GET',
+          headers,
+        });
+        if(response.ok){
+          const assetDetails = await response.json();
+          setViewAsset(assetDetails); // Update the state with the fetched data
+          setIsViewModalVisible(true);
+        }else {
+          const errorData = await response.json();
+          notification.error({
+            message: 'Failed to Fetch Asset Details',
+            description: errorData.message || 'There was an error fetching the asset details.',
+          });
+        }
+
+      } catch (error) {
+        notification.error({
+          message: 'Failed to Update Asset',
+          description: 'There was an error updating the asset.',
+        });
+        console.error('Error updating visibility:', error);
+      }
+
+    } else if (type === 'hide') {
+      try {
+
+        const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+        const response = await fetch(`http://localhost:6060/admin/updateFixedAsset/${record.id}`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({...record,categoryId:record.category.id,status:"0"}),
+        });
+  
+        if (response.ok) {
+          const updatedRecord = await response.json(); 
+          // console.log('Updated Record:', updatedRecord);
+          await fetchFixedAssets();
+
+          notification.success({
+            message: 'Asset  Updated',
+            description: `Asset "${updatedRecord.fixedAsset.name}" has been updated.`,
+          });
+        } else {
+          const errorData = await response.json(); 
+          notification.error({
+            message: 'Failed to Update asset',
+            description: errorData.message || 'There was an error updating the asset .',
+          });
+        }
+      } catch (error) {
+        notification.error({
+          message: 'Failed to Update asset',
+          description: 'There was an error updating the asset.',
+        });
+        console.error('Error updating visibility:', error);
+      }
     }
   };
-  const handleEditFixedasset = (record) => {
-    setEditKey(record.key);
-    form.setFieldsValue(record);
-    showModal('fixedasset');
-  };
 
-
-
-
-
-
-
-
-
-
-
-
-
+  const statusMenu = (
+    <Menu >
+      <Menu.Item key="Issue">Issue</Menu.Item>
+      <Menu.Item key="Available">Available</Menu.Item>
+    </Menu>
+  );
+  
   
   return (
     <>
@@ -465,83 +505,157 @@ const TotalAsset = () => {
           Categories <DownOutlined />
         </Button>
       </Dropdown>
-      <RangePicker 
-        size={size} 
-        className="ml-2 border border-gray-300 rounded px-4 py-2 h-10" 
-        onChange={onDateChange} 
-        placeholder={['Start Date', 'End Date']}
-      />
-      <Button
-        size={size}
-        className="absoload ml-96 bg-yellow-500 hover:bg-yellow-50 text-white"
-        onClick={handleGenerateReport}
-      >
-        <DownloadOutlined className="mr-2" /> Generate Report
-      </Button>
-
-      <Table columns={columns(handleEdit, handleDelete)} dataSource={data} className='mt-5' />
+      <Dropdown overlay={statusMenu} placement="bottomLeft">
+        <Button size={size} style={{ marginLeft: 8 }} className=' hover:bg-yellow-50 text-gray'>
+          Status <DownOutlined />
+        </Button>
+      </Dropdown>
+      <Table columns={columns(handleEdit, handleDelete, handleViewHide)} dataSource={data} className='mt-5' />
 
       <Modal
-        title={modalType === 'category' ? 'Category' : 'Fixed Asset'}
+        title={modalType === 'category' ? (editCategory ? 'Edit Category' : 'Create Category') : (editKey ? 'Edit Fixed Asset' : 'Create Fixed Asset')}
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
+     
+        cancelText="Cancel"
       >
-       <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-       <Form form={form} layout="vertical">
-          {modalType === 'fixedasset' ? (
-            <>
-              <Form.Item name="name" label="Asset Name" rules={[{ required: true, message: 'Please input the asset name!' }]}>
-                <Input />
-              </Form.Item>
-              <Form.Item name="categoryId" label="Category" rules={[{ required: true, message: 'Please select a category!' }]}>
-                <Select>
-                  {categories.map((category) => (
-                    <Option key={category.id} value={category.id}>
-                      {category.name}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-              <Form.Item name="model" label="Model">
-                <Input />
-              </Form.Item>
-              <Form.Item name="year" label="Year">
-                <Input />
-              </Form.Item>
-              <Form.Item name="serialNumber" label="Serial Number">
-                <Input />
-              </Form.Item>
-              <Form.Item name="purchaseDate" label="Purchase Date">
-                <DatePicker />
-              </Form.Item>
-              <Form.Item name="price" label="Price">
-                <Input type="number" />
-              </Form.Item>
-              <Form.Item name="unit" label="Unit">
-                <Input />
-              </Form.Item>
-              <Form.Item name="quantity" label="Quantity">
-                <Input type="number" />
-              </Form.Item>
-            </>
-          ) : (
-            <>
+          <Form
+            form={form}
+            layout="vertical"
+            initialValues={{ remember: true }}
+          >
+            {modalType === 'fixedasset' && (
+              <>
+                <Form.Item
+                  name="name"
+                  label="Asset Name"
+                  rules={[{ required: true, message: 'Please input the asset name!' }]}
+                  
+                >
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                  name="categoryId"
+                  label="Category"
+                  rules={[{ required: true, message: 'Please select a category!' }]}
+                >
+                  <Select>
+                    {categories.map((category) => (
+                      <Option key={category.id} value={category.id}>
+                        {category.name}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+                <Form.Item
+                  name="model"
+                  label="Model"
+                  rules={[{ required: true, message: 'Please input the model!' }]}
+                >
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                  name="year"
+                  label="Year"
+                  rules={[{ required: true, message: 'Please input the year!' }]}
+                >
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                  name="serialNumber"
+                  label="Serial Number"
+                  rules={[{ required: true, message: 'Please input the serial number!' }]}
+                >
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                  name="purchaseDate"
+                  label="Purchase Date"
+                  rules={[{ required: true, message: 'Please select the purchase date!' }]}
+                >
+                  <DatePicker />
+                </Form.Item>
+                <Form.Item
+                  name="price"
+                  label="Price"
+                  rules={[{ required: true, message: 'Please input the price!' }]}
+                >
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                  name="unit"
+                  label="Unit"
+                  rules={[{ required: true, message: 'Please input the unit!' }]}
+                >
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                  name="quantity"
+                  label="Quantity"
+                  rules={[{ required: true, message: 'Please input the quantity!' }]}
+                >
+                  <Input />
+                </Form.Item>
+              </>
+            )}
+            {modalType === 'category' && (
               <Form.Item
                 name="name"
-                label="Name"
-                rules={[{ required: true, message: 'Please input the name of the category!' }]}
+                label="Category Name"
+                rules={[{ required: true, message: 'Please input the category name!' }]}
               >
                 <Input />
               </Form.Item>
-              <Form.Item name="description" label="Description">
-                <Input type="textarea" />
-              </Form.Item>
-            </>
-          )}
-        </Form>
-        </div>
+            )}
+          </Form>
+        
+        {/* } */}
       </Modal>
+      <Modal
+        visible={isViewModalVisible}
+        onOk={handleCancel}
+        onCancel={handleCancel}
+        cancelText="Cancel"
+      >
+          <div>
+            <>
+              <div className='flex'>
+                <div>No: </div>
+                <div>{viewAsset?.fixedAsset?.id}</div>
+              </div>
+              <div className='flex'>
+                <div>Name: </div>
+                <div>{viewAsset?.fixedAsset?.name}</div>
+              </div>
+              <div className='flex'>
+                <div>Category: </div>
+                <div>{viewAsset?.fixedAsset?.category.name}</div>
+              </div>
+              <div className='flex'>
+                <div>Model: </div>
+                <div>{viewAsset?.fixedAsset?.model}</div>
+              </div>
+              <div className='flex'>
+                <div>Year: </div>
+                <div>{viewAsset?.fixedAsset?.year}</div>
+              </div>
+              <div className='flex'>
+                <div>serialNumber: </div>
+                <div>{viewAsset?.fixedAsset?.serialNumber}</div>
+              </div>
+              <div className='flex'>
+                <div>purchaseDate: </div>
+                <div>{viewAsset?.fixedAsset?.purchaseDate}</div>
+              </div>
+              <div className='flex'>
+                <div>Price: </div>
+                <div>{viewAsset?.fixedAsset?.price}</div>
+              </div>
+            </>
+          </div>
+      </Modal>
+      
     </>
   );
 };

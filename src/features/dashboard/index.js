@@ -1,7 +1,4 @@
 import DashboardStats from './components/DashboardStats'
-import AmountStats from './components/AmountStats'
-import PageStats from './components/PageStats'
-
 import UserGroupIcon  from '@heroicons/react/24/outline/UserGroupIcon'
 import UsersIcon  from '@heroicons/react/24/outline/UsersIcon'
 import CircleStackIcon  from '@heroicons/react/24/outline/CircleStackIcon'
@@ -60,8 +57,8 @@ function Dashboard(){
         {/** ---------------------- Different stats content 2 ------------------------- */}
         
             <div className="grid lg:grid-cols-2 mt-10 grid-cols-1 gap-6">
-                <AmountStats />
-                <PageStats />
+                {/* <AmountStats /> */}
+                {/* <PageStats /> */}
             </div>
 
         {/** ---------------------- User source channels table  ------------------------- */}
