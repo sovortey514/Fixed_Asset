@@ -13,4 +13,6 @@ public interface FixedAssetRepository extends JpaRepository<FixedAsset, Long> {
     
     @Query("SELECT fa FROM FixedAsset fa JOIN FETCH fa.category where fa.status = '1'") 
     List<FixedAsset> findAllWithCategory();
+
+    boolean existsBySerialNumber(String serialNumber);
 }

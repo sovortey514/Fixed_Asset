@@ -19,7 +19,7 @@ public class DepartmentController {
     private DepartmentService departmentService;
 
     @PostMapping("/createDepartment")
-    public ResponseEntity<ReqRes> createDepartment( @RequestBody Department department) {
+    public ResponseEntity<ReqRes> createDepartment(@RequestBody Department department) {
         ReqRes resp = new ReqRes();
         try {
             Department createdDepartment = departmentService.creaDepartment(department);
@@ -35,6 +35,7 @@ public class DepartmentController {
         }
         return ResponseEntity.ok(resp);
     }
+
 
     @DeleteMapping("/deleteDepartment/{id}")
     public ResponseEntity<ReqRes> deleteDepartment(@PathVariable Long id) {

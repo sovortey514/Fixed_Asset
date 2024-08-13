@@ -26,6 +26,11 @@ public class FixedAssetServiceImpl implements FixedAssetService {
         
         validateFixedAsset(fixedAsset);
 
+         // Check if a fixed asset with the same serial number already exists
+         if (fixedAssetRepository.existsBySerialNumber(fixedAsset.getSerialNumber())) {
+            throw new RuntimeException("A fixed asset with the same serial number already exists.");
+        }
+
         Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
         if (categoryOpt.isPresent()) {
             fixedAsset.setCategory(categoryOpt.get());

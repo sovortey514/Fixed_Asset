@@ -19,7 +19,7 @@ public class Building {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = true , length = 100)
+  @Column(name = "name", nullable = false, length = 100)
     @NotBlank(message = "Building name must not be empty")
     private String name;
 
@@ -28,6 +28,10 @@ public class Building {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    // public Building getBuilding() {
+    //     return Building();
+    // }
 
     // Getters and Setters
 }

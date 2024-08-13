@@ -20,7 +20,14 @@ public class BuildingServiceImpl implements BuildingService {
 
     @Override
     public Building creatBuilding(Building building) {
+        
         validateBuilding(building);
+        // Check if a building with the same name already exists
+        Optional<Building> existingBuilding = buildingRepository.findByName(building.getName());
+        if (existingBuilding.isPresent()) {
+            throw new IllegalArgumentException("Building with this name already exists");
+        }
+
         building.setName(building.getName());
         building.setCreatedAt(LocalDateTime.now());
         building.setUpdatedAt(LocalDateTime.now());

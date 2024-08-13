@@ -23,6 +23,12 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public Department creaDepartment(Department department) {
         validateDepartment(department);
+        
+        Optional<Department> existingBuilding = departmentRepository.findByName(department.getName());
+        if (existingBuilding.isPresent()) {
+            throw new IllegalArgumentException("Building with this name already exists");
+        }
+        
         department.setName(department.getName());
         department.setBuilding(department.getBuilding());
         department.setFloorNumber(department.getFloorNumber());

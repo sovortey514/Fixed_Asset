@@ -27,7 +27,7 @@ public class Department {
     @JoinColumn(name = "building_id", nullable = false)
     private Building building;
     
-    @Column(name = "name", nullable = false, length = 100)
+    @Column(name = "name", nullable = false, length = 100, unique = true)
     private String name;
 
     @Column(name = "description")
@@ -41,6 +41,11 @@ public class Department {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    // public String getName() {
+    //     return name;
+    // }
+
 
     
 }

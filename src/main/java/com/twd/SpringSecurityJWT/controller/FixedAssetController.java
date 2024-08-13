@@ -35,6 +35,7 @@ public class FixedAssetController {
     public ResponseEntity<ReqRes> createFixedAsset(@RequestBody FixedAssetRequest fixedAssetRequest) {
         ReqRes resp = new ReqRes();
         try {
+            // Populate FixedAsset entity from the request
             FixedAsset fixedAssetToSave = new FixedAsset();
             fixedAssetToSave.setName(fixedAssetRequest.getName());
             fixedAssetToSave.setModel(fixedAssetRequest.getModel());
@@ -47,8 +48,6 @@ public class FixedAssetController {
             fixedAssetToSave.setImage(fixedAssetRequest.getImage());
             fixedAssetToSave.setStatus(fixedAssetRequest.getStatus());
 
-            // fixedAssetToSave.setStatustext(fixedAssetRequest.getStatustext());
-        
             Integer categoryId = fixedAssetRequest.getCategoryId();
             Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
             if (categoryOpt.isPresent()) {
@@ -59,16 +58,20 @@ public class FixedAssetController {
 
             FixedAsset savedFixedAsset = fixedAssetService.createFixedAsset(fixedAssetToSave, categoryId);
             if (savedFixedAsset != null && savedFixedAsset.getId() != null) {
-                resp.setFixedAsset(savedFixedAsset);  // Ensure this method exists
+                resp.setFixedAsset(savedFixedAsset);
                 resp.setMessage("Fixed Asset Saved Successfully");
                 resp.setStatusCode(200);
             }
+        } catch (RuntimeException e) {
+            resp.setStatusCode(400); // Bad Request
+            resp.setError(e.getMessage());
         } catch (Exception e) {
-            resp.setStatusCode(500);
+            resp.setStatusCode(500); // Internal Server Error
             resp.setError(e.getMessage());
         }
         return ResponseEntity.ok(resp);
-    }
+}
+
 
     @DeleteMapping("/deleteFixedAsset/{id}")
     public ResponseEntity<ReqRes> deleteFixedAsset(@PathVariable Long id){
