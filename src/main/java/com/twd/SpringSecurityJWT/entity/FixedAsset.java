@@ -75,15 +75,13 @@ public class FixedAsset {
     @JoinColumn(name = "building_id")
     private Building building;
 
-    // @ManyToOne
-    // @JoinColumn(name = "asset_holder_id")
-    // private AssetHolder assetHolder;
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "asset_holder_id") // Foreign key column
+    private AssetHolder assetHolder; // Relationship to AssetHolder
 
     @Lob
     @Column(name = "image")
     private byte[] image;
-
-
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -107,4 +105,5 @@ public class FixedAsset {
     public void setCategory(Category category) {
         this.category = category;
     }
+
 }

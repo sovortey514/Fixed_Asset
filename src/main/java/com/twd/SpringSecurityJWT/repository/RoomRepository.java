@@ -1,6 +1,5 @@
 package com.twd.SpringSecurityJWT.repository;
 
-import com.twd.SpringSecurityJWT.entity.Department;
 import com.twd.SpringSecurityJWT.entity.Room;
 
 import java.util.List;

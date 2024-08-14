@@ -2,6 +2,8 @@ package com.twd.SpringSecurityJWT.dto;
 
 import java.time.LocalDate;
 
+import com.twd.SpringSecurityJWT.entity.AssetHolder;
+
 import lombok.Data;
 
 @Data
@@ -18,18 +20,12 @@ public class FixedAssetRequest {
     private Integer categoryId; 
     private Boolean assetExistence;  // Assuming category ID is included in the request
     private String status;
+    private String assetHolder;
     public String getStatus() {
         return status;
     }
-    // public String getStatustext() {
-    //     // TODO Auto-generated method stub
-    //     throw new UnsupportedOperationException("Unimplemented method 'getStatustext'");
-    // }
-    // public String getStatustext() {
-    //     // TODO Auto-generated method stub
-    //     return statustext;
-    // }
-  
-
-    // Getters and Setters
+    public String getAssetHolder(){
+        return assetHolder;
+    }
+    private String statustext;
 }

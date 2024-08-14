@@ -16,4 +16,5 @@ public interface FixedAssetService {
     Optional<FixedAsset> getFixedAssetById(Long id);
 
     FixedAsset updateFixedAsset(Long id, FixedAsset fixedAsset);
+    
 }

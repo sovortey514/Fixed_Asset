@@ -30,6 +30,12 @@ public class RoomServiceImpl implements RoomService {
 
    @Override
     public Room createRoom(Room room) {
+
+        // Check if a room with the same name already exists
+        if (roomRepository.findByName(room.getName()).isPresent()) {
+            throw new IllegalArgumentException("A room with this name already exists");
+        }
+        
         Department department = departmentRepository.findById(room.getDepartment().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid department ID"));
 
