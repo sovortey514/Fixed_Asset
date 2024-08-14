@@ -163,6 +163,7 @@ const TotalAsset = () => {
         });
 
         data = await response.json();
+
         if (response.ok) {
           setBuildings([...buildings, data.building]); // Update state
           setSelectedBuilding(data.building.name); // Update selection
@@ -207,10 +208,11 @@ const TotalAsset = () => {
           headers,
           body: JSON.stringify({ ...values, building: { id: values.building } }),
         });
-    
+        
         data = await response.json();
-        if (response.ok) {
-          setDepartments([...departments, data.department]);
+        
+        if (response.ok && data.department) {
+          setDepartments(prev => [...prev, data.department]);
           setSelectedDepartment(data.department.name);
           notification.success({
             message: 'Department created successfully!',
@@ -229,7 +231,7 @@ const TotalAsset = () => {
           headers,
           body: JSON.stringify({ ...values, department: { id: values.department }, building: { id: values.building } }),
         });
-    
+        
         data = await response.json();
         if (response.ok) {
           setRooms(prevRooms =>
@@ -255,8 +257,9 @@ const TotalAsset = () => {
         });
     
         data = await response.json();
-        if (response.ok) {
-          setRooms([...rooms, data.room]); // Update state
+        if (response.ok && data.room) {
+
+          // setRooms([...rooms, data.room]); // Update state
           setSelectedRoom(data.room.name); // Update selection
           notification.success({
             message: 'Room created successfully!',
@@ -296,7 +299,7 @@ const TotalAsset = () => {
         }
       } else {
         // Create new asset holder
-        response = await fetch('http://localhost:6060/admin/createAssetHolder', {
+        response = await fetch('http://localhost:6060/admin/createassetholder', {
           method: 'POST',
           headers,
           body: JSON.stringify({ ...values, department: { id: values.department } }),
@@ -304,8 +307,8 @@ const TotalAsset = () => {
     
         data = await response.json();
         console.log('Asset Holder Response:', data);
-        if (response.ok) {
-          setAssetHolder([...assetHolders, data.assetholder]);
+        if (response.ok && data.assetHolder) {
+          // setAssetHolder([...assetHolders, data.assetholder]);
           setSelectedAssetHolder(data.assetholder); // Update selection
           notification.success({
             message: 'Asset holder created successfully!',

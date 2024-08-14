@@ -3,6 +3,7 @@ import { Button, Modal, Form, Input, Select, Dropdown, Menu, Tag, Space, Popconf
 import { DownOutlined, EditOutlined, EyeOutlined, DeleteOutlined, DownloadOutlined } from '@ant-design/icons';
 import { DatePicker } from 'antd'; 
 import moment from 'moment';
+import { PlusOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -21,7 +22,8 @@ const TotalAsset = () => {
   const [visibleAssets, setVisibleAssets] = useState([]);
   const [viewAsset, setViewAsset] = useState(null);
   const [item, setItem]=useState([])
-  
+  const [assignasset, setAssignasset] = useState([]);
+  const [assetHolders, setAssetHolder] = useState([]);
 
 // Define table columns
 const columns = (handleEdit, handleDelete, handleViewHide) => [
@@ -148,7 +150,9 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
   useEffect(() => {
     fetchCategories();
     fetchFixedAssets();
+    fetchAssetHolder();
   }, []);
+
 
   const fetchCategories = async () => {
     try {
@@ -168,6 +172,29 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
       console.error('Error fetching categories:', error);
     }
   };
+
+  const fetchAssetHolder = async () => {
+    try {
+      const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+  
+      const response = await fetch('http://localhost:6060/admin/getallassetholders', { headers });
+      const result = await response.json();
+      
+      console.log(result.assetHolders);  // Logs the asset holders to the console
+      
+      if (result.statusCode === 200) {
+        setAssetHolder(result.assetHolders || []);
+      } else {
+        notification.error({
+          message: 'Failed to fetch asset holders',
+          description: result.error,
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching asset holders:', error);
+    }
+  };
+  
 
   const fetchFixedAssets = async () => {
     try {
@@ -194,6 +221,7 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
     setEditKey(null);
     setIsModalVisible(true);
     setViewAsset(null);
+    setAssignasset(null);
   };
 
   const handleOk = async () => {
@@ -219,6 +247,7 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
           notification.success({
             message: 'Category Updated',
             description: `Category "${values.name}" has been updated successfully.`,
+            duration:1,
           });
         } else {
           // Create new category
@@ -227,25 +256,40 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
             headers,
             body: JSON.stringify(values),
           });
-  
+
           const result = await response.json();
-  
+
+          
           if (response.ok) {
             // Successfully created category
-            setCategories((prevCategories) => [...prevCategories, result.category]);
-  
+            // setCategories((prevCategories) => [...prevCategories, result.category]);
+            if(result.statusCode === 400){
+              notification.error({
+                message: 'Failed',
+                description: `Category "${values.name}" already exists.`,
+                duration:1,
+              });
+             return
+            }
             notification.success({
               message: 'Category Created',
               description: `Category "${values.name}" has been created successfully.`,
+              duration:1,
             });
+          
+
+            fetchCategories();
+  
           } else {
             // Handle error response from server
             notification.error({
               message: 'Can not create with the same name category',
               description: result.message || 'Category with this name already exists.',
+              duration:1,
             });
           }
         }
+
       } else if (modalType === 'fixedasset') {
         if (editKey !== null) {
           // Edit existing asset
@@ -260,6 +304,7 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
           notification.success({
             message: 'Asset Updated',
             description: 'Fixed asset has been updated successfully.',
+            duration:1,
           });
         } else {
           // Create new asset
@@ -272,27 +317,96 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
           const result = await response.json();
   
           if (response.ok) {
+            // Successfully created Fixed asset
+            
+            if(result.statusCode === 400){
+              notification.error({
+                message: 'Can not create fixed asset',
+                description: `Asset "${values.name}" already exists.`,
+                duration:1,
+              });
+             return
+            }
+            notification.success({
+              message: 'Fixed Asset Created',
+              description: `fixed Asset "${values.name}" has been created successfully.`,
+              duration:1,
+            });
+          
+
             fetchFixedAssets();
   
-            notification.success({
-              message: 'Asset Created',
-              description: 'A new fixed asset has been created successfully.',
-            });
           } else {
             // Handle error response from server
             notification.error({
               message: 'Creation Failed',
-              description: result.message || 'An error occurred while creating the asset.',
+              description: result.message || 'A fixed asset with the same serial number already exists.',
+              duration:1,
             });
           }
         }
       }
+      else if (modalType === 'assign') {
+        if (editKey && editKey.id) {
+          const requestBody = {
+            ...values,
+            status: '1',
+            statusText: 'In Use'
+          };
+      
+          // Optionally include fixedAsset if needed
+          if (values.fixedAsset) {
+            requestBody.fixedAsset = { id: values.fixedAsset };
+          }
+          console.log('editKey:', editKey);
+          console.log('editKey.id:', editKey ? editKey.id : 'No editKey.id');
+          try {
+            const response = await fetch(`http://localhost:6060/admin/updateFixedAsset/${editKey.id}`, {
+              method: 'PUT',
+              headers,
+              body: JSON.stringify(requestBody),
+            });
+      
+            if (response.ok) {
+              
+              fetchFixedAssets();
+              notification.success({
+                message: 'Asset Updated',
+                description: 'Fixed asset has been updated successfully.',
+                duration: 1,
+              });
+            } else {
+              const result = await response.json();
+              notification.error({
+                message: 'Update Failed',
+                description: result.message || 'An error occurred while updating the fixed asset.',
+                duration: 1,
+              });
+            }
+          } catch (error) {
+            console.error('Fetch error:', error);
+            notification.error({
+              message: 'Update Failed',
+              description: 'An unexpected error occurred.',
+              duration: 1,
+            });
+          }
+        } else {
+          notification.error({
+            message: 'Update Failed',
+            description: 'The asset ID is missing or invalid.',
+            duration: 1,
+          });
+        }
+      }
+      
   
       // Close modal and reset form fields
       form.resetFields();
       setIsModalVisible(false);
   
-    } catch (info) {
+    }
+     catch (info) {
       console.log('Validate Failed:', info);
     }
   };
@@ -321,6 +435,18 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
     });
     setIsModalVisible(true)
   };
+
+  // const handleAssign = (record) => {
+  //   setModalType('assign');
+  //   setEditKey(record);
+  //   form.setFieldsValue({
+  //     fixedAsset: record.fixedAsset,
+  //     assetHolderId: record.assetHolderId,
+  //   });
+  //   setIsModalVisible(true)
+  // };
+
+
 
 
   const handleDelete = async (record) => {
@@ -510,16 +636,35 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
           Status <DownOutlined />
         </Button>
       </Dropdown>
+      
+      <Button 
+        size={size} 
+        style={{ marginLeft: 8 }} 
+        shape="circle" 
+        icon={<PlusOutlined />} 
+        onClick={() => {
+          setIsModalVisible(true);
+          setModalType('assign');
+        }}
+      />
+
+
+
       <Table columns={columns(handleEdit, handleDelete, handleViewHide)} dataSource={data} className='mt-5' />
 
       <Modal
-        title={modalType === 'category' ? (editCategory ? 'Edit Category' : 'Create Category') : (editKey ? 'Edit Fixed Asset' : 'Create Fixed Asset')}
-        visible={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-     
-        cancelText="Cancel"
-      >
+            title={
+              modalType === 'category' 
+                ? (editCategory ? 'Edit Category' : 'Create Category') 
+                : modalType === 'fixedasset' 
+                  ? (editKey ? 'Edit Fixed Asset' : 'Create Fixed Asset') 
+                  : 'Assign Fixed Asset'
+            }
+            visible={isModalVisible}
+            onOk={handleOk}
+            onCancel={handleCancel}
+            cancelText="Cancel"
+          >
           <Form
             form={form}
             layout="vertical"
@@ -608,6 +753,43 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
                 <Input />
               </Form.Item>
             )}
+            {modalType === 'assign' && (
+            <>
+              <Form.Item
+                name="id"
+                label="Select Fixed Asset"
+                rules={[{ required: true, message: 'Please select a fixed asset!' }]}
+              >
+                <Select placeholder="Select a fixed asset">
+                  {data.map((fixedAsset) => (
+                    <Option key={fixedAsset.id} value={fixedAsset.id}>
+                      {fixedAsset.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                name="assetHolderId"
+                label="Select Asset Holder"
+                rules={[{ required: true, message: 'Please select an asset holder!' }]}
+              >
+                <Select placeholder="Select an asset holder">
+                  {assetHolders.map((holder) => (
+                    <Option key={holder.id} value={holder.id}>
+                      {holder.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                  name="purchaseDate"
+                  label="Purchase Date"
+                  rules={[{ required: true, message: 'Please select the purchase date!' }]}
+                >
+                  <DatePicker />
+                </Form.Item>
+            </>
+            )}
           </Form>
         
         {/* } */}
@@ -618,43 +800,45 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
         onCancel={handleCancel}
         cancelText="Cancel"
       >
-          <div>
-            <>
-              <div className='flex'>
-                <div>No: </div>
-                <div>{viewAsset?.fixedAsset?.id}</div>
-              </div>
-              <div className='flex'>
-                <div>Name: </div>
-                <div>{viewAsset?.fixedAsset?.name}</div>
-              </div>
-              <div className='flex'>
-                <div>Category: </div>
-                <div>{viewAsset?.fixedAsset?.category.name}</div>
-              </div>
-              <div className='flex'>
-                <div>Model: </div>
-                <div>{viewAsset?.fixedAsset?.model}</div>
-              </div>
-              <div className='flex'>
-                <div>Year: </div>
-                <div>{viewAsset?.fixedAsset?.year}</div>
-              </div>
-              <div className='flex'>
-                <div>serialNumber: </div>
-                <div>{viewAsset?.fixedAsset?.serialNumber}</div>
-              </div>
-              <div className='flex'>
-                <div>purchaseDate: </div>
-                <div>{viewAsset?.fixedAsset?.purchaseDate}</div>
-              </div>
-              <div className='flex'>
-                <div>Price: </div>
-                <div>{viewAsset?.fixedAsset?.price}</div>
-              </div>
-            </>
-          </div>
+        <div className="p-4 border rounded-lg bg-white shadow-md">
+            <h2 className="text-lg font-semibold mb-4">Asset Details</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="font-medium">No:</div>
+              <div>{viewAsset?.fixedAsset?.id}</div>
+              
+              <div className="font-medium">Name:</div>
+              <div>{viewAsset?.fixedAsset?.name}</div>
+              
+              <div className="font-medium">Category:</div>
+              <div>{viewAsset?.fixedAsset?.category?.name}</div>
+              
+              <div className="font-medium">Model:</div>
+              <div>{viewAsset?.fixedAsset?.model}</div>
+              
+              <div className="font-medium">Year:</div>
+              <div>{viewAsset?.fixedAsset?.year}</div>
+              
+              <div className="font-medium">Serial Number:</div>
+              <div>{viewAsset?.fixedAsset?.serialNumber}</div>
+              
+              <div className="font-medium">Purchase Date:</div>
+              <div>{viewAsset?.fixedAsset?.purchaseDate}</div>
+              
+              <div className="font-medium">Price:</div>
+              <div>{viewAsset?.fixedAsset?.price}</div>
+              <div className="font-bold">Unit:</div>
+              <div>{viewAsset?.fixedAsset?.unit}</div>
+
+              <div className="font-bold">Quantity:</div>
+              <div>{viewAsset?.fixedAsset?.quantity}</div>
+
+              <div className="font-bold">Status:</div>
+              <div>{viewAsset?.fixedAsset?.statustext}</div>
+            </div>
+        </div>
+
       </Modal>
+
       
     </>
   );
