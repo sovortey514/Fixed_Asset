@@ -2,8 +2,11 @@ package com.twd.SpringSecurityJWT.entity;
 
 import java.time.LocalDateTime;
 
+
+
 import jakarta.persistence.*;
 import lombok.Data;
+import java.util.List;
 
 @Entity
 @Data
@@ -17,8 +20,9 @@ public class AssetHolder {
     @Column(length = 50, nullable = false)
     private String name;
 
-    @Column(length = 255, nullable = false)
+    @Column(length = 255, nullable = false, unique = true)
     private String email;
+
 
     @Column(length = 20, nullable = false)
     private String phoneNumber;
@@ -35,6 +39,9 @@ public class AssetHolder {
 
     @Column(columnDefinition = "TEXT")
     private String remark;
+
+    @OneToMany(mappedBy = "assetHolder") // Reference to the field in FixedAsset
+    private List<FixedAsset> fixedAssets;
 
     private LocalDateTime assignedAt;
     private LocalDateTime createdAt;

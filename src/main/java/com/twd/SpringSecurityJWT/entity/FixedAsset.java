@@ -64,8 +64,8 @@ public class FixedAsset {
     @Column(nullable = true)
     private String status= "1";
 
-    @Column(nullable = true)
-    private String statustext= "Avaliable";
+    @Column(nullable = false)
+    private String statustext;
 
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_id")

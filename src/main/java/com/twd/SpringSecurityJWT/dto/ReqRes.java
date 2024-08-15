@@ -50,11 +50,6 @@ public class ReqRes {
     private List<AssetHolder> assetHolders;
 
     private String status;
-
-    
-
-    
-
-   
+    private String statustext;
 
 }

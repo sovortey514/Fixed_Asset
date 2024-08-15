@@ -65,6 +65,11 @@ public class FixedAssetServiceImpl implements FixedAssetService {
         if (fixedAsset.getQuantity() == null) {
             throw new RuntimeException("Quantity is required");
         }
+        if (fixedAsset.getStatustext() == null) {
+            throw new RuntimeException("Statustext is required");
+        }
+
+        
         
         // if (fixedAsset.getAssetExistence() == null) {
         //     throw new RuntimeException("Asset existence is required");
@@ -105,6 +110,7 @@ public class FixedAssetServiceImpl implements FixedAssetService {
             existingAsset.setImage(fixedAsset.getImage());
             existingAsset.setCategory(fixedAsset.getCategory());
             existingAsset.setStatus(fixedAsset.getStatus());
+            existingAsset.setStatustext(fixedAsset.getStatustext());
             // existingAsset.setStatustext(fixedAsset.getStatustext());
            
 

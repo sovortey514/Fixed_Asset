@@ -20,6 +20,7 @@ public class FixedAssetRequest {
     private Integer categoryId; 
     private Boolean assetExistence;  // Assuming category ID is included in the request
     private String status;
+  
     private String assetHolder;
     public String getStatus() {
         return status;
@@ -27,5 +28,14 @@ public class FixedAssetRequest {
     public String getAssetHolder(){
         return assetHolder;
     }
+
     private String statustext;
+    
+    public String getStatustext() {
+        return statustext;
+    }
+
+    public void setStatustext(String statustext) {
+        this.statustext = statustext;
+    }
 }

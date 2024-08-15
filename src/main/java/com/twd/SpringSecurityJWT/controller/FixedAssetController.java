@@ -47,6 +47,7 @@ public class FixedAssetController {
             fixedAssetToSave.setQuantity(fixedAssetRequest.getQuantity());
             fixedAssetToSave.setImage(fixedAssetRequest.getImage());
             fixedAssetToSave.setStatus(fixedAssetRequest.getStatus());
+            fixedAssetToSave.setStatustext(fixedAssetRequest.getStatustext() != null ? fixedAssetRequest.getStatustext() : "Avaliable");
 
             Integer categoryId = fixedAssetRequest.getCategoryId();
             Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
@@ -55,6 +56,7 @@ public class FixedAssetController {
             } else {
                 throw new RuntimeException("Category not found");
             }
+            
 
             FixedAsset savedFixedAsset = fixedAssetService.createFixedAsset(fixedAssetToSave, categoryId);
             if (savedFixedAsset != null && savedFixedAsset.getId() != null) {
@@ -86,6 +88,7 @@ public class FixedAssetController {
         }
         return ResponseEntity.ok(resp);
     }
+
     @GetMapping("/getAllFixedAssets")
     public ResponseEntity<ReqRes> getAllFixedAssets() {
     ReqRes resp = new ReqRes();
@@ -140,6 +143,7 @@ public class FixedAssetController {
             fixedAssetToUpdate.setQuantity(fixedAssetRequest.getQuantity());
             fixedAssetToUpdate.setImage(fixedAssetRequest.getImage());
             fixedAssetToUpdate.setStatus(fixedAssetRequest.getStatus());
+            fixedAssetToUpdate.setStatustext(fixedAssetRequest.getStatustext());
             
             Integer categoryId = fixedAssetRequest.getCategoryId();
             Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
@@ -148,6 +152,8 @@ public class FixedAssetController {
             } else {
                 throw new RuntimeException("Category not found");
             }
+
+            
 
             FixedAsset updatedFixedAsset = fixedAssetService.updateFixedAsset(id, fixedAssetToUpdate);
             resp.setFixedAsset(updatedFixedAsset);
@@ -162,6 +168,3 @@ public class FixedAssetController {
 
 
 }
-
-
-
