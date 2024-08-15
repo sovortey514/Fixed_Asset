@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form, Input, Select, Dropdown, Menu, Tag, Space, Popconfirm, Table, notification } from 'antd';
 import { DownOutlined, EditOutlined, EyeOutlined, DeleteOutlined, DownloadOutlined } from '@ant-design/icons';
+import { UserAddOutlined } from '@ant-design/icons';
 import { DatePicker } from 'antd'; 
 import moment from 'moment';
 import { PlusOutlined } from '@ant-design/icons';
@@ -24,6 +25,9 @@ const TotalAsset = () => {
   const [item, setItem]=useState([])
   const [assignasset, setAssignasset] = useState([]);
   const [assetHolders, setAssetHolder] = useState([]);
+  const [assetId,setAssetId]= useState(0);
+  const [currentRecord, setCurrentRecord] = useState(null);
+ 
 
 // Define table columns
 const columns = (handleEdit, handleDelete, handleViewHide) => [
@@ -134,11 +138,20 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
             className='bg-white hover:bg-yellow-500 text-yellow-500 border-none rounded-full p-2 shadow-md'
           />
         </Dropdown>
-        <Button 
-          icon={<DownloadOutlined />} 
-          // onClick={() => handleDownload(record)}
-          className='bg-white hover:bg-yellow-500 text-yellow-500 border-none rounded-full p-2 shadow-md'
-        />
+        {record.statustext === 'In Use' && (
+          <Button
+            // Uncomment and define handleDownload if needed
+            onClick={() => {
+              setIsModalVisible(true);
+              setModalType('return');
+              setAssetId(record.id)
+            }}
+            className='bg-white hover:bg-yellow-500 text-yellow-500 border-none rounded-full p-1 text-xs shadow-sm'
+          >
+            Return
+          </Button>
+        )}
+        
       </Space>
     ),
   },
@@ -222,6 +235,8 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
     setIsModalVisible(true);
     setViewAsset(null);
     setAssignasset(null);
+    setCurrentRecord(null);
+
   };
 
   const handleOk = async () => {
@@ -296,7 +311,7 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
           await fetch(`http://localhost:6060/admin/updateFixedAsset/${editKey.id}`, {
             method: 'PUT',
             headers,
-            body: JSON.stringify({ ...values, status: '1' }),
+            body: JSON.stringify({ ...values, status: '1' ,statustext: 'Avaliable'}),
           });
   
           fetchFixedAssets();
@@ -311,7 +326,7 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
           const response = await fetch('http://localhost:6060/admin/createFixedAsset', {
             method: 'POST',
             headers,
-            body: JSON.stringify({ ...values, status: '1', statusText: 'Available' }),
+            body: JSON.stringify({ ...values, status: '1', statustext: 'Avaliable' }),
           });
   
           const result = await response.json();
@@ -333,7 +348,6 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
               duration:1,
             });
           
-
             fetchFixedAssets();
   
           } else {
@@ -347,13 +361,24 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
         }
       }
       else if (modalType === 'assign') {
-        if (editKey && editKey.id) {
+        console.log(values)
+
+        if (values && values.id) {
           const requestBody = {
             ...values,
             status: '1',
-            statusText: 'In Use'
+            statustext: 'In Use',
+            id:1,
+            categoryId: 50,
+            model: "gtr35",
+            name: "A",
+            price: 600,
+            purchaseDate: "2024-08-13T17:00:00.000Z",
+            quantity: 1,
+            serialNumber: "wdc",
+            unit: "set",
+            year: 2002
           };
-      
           // Optionally include fixedAsset if needed
           if (values.fixedAsset) {
             requestBody.fixedAsset = { id: values.fixedAsset };
@@ -361,7 +386,7 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
           console.log('editKey:', editKey);
           console.log('editKey.id:', editKey ? editKey.id : 'No editKey.id');
           try {
-            const response = await fetch(`http://localhost:6060/admin/updateFixedAsset/${editKey.id}`, {
+            const response = await fetch(`http://localhost:6060/admin/updateFixedAsset/${values.id}`, {
               method: 'PUT',
               headers,
               body: JSON.stringify(requestBody),
@@ -399,6 +424,70 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
           });
         }
       }
+      else if (modalType === 'return') {
+        console.log(assetId)
+
+        if ( assetId) {
+          const requestBody = {
+            ...values,
+            status: '1',
+            statustext: 'Avaliable',
+            id:1,
+            categoryId: 50,
+            model: "gtr35",
+            name: "A",
+            price: 600,
+            purchaseDate: "2024-08-13T17:00:00.000Z",
+            quantity: 1,
+            serialNumber: "wdc",
+            unit: "set",
+            year: 2002
+          };
+          // Optionally include fixedAsset if needed
+          if (values.fixedAsset) {
+            requestBody.fixedAsset = { id: values.fixedAsset };
+          }
+
+          try {
+            const response = await fetch(`http://localhost:6060/admin/updateFixedAsset/${assetId}`, {
+              method: 'PUT',
+              headers,
+              body: JSON.stringify(requestBody),
+            });
+      
+            if (response.ok) {
+              
+              fetchFixedAssets();
+              notification.success({
+                message: 'Asset Updated',
+                description: 'Fixed asset has been updated successfully.',
+                duration: 1,
+              });
+            } else {
+              const result = await response.json();
+              notification.error({
+                message: 'Update Failed',
+                description: result.message || 'An error occurred while updating the fixed asset.',
+                duration: 1,
+              });
+            }
+          } catch (error) {
+            console.error('Fetch error:', error);
+            notification.error({
+              message: 'Update Failed',
+              description: 'An unexpected error occurred.',
+              duration: 1,
+            });
+          }
+        } else {
+          notification.error({
+            message: 'Update Failed',
+            description: 'The asset ID is missing or invalid.',
+            duration: 1,
+          });
+        }
+      }
+
       
   
       // Close modal and reset form fields
@@ -435,17 +524,6 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
     });
     setIsModalVisible(true)
   };
-
-  // const handleAssign = (record) => {
-  //   setModalType('assign');
-  //   setEditKey(record);
-  //   form.setFieldsValue({
-  //     fixedAsset: record.fixedAsset,
-  //     assetHolderId: record.assetHolderId,
-  //   });
-  //   setIsModalVisible(true)
-  // };
-
 
 
 
@@ -613,8 +691,8 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
 
   const statusMenu = (
     <Menu >
-      <Menu.Item key="Issue">Issue</Menu.Item>
-      <Menu.Item key="Available">Available</Menu.Item>
+      <Menu.Item key="Issue">In Use</Menu.Item>
+      <Menu.Item key="Available">Avaliable</Menu.Item>
     </Menu>
   );
   
@@ -659,6 +737,7 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
                 : modalType === 'fixedasset' 
                   ? (editKey ? 'Edit Fixed Asset' : 'Create Fixed Asset') 
                   : 'Assign Fixed Asset'
+
             }
             visible={isModalVisible}
             onOk={handleOk}
@@ -762,7 +841,7 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
               >
                 <Select placeholder="Select a fixed asset">
                   {data.map((fixedAsset) => (
-                    <Option key={fixedAsset.id} value={fixedAsset.id}>
+                    <Option key={fixedAsset.id} value={fixedAsset.id} >
                       {fixedAsset.name}
                     </Option>
                   ))}
@@ -790,6 +869,10 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
                 </Form.Item>
             </>
             )}
+            {modalType === 'return' && (
+              <p>Are you sure you want to return this asset?</p>
+            )}
+
           </Form>
         
         {/* } */}
@@ -834,12 +917,13 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
 
               <div className="font-bold">Status:</div>
               <div>{viewAsset?.fixedAsset?.statustext}</div>
+
+              <div className="font-bold">AssetHolder:</div>
+              <div>{viewAsset?.fixedAsset?.assetHolders}</div>
             </div>
         </div>
 
       </Modal>
-
-      
     </>
   );
 };
