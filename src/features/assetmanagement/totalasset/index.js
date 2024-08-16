@@ -27,8 +27,8 @@ const TotalAsset = () => {
   const [assetHolders, setAssetHolder] = useState([]);
   const [assetId,setAssetId]= useState(0);
   const [currentRecord, setCurrentRecord] = useState(null);
- 
-
+ const [a,setA]=useState(0);
+  const [assetById, setAssetById]= useState([]);
 // Define table columns
 const columns = (handleEdit, handleDelete, handleViewHide) => [
   {
@@ -145,6 +145,7 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
               setIsModalVisible(true);
               setModalType('return');
               setAssetId(record.id)
+              setA(record.id)
             }}
             className='bg-white hover:bg-yellow-500 text-yellow-500 border-none rounded-full p-1 text-xs shadow-sm'
           >
@@ -157,6 +158,61 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
   },
 
 ];
+
+useEffect(()=>{
+  const data = async()=>{
+    try {
+      const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+      const response = await fetch(`http://localhost:6060/admin/getFixedAssetById/${a}`, {
+        method: 'GET',
+        headers,
+      });
+      if(response.ok){
+        const assetDetails = await response.json();
+        setAssetById(assetDetails.fixedAsset);
+      }else {
+        const errorData = await response.json();
+        notification.error({
+          message: 'Failed to Fetch Asset Details',
+          description: errorData.message || 'There was an error fetching the asset details.',
+        });
+      }
+
+    } catch (error) {
+      notification.error({
+        message: 'Failed to Update Asset',
+        description: 'There was an error updating the asset.',
+      });
+      console.error('Error updating visibility:', error);
+    }
+  }
+  data()
+},[a])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   // Fetch categories and assets on component mount
@@ -368,16 +424,16 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
             ...values,
             status: '1',
             statustext: 'In Use',
-            id:1,
-            categoryId: 50,
-            model: "gtr35",
-            name: "A",
-            price: 600,
-            purchaseDate: "2024-08-13T17:00:00.000Z",
-            quantity: 1,
-            serialNumber: "wdc",
-            unit: "set",
-            year: 2002
+            id:a,
+            categoryId: assetById.category.id,
+            model: assetById.model,
+            name: assetById.name,
+            price: assetById.price,
+            purchaseDate: assetById.purchaseDate,
+            quantity: assetById.quantity,
+            serialNumber: assetById.serialNumber,
+            unit: assetById.unit,
+            year: assetById.year
           };
           // Optionally include fixedAsset if needed
           if (values.fixedAsset) {
@@ -432,16 +488,18 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
             ...values,
             status: '1',
             statustext: 'Avaliable',
-            id:1,
-            categoryId: 50,
-            model: "gtr35",
-            name: "A",
-            price: 600,
-            purchaseDate: "2024-08-13T17:00:00.000Z",
-            quantity: 1,
-            serialNumber: "wdc",
-            unit: "set",
-            year: 2002
+            id:a,
+            categoryId: assetById.category.id,
+            model: assetById.model,
+            name: assetById.name,
+            price: assetById.price,
+            purchaseDate: assetById.purchaseDate,
+            quantity: assetById.quantity,
+            serialNumber: assetById.serialNumber,
+            unit: assetById.unit,
+            year: assetById.year,
+            
+            
           };
           // Optionally include fixedAsset if needed
           if (values.fixedAsset) {
@@ -833,42 +891,60 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
               </Form.Item>
             )}
             {modalType === 'assign' && (
-            <>
-              <Form.Item
-                name="id"
-                label="Select Fixed Asset"
-                rules={[{ required: true, message: 'Please select a fixed asset!' }]}
-              >
-                <Select placeholder="Select a fixed asset">
-                  {data.map((fixedAsset) => (
-                    <Option key={fixedAsset.id} value={fixedAsset.id} >
-                      {fixedAsset.name}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-              <Form.Item
-                name="assetHolderId"
-                label="Select Asset Holder"
-                rules={[{ required: true, message: 'Please select an asset holder!' }]}
-              >
-                <Select placeholder="Select an asset holder">
-                  {assetHolders.map((holder) => (
-                    <Option key={holder.id} value={holder.id}>
-                      {holder.name}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-              <Form.Item
-                  name="purchaseDate"
-                  label="Purchase Date"
-                  rules={[{ required: true, message: 'Please select the purchase date!' }]}
-                >
-                  <DatePicker />
-                </Form.Item>
-            </>
-            )}
+                <>
+                  <Form.Item
+                    name="id"
+                    label="Select Fixed Asset"
+                    rules={[{ required: true, message: 'Please select a fixed asset!' }]}
+                  >
+                    <Select
+                      showSearch
+                      placeholder="Select a fixed asset"
+                      onChange={(e) => setA(e)}
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        option?.children.toLowerCase().includes(input.toLowerCase())
+                      }
+                    >
+                      {data.map((fixedAsset) => (
+                        <Option key={fixedAsset.id} value={fixedAsset.id}>
+                          {fixedAsset.name}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+
+                  <Form.Item
+                    name="assetHolder"
+                    label="Select Asset Holder"
+                    rules={[{ required: true, message: 'Please select an asset holder!' }]}
+                  >
+                    <Select
+                      showSearch
+                      placeholder="Select an asset holder"
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        option?.children.toLowerCase().includes(input.toLowerCase())
+                      }
+                    >
+                      {assetHolders.map((holder) => (
+                        <Option key={holder.id} value={holder.id}>
+                          {holder.name}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+
+                  <Form.Item
+                    name="purchaseDate"
+                    label="Purchase Date"
+                    rules={[{ required: true, message: 'Please select the purchase date!' }]}
+                  >
+                    <DatePicker />
+                  </Form.Item>
+                </>
+              )}
+
             {modalType === 'return' && (
               <p>Are you sure you want to return this asset?</p>
             )}
@@ -917,9 +993,9 @@ const columns = (handleEdit, handleDelete, handleViewHide) => [
 
               <div className="font-bold">Status:</div>
               <div>{viewAsset?.fixedAsset?.statustext}</div>
-
+              
               <div className="font-bold">AssetHolder:</div>
-              <div>{viewAsset?.fixedAsset?.assetHolders}</div>
+              <div>{viewAsset?.fixedAsset?.assetHolder}</div>
             </div>
         </div>
 
