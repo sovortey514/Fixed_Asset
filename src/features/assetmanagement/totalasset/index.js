@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Form, Input, Select, Dropdown, Menu, Tag, Space, Popconfirm, Table, notification } from 'antd';
-import { DownOutlined, EditOutlined, EyeOutlined, DeleteOutlined, DownloadOutlined } from '@ant-design/icons';
-import { UserAddOutlined } from '@ant-design/icons';
+import { Button, Modal, Form, Input, Select, Dropdown, Menu, Space,  Table, notification } from 'antd';
+import { DownOutlined, EditOutlined, EyeOutlined, DeleteOutlined, DownloadOutlined ,ReloadOutlined} from '@ant-design/icons';
+
 import { DatePicker } from 'antd'; 
 import moment from 'moment';
 import { PlusOutlined } from '@ant-design/icons';
+// import { select } from '@nextui-org/react';
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -27,6 +28,10 @@ const TotalAsset = () => {
   const [assetHolders, setAssetHolder] = useState([]);
   const [assetId,setAssetId]= useState(0);
   const [currentRecord, setCurrentRecord] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [loading, setLoading] = useState(false);
+
  const [a,setA]=useState(0);
   const [assetById, setAssetById]= useState([]);
 // Define table columns
@@ -188,31 +193,6 @@ useEffect(()=>{
   }
   data()
 },[a])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
   // Fetch categories and assets on component mount
@@ -658,30 +638,51 @@ useEffect(()=>{
     </Menu>
   );
 
-  const categoryMenu = (
-    <Menu>
-    {categories.map((category) => (
-      <Menu.Item key={category.id}>
-        <div className="flex justify-between items-center w-full">
-          <span>{category.name}</span>
-          <div className="flex gap-2">
-            <Button
-              type="link"
-              onClick={() => handleCategoryEdit(category)}
-              icon={<EditOutlined />}
-            />
-            <Button
-              type="link"
-              icon={<DeleteOutlined />}
-              onClick={() => handleCategoryDelete(category)}
-            />
-          </div>
-        </div>
-      </Menu.Item>
-    ))}
-  </Menu>
+  const handleMenuClick = (e) => {
+    setSelectedStatus(e.key);
+    console.log(e.key) 
+  };
+
+  const handleCategorySelect = (categoryId) => {
+    setSelectedCategory(categoryId);
+  };
+
+  const filteredData = data.filter(item => {
+    const statusMatch = selectedStatus ? item.statustext === selectedStatus : true;
+    const categoryMatch = selectedCategory ? item.category.id === selectedCategory : true;
+    return statusMatch && categoryMatch;
+  });
+
+  const statusMenu = (
+    <Menu onClick={handleMenuClick} >
+      <Menu.Item key="In Use">In Use</Menu.Item>
+      <Menu.Item key="Avaliable">Avaliable</Menu.Item>
+    </Menu>
   );
 
+  const categoryMenu = (
+    <Menu>
+      {categories.map((category) => (
+        <Menu.Item key={category.id} onClick={() => handleCategorySelect(category.id)}>
+          <div className="flex justify-between items-center w-full">
+            <span>{category.name}</span>
+            <div className="flex gap-2">
+              <Button
+                type="link"
+                onClick={() => handleCategoryEdit(category)}
+                icon={<EditOutlined />}
+              />
+              <Button
+                type="link"
+                icon={<DeleteOutlined />}
+                onClick={() => handleCategoryDelete(category)}
+              />
+            </div>
+          </div>
+        </Menu.Item>
+      ))}
+    </Menu>
+  );
   const handleViewHide = async (record, type) => {
 
     if (type === 'view') {
@@ -747,46 +748,83 @@ useEffect(()=>{
     }
   };
 
-  const statusMenu = (
-    <Menu >
-      <Menu.Item key="Issue">In Use</Menu.Item>
-      <Menu.Item key="Available">Avaliable</Menu.Item>
-    </Menu>
-  );
+  const handleRefresh = async () => {
+
+    setLoading(true);
+    try {
+      await fetchFixedAssets(); // Call the function to refresh data
+    } catch (error) {
+      console.error("Failed to refresh data", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+ 
   
   
   return (
     <>
-      <Dropdown overlay={menu} placement="bottomLeft">
-        <Button  size={size} className='bg-yellow-500 hover:bg-white text-white'>
-          Create <DownOutlined />
-        </Button>
-      </Dropdown>
-      <Dropdown overlay={categoryMenu} placement="bottomLeft">
-        <Button size={size} style={{ marginLeft: 8 }} >
-          Categories <DownOutlined />
-        </Button>
-      </Dropdown>
-      <Dropdown overlay={statusMenu} placement="bottomLeft">
-        <Button size={size} style={{ marginLeft: 8 }} className=' hover:bg-yellow-50 text-gray'>
-          Status <DownOutlined />
-        </Button>
-      </Dropdown>
-      
-      <Button 
-        size={size} 
-        style={{ marginLeft: 8 }} 
-        shape="circle" 
-        icon={<PlusOutlined />} 
-        onClick={() => {
-          setIsModalVisible(true);
-          setModalType('assign');
-        }}
-      />
+      <div className="flex flex-col h-screen ">
+      {/* Button Groups */}
+      <div className="flex justify-between items-center ">
+        <div className="flex">
+          <Dropdown overlay={menu} placement="bottomLeft">
+            <Button size="middle" className='bg-yellow-500 hover:bg-white text-white'>
+              Create <DownOutlined />
+            </Button>
+          </Dropdown>
 
+          <Dropdown overlay={categoryMenu} placement="bottomLeft">
+            <Button size="middle" style={{ marginLeft: 8 }}>
+              Categories <DownOutlined />
+            </Button>
+          </Dropdown>
 
+          <Dropdown overlay={statusMenu} placement="bottomLeft">
+            <Button size="middle" style={{ marginLeft: 8 }} className='hover:bg-yellow-50 text-gray'>
+              Status <DownOutlined />
+            </Button>
+          </Dropdown>
 
-      <Table columns={columns(handleEdit, handleDelete, handleViewHide)} dataSource={data} className='mt-5' />
+          <Button
+            size="middle"
+            style={{ marginLeft: 8 }}
+            shape="circle"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              setIsModalVisible(true);
+              setModalType('assign');
+            }}
+          />
+        </div>
+
+        <div className="flex">
+          <Button
+            size="middle"
+            style={{ marginLeft: 8 }}
+            icon={<DownloadOutlined />}
+            // onClick={handleDownload}
+          >
+            Download
+          </Button>
+
+          <Button
+            size="middle"
+            style={{ marginLeft: 8 }}
+            icon={<ReloadOutlined />}
+            onClick={handleRefresh}
+          >
+            Refresh
+          </Button>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="flex-1 overflow-auto">
+        <Table columns={columns(handleEdit, handleDelete, handleViewHide)} dataSource={filteredData} className='mt-5' />
+      </div>
+    </div>
 
       <Modal
             title={
@@ -983,7 +1021,7 @@ useEffect(()=>{
               <div className="font-medium">Purchase Date:</div>
               <div>{viewAsset?.fixedAsset?.purchaseDate}</div>
               
-              <div className="font-medium">Price:</div>
+              <div className="font-medium">Price($):</div>
               <div>{viewAsset?.fixedAsset?.price}</div>
               <div className="font-bold">Unit:</div>
               <div>{viewAsset?.fixedAsset?.unit}</div>
