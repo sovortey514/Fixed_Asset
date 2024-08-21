@@ -64,7 +64,7 @@ function ForgotPassword() {
                     <InputText
                       type="email"
                       defaultValue={userObj.emailId}
-                      updateType="emailId"
+                      updateType="email"
                       containerStyle="mt-4"
                       labelTitle="Email Id"
                       updateFormValue={updateFormValue}
@@ -74,19 +74,19 @@ function ForgotPassword() {
                   <ErrorText styleClass="mt-4 text-red-500">{errorMessage}</ErrorText>
                   <button
                     type="submit"
-                    className={`btn btn-primary w-full mt-4 ${loading ? 'loading' : ''}`}
+                    className={`btn bg-yellow-500 w-full mt-4 text-white ${loading ? 'loading' : ''}`}
                   >
                     Send Reset Link
                   </button>
 
-                  <div className="text-center mt-4">
+                  {/* <div className="text-center mt-4">
                     Don't have an account yet?{' '}
                     <Link to="/register">
                       <button className="inline-block text-primary hover:underline transition duration-200">
                         Register
                       </button>
                     </Link>
-                  </div>
+                  </div> */}
                 </form>
               </>
             )}

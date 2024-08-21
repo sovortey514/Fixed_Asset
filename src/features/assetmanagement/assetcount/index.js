@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Form, Input, Select, Dropdown, Menu, notification, Space } from 'antd';
+import { Button, Modal, Form, Input, Select, Dropdown, Menu, notification, Space ,Tag,Table} from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 const { Option } = Select;
 
 const TotalAsset = () => {
@@ -32,7 +33,41 @@ const TotalAsset = () => {
   useEffect(() => {
     fetchData();
   }, []);
-  
+
+  const columns = [
+    {
+      title: 'No',
+      dataIndex: 'key',
+      render:(_,r,index)=>index+1
+    },
+    {
+      title: 'Department',
+      dataIndex: 'department',
+      key: 'department',
+      render: (text) => <a>{text}</a>,
+    },
+    {
+      title: 'Total Asset',
+      dataIndex: 'total asset',
+      key: 'total asset',
+    },
+    {
+      title: 'Count By',
+      dataIndex: 'count by',
+      key: 'count by',
+    },
+    {
+      title: 'Count Date',
+      dataIndex: 'count date',
+      key: 'count date',
+    },
+    {
+      title: 'Remark',
+      dataIndex: 'remarks',
+      key: 'remarks',
+    },
+    
+  ];
   const fetchData = async () => {
     try {
 
@@ -563,31 +598,55 @@ const TotalAsset = () => {
 
   return (
     <>
-      <Dropdown overlay={createMenu} placement="bottomLeft">
-        <Button size={size} className='bg-yellow-500 hover:bg-white text-white'>
-          Create <DownOutlined />
-        </Button>
-      </Dropdown>
-      <Dropdown overlay={buildingMenu} placement="bottomLeft">
-        <Button size={size} style={{ marginLeft: 8 }}>
-          Building <DownOutlined />
-        </Button>
-      </Dropdown>
-      <Dropdown overlay={departmentMenu} placement="bottomLeft">
-        <Button size={size} style={{ marginLeft: 8 }}>
-          Department <DownOutlined />
-        </Button>
-      </Dropdown>
-      <Dropdown overlay={roomMenu} placement="bottomLeft">
-        <Button size={size} style={{ marginLeft: 8 }}>
-          Room <DownOutlined />
-        </Button>
-      </Dropdown>
-      <Dropdown overlay={assetholderMenu} placement="bottomLeft">
-        <Button size={size} style={{ marginLeft: 8 }}>
-          AssetHolder <DownOutlined />
-        </Button>
-      </Dropdown>
+      <div className="flex justify-between items-center">
+          <div className="flex">
+            <Dropdown overlay={createMenu} placement="bottomLeft">
+              <Button size="middle" className="bg-yellow-500 text-white hover:bg-white hover:text-yellow-500 border-none">
+                Create <DownOutlined />
+              </Button>
+            </Dropdown>
+
+            <Dropdown overlay={buildingMenu} placement="bottomLeft">
+              <Button size="middle" className="ml-2 text-gray-700 hover:bg-yellow-50">
+                Building <DownOutlined />
+              </Button>
+            </Dropdown>
+
+            <Dropdown overlay={departmentMenu} placement="bottomLeft">
+              <Button size="middle" className="ml-2 text-gray-700 hover:bg-yellow-50">
+                Department <DownOutlined />
+              </Button>
+            </Dropdown>
+
+            <Dropdown overlay={roomMenu} placement="bottomLeft">
+              <Button size="middle" className="ml-2 text-gray-700 hover:bg-yellow-50">
+                Room <DownOutlined />
+              </Button>
+            </Dropdown>
+
+            <Dropdown overlay={assetholderMenu} placement="bottomLeft">
+              <Button size="middle" className="ml-2 text-gray-700 hover:bg-yellow-50">
+                AssetHolder <DownOutlined />
+              </Button>
+            </Dropdown>
+
+            <Button
+              size="middle"
+              className="ml-2 bg-gray-100 hover:bg-yellow-500 hover:text-white rounded-full"
+              shape="circle"
+              icon={<PlusOutlined />}
+              onClick={() => {
+                setIsModalVisible(true);
+                setModalType('assign');
+              }}
+            />
+          </div>
+        
+        </div>
+        <div className="flex-1 overflow-auto pt-4 ">
+          <Table columns={columns} />;
+        </div>
+      
 
       <Modal
         title={modalType.charAt(0).toUpperCase() + modalType.slice(1)}

@@ -5,6 +5,7 @@ import { DownOutlined, EditOutlined, EyeOutlined, DeleteOutlined, DownloadOutlin
 import { DatePicker } from 'antd'; 
 import moment from 'moment';
 import { PlusOutlined } from '@ant-design/icons';
+import { SearchOutlined } from '@ant-design/icons';
 // import { select } from '@nextui-org/react';
 
 const { Option } = Select;
@@ -930,57 +931,59 @@ useEffect(()=>{
             )}
             {modalType === 'assign' && (
                 <>
-                  <Form.Item
-                    name="id"
-                    label="Select Fixed Asset"
-                    rules={[{ required: true, message: 'Please select a fixed asset!' }]}
+                <Form.Item
+                  name="id"
+                  label="Select Fixed Asset"
+                  rules={[{ required: true, message: 'Please select a fixed asset!' }]}
+                >
+                  <Select
+                    showSearch
+                    placeholder="Select a fixed asset"
+                    onChange={(e) => setA(e)}
+                    optionFilterProp="children"
+                    filterOption={(input, option) =>
+                      option?.children.toLowerCase().includes(input.toLowerCase())
+                    }
+                    suffixIcon={<SearchOutlined />}
                   >
-                    <Select
-                      showSearch
-                      placeholder="Select a fixed asset"
-                      onChange={(e) => setA(e)}
-                      optionFilterProp="children"
-                      filterOption={(input, option) =>
-                        option?.children.toLowerCase().includes(input.toLowerCase())
-                      }
-                    >
-                      {data.map((fixedAsset) => (
-                        <Option key={fixedAsset.id} value={fixedAsset.id}>
-                          {fixedAsset.name}
-                        </Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
-
-                  <Form.Item
-                    name="assetHolder"
-                    label="Select Asset Holder"
-                    rules={[{ required: true, message: 'Please select an asset holder!' }]}
+                    {data.map((fixedAsset) => (
+                      <Option key={fixedAsset.id} value={fixedAsset.id}>
+                        {fixedAsset.name}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+            
+                <Form.Item
+                  name="assetHolder"
+                  label="Select Asset Holder"
+                  rules={[{ required: true, message: 'Please select an asset holder!' }]}
+                >
+                  <Select
+                    showSearch
+                    placeholder="Select an asset holder"
+                    optionFilterProp="children"
+                    filterOption={(input, option) =>
+                      option?.children.toLowerCase().includes(input.toLowerCase())
+                    }
+                    suffixIcon={<SearchOutlined />}
                   >
-                    <Select
-                      showSearch
-                      placeholder="Select an asset holder"
-                      optionFilterProp="children"
-                      filterOption={(input, option) =>
-                        option?.children.toLowerCase().includes(input.toLowerCase())
-                      }
-                    >
-                      {assetHolders.map((holder) => (
-                        <Option key={holder.id} value={holder.id}>
-                          {holder.name}
-                        </Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
-
-                  <Form.Item
-                    name="purchaseDate"
-                    label="Purchase Date"
-                    rules={[{ required: true, message: 'Please select the purchase date!' }]}
-                  >
-                    <DatePicker />
-                  </Form.Item>
-                </>
+                    {assetHolders.map((holder) => (
+                      <Option key={holder.id} value={holder.id}>
+                        {holder.name}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+            
+                <Form.Item
+                  name="purchaseDate"
+                  label="Purchase Date"
+                  rules={[{ required: true, message: 'Please select the purchase date!' }]}
+                >
+                  <DatePicker />
+                </Form.Item>
+              </>
               )}
 
             {modalType === 'return' && (
@@ -997,45 +1000,49 @@ useEffect(()=>{
         onCancel={handleCancel}
         cancelText="Cancel"
       >
-        <div className="p-4 border rounded-lg bg-white shadow-md">
-            <h2 className="text-lg font-semibold mb-4">Asset Details</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="font-medium">No:</div>
-              <div>{viewAsset?.fixedAsset?.id}</div>
-              
-              <div className="font-medium">Name:</div>
-              <div>{viewAsset?.fixedAsset?.name}</div>
-              
-              <div className="font-medium">Category:</div>
-              <div>{viewAsset?.fixedAsset?.category?.name}</div>
-              
-              <div className="font-medium">Model:</div>
-              <div>{viewAsset?.fixedAsset?.model}</div>
-              
-              <div className="font-medium">Year:</div>
-              <div>{viewAsset?.fixedAsset?.year}</div>
-              
-              <div className="font-medium">Serial Number:</div>
-              <div>{viewAsset?.fixedAsset?.serialNumber}</div>
-              
-              <div className="font-medium">Purchase Date:</div>
-              <div>{viewAsset?.fixedAsset?.purchaseDate}</div>
-              
-              <div className="font-medium">Price($):</div>
-              <div>{viewAsset?.fixedAsset?.price}</div>
-              <div className="font-bold">Unit:</div>
-              <div>{viewAsset?.fixedAsset?.unit}</div>
+        <div className="p-6 border rounded-lg bg-gradient-to-r from-blue-50 to-white shadow-lg">
+          <h2 className="text-xl font-bold text-blue-800 mb-6">Asset Details</h2>
+          <div className="grid grid-cols-2 gap-6">
+            <div className="text-gray-600 font-semibold">No:</div>
+            <div className="text-gray-800">{viewAsset?.fixedAsset?.id}</div>
 
-              <div className="font-bold">Quantity:</div>
-              <div>{viewAsset?.fixedAsset?.quantity}</div>
+            <div className="text-gray-600 font-semibold">Name:</div>
+            <div className="text-gray-800">{viewAsset?.fixedAsset?.name}</div>
 
-              <div className="font-bold">Status:</div>
-              <div>{viewAsset?.fixedAsset?.statustext}</div>
-              
-              <div className="font-bold">AssetHolder:</div>
-              <div>{viewAsset?.fixedAsset?.assetHolder}</div>
+            <div className="text-gray-600 font-semibold">Category:</div>
+            <div className="text-gray-800">{viewAsset?.fixedAsset?.category?.name}</div>
+
+            <div className="text-gray-600 font-semibold">Model:</div>
+            <div className="text-gray-800">{viewAsset?.fixedAsset?.model}</div>
+
+            <div className="text-gray-600 font-semibold">Year:</div>
+            <div className="text-gray-800">{viewAsset?.fixedAsset?.year}</div>
+
+            <div className="text-gray-600 font-semibold">Serial Number:</div>
+            <div className="text-gray-800">{viewAsset?.fixedAsset?.serialNumber}</div>
+
+            <div className="text-gray-600 font-semibold">Purchase Date:</div>
+            <div className="text-gray-800">{viewAsset?.fixedAsset?.purchaseDate}</div>
+
+            <div className="text-gray-600 font-semibold">Price ($):</div>
+            <div className="text-gray-800">{viewAsset?.fixedAsset?.price}</div>
+
+            <div className="text-gray-600 font-semibold">Unit:</div>
+            <div className="text-gray-800">{viewAsset?.fixedAsset?.unit}</div>
+
+            <div className="text-gray-600 font-semibold">Quantity:</div>
+            <div className="text-gray-800">{viewAsset?.fixedAsset?.quantity}</div>
+
+            <div className="text-gray-600 font-semibold">Status:</div>
+            <div className={`text-gray-800 ${viewAsset?.fixedAsset?.statustext === 'Available' ? 'text-green-600' : viewAsset?.fixedAsset?.statustext === 'In Use' ? 'text-red-600' : ''}`}>
+                {viewAsset?.fixedAsset?.statustext}
             </div>
+
+            <div className="text-gray-600 font-semibold">Asset Holder:</div>
+            <div className="text-gray-800">{viewAsset?.fixedAsset?.assetHolder}</div>
+          </div>
         </div>
+
 
       </Modal>
     </>

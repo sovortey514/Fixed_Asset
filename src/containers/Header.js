@@ -84,7 +84,7 @@ function Header(){
                 <button className="btn btn-ghost ml-4  btn-circle" onClick={() => openNotification()}>
                     <div className="indicator">
                         <BellIcon className="h-6 w-6"/>
-                        {noOfNotifications > 0 ? <span className="indicator-item badge badge-secondary badge-sm">{noOfNotifications}</span> : null }
+                        {/* {noOfNotifications > 0 ? <span className="indicator-item badge badge-secondary badge-sm">{noOfNotifications}</span> : null } */}
                     </div>
                 </button>
 
@@ -93,7 +93,7 @@ function Header(){
                 <div className="dropdown dropdown-end ml-4">
                     <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
                         <div className="w-10 rounded-full">
-                        <img src="https://placeimg.com/80/80/people" alt="profile" />
+                        <img src="/Profile.jpg" alt="profile" />
                         </div>
                     </label>
                     <ul tabIndex={0} className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">

@@ -28,27 +28,27 @@ function Register() {
 
     const { name, email, password, role } = registerObj;
 
-    if (!name.trim()) {
-      return setErrorMessage("Name is required!");
-    }
-    if (!email.trim()) {
-      return setErrorMessage("Email is required!");
-    }
-    if (!emailRegex.test(email.trim())) {
-      return setErrorMessage("Invalid email format!");
-    }
-    if (!password.trim()) {
-      return setErrorMessage("Password is required!");
-    }
-    if (password.trim().length < 6) {
-      return setErrorMessage("Password must be at least 6 characters long!");
-    }
-    if (!role.trim()) {
-      return setErrorMessage("Role is required!");
-    }
-    if (!validRoles.includes(role.trim())) {
-      return setErrorMessage("Invalid role selected!");
-    }
+    // if (!name.trim()) {
+    //   return setErrorMessage("Name is required!");
+    // }
+    // if (!email.trim()) {
+    //   return setErrorMessage("Email is required!");
+    // }
+    // if (!emailRegex.test(email.trim())) {
+    //   return setErrorMessage("Invalid email format!");
+    // }
+    // if (!password.trim()) {
+    //   return setErrorMessage("Password is required!");
+    // }
+    // if (password.trim().length < 6) {
+    //   return setErrorMessage("Password must be at least 6 characters long!");
+    // }
+    // if (!role.trim()) {
+    //   return setErrorMessage("Role is required!");
+    // }
+    // if (!validRoles.includes(role.trim())) {
+    //   return setErrorMessage("Invalid role selected!");
+    // }
 
     setLoading(true);
     try {

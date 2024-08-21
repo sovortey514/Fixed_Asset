@@ -12,11 +12,12 @@ import {showNotification} from '../common/headerSlice'
 
 
 const statsData = [
-    {title : "New Users", value : "34.7k", icon : <UserGroupIcon className='w-8 h-8'/>, description : "↗︎ 2300 (22%)"},
-    {title : "Total Sales", value : "$34,545", icon : <CreditCardIcon className='w-8 h-8'/>, description : "Current month"},
-    {title : "Pending Leads", value : "450", icon : <CircleStackIcon className='w-8 h-8'/>, description : "50 in hot leads"},
-    {title : "Active Users", value : "5.6k", icon : <UsersIcon className='w-8 h-8'/>, description : "↙ 300 (18%)"},
-]
+    {title: "New Asset", value: "5", icon: <CircleStackIcon className='w-8 h-8'/>},
+    {title: "Total Asset", value: "150", icon: <CreditCardIcon className='w-8 h-8'/>},
+    {title: "In Use", value: "100", icon: <CircleStackIcon className='w-8 h-8'/>},
+    {title: "Available", value: "50", icon: <UsersIcon className='w-8 h-8'/>},
+];
+
 
 
 
@@ -36,15 +37,12 @@ function Dashboard(){
             <DashboardTopBar updateDashboardPeriod={updateDashboardPeriod}/>
         
         {/** ---------------------- Different stats content 1 ------------------------- */}
-            <div className="grid lg:grid-cols-4 mt-2 md:grid-cols-2 grid-cols-1 gap-6">
-                {
-                    statsData.map((d, k) => {
-                        return (
-                            <DashboardStats key={k} {...d} colorIndex={k}/>
-                        )
-                    })
-                }
-            </div>
+        <div className="grid lg:grid-cols-4 mt-2 md:grid-cols-2 grid-cols-1 gap-6">
+            {statsData.map((d, k) => (
+                <DashboardStats key={k} {...d} colorIndex={k}/>
+            ))}
+        </div>
+
 
 
 

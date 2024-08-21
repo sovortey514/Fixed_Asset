@@ -56,10 +56,6 @@ const routes = [
     component: GettingStarted,
   },
 
-  // {
-  //   path: '/usermanagement-users',
-  //   component: Users,
-  // },
 
   {
     path: '/integration',
