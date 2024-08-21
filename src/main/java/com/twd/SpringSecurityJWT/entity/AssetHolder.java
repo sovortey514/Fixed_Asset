@@ -8,6 +8,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @Data
 @Table(name = "AssetHolder")
@@ -40,9 +42,10 @@ public class AssetHolder {
     @Column(columnDefinition = "TEXT")
     private String remark;
 
-    @OneToMany(mappedBy = "assetHolder") // Reference to the field in FixedAsset
+    @OneToMany(mappedBy = "assetHolder", cascade = CascadeType.REMOVE) 
+    @JsonBackReference// Reference to the field in FixedAsset
     private List<FixedAsset> fixedAssets;
-
+   
     private LocalDateTime assignedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

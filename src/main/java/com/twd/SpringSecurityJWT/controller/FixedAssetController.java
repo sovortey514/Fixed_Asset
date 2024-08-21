@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.twd.SpringSecurityJWT.dto.FixedAssetRequest;
 import com.twd.SpringSecurityJWT.dto.ReqRes;
+import com.twd.SpringSecurityJWT.entity.AssetHolder;
 import com.twd.SpringSecurityJWT.entity.Category;
 import com.twd.SpringSecurityJWT.entity.FixedAsset;
+import com.twd.SpringSecurityJWT.repository.AssetHolderRepository;
 import com.twd.SpringSecurityJWT.repository.CategoryRepository;
 import com.twd.SpringSecurityJWT.service.FixedAssetService;
 
@@ -30,6 +32,9 @@ public class FixedAssetController {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private AssetHolderRepository assetHolderRepository;
     
     @PostMapping("/createFixedAsset")
     public ResponseEntity<ReqRes> createFixedAsset(@RequestBody FixedAssetRequest fixedAssetRequest) {
@@ -56,6 +61,8 @@ public class FixedAssetController {
             } else {
                 throw new RuntimeException("Category not found");
             }
+
+            
             
 
             FixedAsset savedFixedAsset = fixedAssetService.createFixedAsset(fixedAssetToSave, categoryId);
@@ -152,6 +159,22 @@ public class FixedAssetController {
             } else {
                 throw new RuntimeException("Category not found");
             }
+
+            Long assetHolderId = fixedAssetRequest.getAssetHolder();
+            if (assetHolderId != null) {
+                System.out.println(assetHolderId);
+                Optional<AssetHolder> assetHolderOpt = assetHolderRepository.findById(assetHolderId);
+                System.out.println(assetHolderOpt.get());
+                if (assetHolderOpt.isPresent()) {
+                    fixedAssetToUpdate.setAssetHolder(assetHolderOpt.get());
+                } else {
+                    throw new RuntimeException("AssetHolder not found");
+                }
+            } else {
+                fixedAssetToUpdate.setAssetHolder(null); // or handle as needed
+            }
+
+
 
             
 

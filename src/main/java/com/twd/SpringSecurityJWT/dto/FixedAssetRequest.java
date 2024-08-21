@@ -2,7 +2,7 @@ package com.twd.SpringSecurityJWT.dto;
 
 import java.time.LocalDate;
 
-import com.twd.SpringSecurityJWT.entity.AssetHolder;
+
 
 import lombok.Data;
 
@@ -21,12 +21,10 @@ public class FixedAssetRequest {
     private Boolean assetExistence;  // Assuming category ID is included in the request
     private String status;
   
-    private String assetHolder;
+    private Long assetHolder;
+    
     public String getStatus() {
         return status;
-    }
-    public String getAssetHolder(){
-        return assetHolder;
     }
 
     private String statustext;

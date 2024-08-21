@@ -71,9 +71,7 @@ public class FixedAssetServiceImpl implements FixedAssetService {
 
         
         
-        // if (fixedAsset.getAssetExistence() == null) {
-        //     throw new RuntimeException("Asset existence is required");
-        // }
+     
     }
 
     //
@@ -111,8 +109,8 @@ public class FixedAssetServiceImpl implements FixedAssetService {
             existingAsset.setCategory(fixedAsset.getCategory());
             existingAsset.setStatus(fixedAsset.getStatus());
             existingAsset.setStatustext(fixedAsset.getStatustext());
+            existingAsset.setAssetHolder(fixedAsset.getAssetHolder());
             // existingAsset.setStatustext(fixedAsset.getStatustext());
-           
 
             return fixedAssetRepository.save(existingAsset);
         }).orElseThrow(() -> new RuntimeException("Fixed Asset not found"));
