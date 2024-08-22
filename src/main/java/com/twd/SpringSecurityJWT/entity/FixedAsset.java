@@ -75,9 +75,9 @@ public class FixedAsset {
     @JoinColumn(name = "building_id")
     private Building building;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "asset_holder_id") // Foreign key column
-    private AssetHolder assetHolder; // Relationship to AssetHolder
+    @ManyToOne(cascade= CascadeType.PERSIST)
+    @JoinColumn(name = "asset_holder_id", insertable = false, updatable = false)
+    private AssetHolder assetHolder;
 
     @Lob
     @Column(name = "image")

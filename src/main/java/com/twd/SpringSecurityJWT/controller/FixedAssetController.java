@@ -174,10 +174,6 @@ public class FixedAssetController {
                 fixedAssetToUpdate.setAssetHolder(null); // or handle as needed
             }
 
-
-
-            
-
             FixedAsset updatedFixedAsset = fixedAssetService.updateFixedAsset(id, fixedAssetToUpdate);
             resp.setFixedAsset(updatedFixedAsset);
             resp.setMessage("Fixed Asset Updated Successfully");
