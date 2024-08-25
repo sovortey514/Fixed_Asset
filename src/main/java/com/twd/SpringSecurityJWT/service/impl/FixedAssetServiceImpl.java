@@ -115,4 +115,9 @@ public class FixedAssetServiceImpl implements FixedAssetService {
             return fixedAssetRepository.save(existingAsset);
         }).orElseThrow(() -> new RuntimeException("Fixed Asset not found"));
     }
+
+    // @Override
+    // public List<Object[]> getAssetsCountInEachDepartment() {
+    //     return fixedAssetRepository.countAssetsInEachDepartment();
+    // }
 }
