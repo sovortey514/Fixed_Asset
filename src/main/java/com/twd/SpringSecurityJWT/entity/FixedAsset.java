@@ -76,7 +76,7 @@ public class FixedAsset {
     private Building building;
 
     @ManyToOne(cascade= CascadeType.PERSIST)
-    @JoinColumn(name = "asset_holder_id", insertable = false, updatable = false)
+    @JoinColumn(name = "asset_holder_id", insertable = true, updatable = true)
     private AssetHolder assetHolder;
 
     @Lob
