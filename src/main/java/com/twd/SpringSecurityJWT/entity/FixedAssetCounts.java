@@ -16,10 +16,7 @@ import jakarta.persistence.JoinColumn;
 // import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-// import jakarta.persistence.Temporal;
-// import jakarta.persistence.TemporalType;
+
 import lombok.Data;
 
 @Entity
@@ -28,7 +25,7 @@ public class FixedAssetCounts {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long countId;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "department_id", nullable = false)
@@ -46,10 +43,11 @@ public class FixedAssetCounts {
     @Column(name = "updated_by", nullable = false)
     private String updatedBy;
 
-    @Column(nullable = false)
-    @Temporal(TemporalType.DATE)
-    private Date countDate;
-
     @OneToMany(mappedBy = "fixedAssetCount", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FixedAssetDetail> assetDetails;
+
+    public FixedAssetCounts save(FixedAssetCounts fixedAssetCounts) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'save'");
+    }
 }

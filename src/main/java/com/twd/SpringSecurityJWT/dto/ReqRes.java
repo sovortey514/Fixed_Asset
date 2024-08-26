@@ -6,6 +6,7 @@ import com.twd.SpringSecurityJWT.entity.Building;
 import com.twd.SpringSecurityJWT.entity.Category;
 import com.twd.SpringSecurityJWT.entity.Department;
 import com.twd.SpringSecurityJWT.entity.FixedAsset;
+import com.twd.SpringSecurityJWT.entity.FixedAssetCounts;
 import com.twd.SpringSecurityJWT.entity.FixedAssetDetail;
 import com.twd.SpringSecurityJWT.entity.OurUsers;
 import com.twd.SpringSecurityJWT.entity.Product;
@@ -52,6 +53,9 @@ public class ReqRes {
 
     private FixedAssetDetail fixedAssetDetail;
     private List<FixedAssetDetail> fixedAssetDetails;
+
+    private FixedAssetCounts fixedAssetCounts;
+    private List<FixedAssetCounts> fixedAssetCounts2;
 
     private String status;
     private String statustext;
