@@ -8,14 +8,14 @@ import java.util.List;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 // import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+
 
 import lombok.Data;
 
@@ -27,7 +27,7 @@ public class FixedAssetCounts {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;  // Assuming you have a Department entity
 
@@ -43,11 +43,7 @@ public class FixedAssetCounts {
     @Column(name = "updated_by", nullable = false)
     private String updatedBy;
 
-    @OneToMany(mappedBy = "fixedAssetCount", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FixedAssetDetail> assetDetails;
+    // @OneToMany(mappedBy = "fixedAssetCount", cascade = CascadeType.ALL, orphanRemoval = true)
+    // private List<FixedAssetDetail> assetDetails;
 
-    public FixedAssetCounts save(FixedAssetCounts fixedAssetCounts) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
-    }
 }
