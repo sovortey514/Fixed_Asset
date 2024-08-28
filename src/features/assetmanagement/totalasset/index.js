@@ -196,6 +196,7 @@ useEffect(()=>{
 },[a])
 
 
+
   // Fetch categories and assets on component mount
   useEffect(() => {
     fetchCategories();

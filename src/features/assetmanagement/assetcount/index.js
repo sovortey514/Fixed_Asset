@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Modal, Form, Input, Select, Dropdown, Menu, notification, Space ,Tag,Table} from 'antd';
+import React, { useState, useEffect, useRef } from 'react';
+import { Button, Modal, Form, Input, Select, Dropdown, Menu, notification, Space ,Tag,Table,List,Spin,Card,DatePicker} from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { PlusOutlined } from '@ant-design/icons';
@@ -18,11 +18,19 @@ const TotalAsset = () => {
   const [selectedDepartment, setSelectedDepartment] = useState('Select Department');
   const [selectedRoom, setSelectedRoom] = useState('Select Room');
   const [selectedAssetHolder, setSelectedAssetHolder] = useState('Select Asset Holder');
+  const [showAssetDetails, setShowAssetDetails] = useState(false);
 
   const [editBuilding, setEditBuilding] = useState(null);
   const [editDepartment, setEditDepartment] = useState(null);
   const [editRoom, setEditRoom] = useState(null);
   const [editAssetHolder, setEditAssetHolder] = useState(null);
+
+  const [fixedassetwithdepartment, setFixedAssetwithdepartment] = useState(null);
+ 
+  const [assetById, setAssetById]= useState([]);
+  const [departmentId, setDepartmentId] = useState(null);
+  const [loading, setLoading] = useState(false); 
+
 
 
 
@@ -68,6 +76,129 @@ const TotalAsset = () => {
     },
     
   ];
+
+  const columnscount = [
+    {
+      title: 'No',
+      dataIndex: 'key',
+      render: (_, r, index) => index + 1,
+    },
+    {
+      title: 'Fixed Asset Name',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'Category',
+      dataIndex: ['category', 'name'],
+      key: 'category',
+    },
+    {
+      title: 'Model',
+      dataIndex: 'model',
+      key: 'model',
+    },
+    {
+      title: 'Year',
+      dataIndex: 'year',
+      key: 'year',
+    },
+    {
+      title: 'Price',
+      dataIndex: 'price',
+      key: 'price',
+      render: (text) => `$${text}`,
+    },
+    {
+      title: 'Serial Number',
+      dataIndex: 'serialNumber',
+      key: 'serialNumber',
+    },
+    {
+      title: 'Purchase Date',
+      dataIndex: 'purchaseDate',
+      key: 'purchaseDate',
+    },
+    {
+      title: 'Unit',
+      dataIndex: 'unit',
+      key: 'unit',
+    },
+   
+    {
+      title: 'Asset Holder',
+      dataIndex: ['assetHolder', 'name'],
+      key: 'assetHolder',
+      render: (text, record) => (record.assetHolder ? text : 'N/A'),
+    },
+    {
+      title: 'Quantity Counted',
+      dataIndex: 'quantityCounted',
+      key: 'quantityCounted',
+      editable: true,
+    },
+    {
+      title: 'Conditions',
+      dataIndex: 'conditions',
+      key: 'conditions',
+      editable: true,
+    },
+    {
+      title: 'Existence Asset',
+      dataIndex: 'existenceAsset',
+      key: 'existenceAsset',
+      editable: true,
+    },
+    {
+      title: 'Remarks',
+      dataIndex: 'remarks',
+      key: 'remarks',
+      editable: true,
+    },
+  ];
+
+  useEffect(() => {
+    if (departmentId) {
+      const fetchAssets = async () => {
+        setLoading(true);
+        try {
+          const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          };
+
+          const response = await fetch(`http://localhost:6060/admin/getFixedAssetsByDepartment/${departmentId}`, {
+            method: 'GET',
+            headers,
+          });
+
+          console.log(departmentId)
+
+          if (response.ok) {
+            const assetDetails = await response.json();
+            console.log('API Response:', assetDetails); // Debugging: Log API response
+            setAssetById(assetDetails.fixedAssets || []);
+          } else {
+            const errorData = await response.json();
+            notification.error({
+              message: 'Failed to Fetch Asset Details',
+              description: errorData.message || 'There was an error fetching the asset details.',
+            });
+          }
+        } catch (error) {
+          notification.error({
+            message: 'Failed to Fetch Asset Details',
+            description: 'There was an error fetching the asset details.',
+          });
+          console.error('Error fetching asset details:', error);
+        }
+      };
+
+      fetchAssets();
+    }
+  }, [departmentId, token]);
+
+
   const fetchData = async () => {
     try {
 
@@ -80,6 +211,7 @@ const TotalAsset = () => {
       response = await fetch('http://localhost:6060/admin/getAllDepartments', { headers });
       data = await response.json();
       if (response.ok) setDepartments(data.departments || []);
+      console.log(departments)
       
       response = await fetch('http://localhost:6060/admin/getAllRooms', { headers });
       data = await response.json();
@@ -93,7 +225,6 @@ const TotalAsset = () => {
       console.error('Failed to fetch data:', error);
     }
   };
-  
 
   const showModal = (type) => {
     setModalType(type);
@@ -465,6 +596,10 @@ const TotalAsset = () => {
     }
   }
 
+  const handleDepartmentChange = (value) => {
+    setDepartmentId(value);
+  };
+
   const createMenu = (
     <Menu>
       <Menu.Item key="1">
@@ -593,6 +728,68 @@ const TotalAsset = () => {
     ))}
   </Menu>
   );
+
+  const headerStyle = {
+    fontSize: '0.75rem', // Tailwind's text-xs equivalent
+  };
+
+  const EditableCell = ({
+    title,
+    editable,
+    children,
+    inputType,
+    record,
+    index,
+    ...restProps
+  }) => {
+    const [editing, setEditing] = useState(false);
+    const [form] = Form.useForm();
+    const inputRef = useRef(null);
+  
+    useEffect(() => {
+      if (editing) {
+        inputRef.current.focus();
+      }
+    }, [editing]);
+  
+    const toggleEdit = () => {
+      setEditing(!editing);
+    };
+  
+    const save = async () => {
+      try {
+        const values = await form.validateFields();
+        setEditing(false);
+        // Implement save logic here, e.g., update data
+        // You can call a function passed from parent component to handle the data update
+        // handleSave(record.id, values);
+      } catch (errInfo) {
+        console.log('Validate Failed:', errInfo);
+      }
+    };
+  
+    const inputNode = <Input ref={inputRef} onPressEnter={save} onBlur={save} />;
+  
+    return (
+      <td {...restProps}>
+        {editable ? (
+          <Form form={form} style={{ margin: 0 }} name="editable-cell-form">
+            <Form.Item
+              style={{ margin: 0 }}
+              name={title}
+              initialValue={record[title]}
+            >
+              {inputNode}
+            </Form.Item>
+          </Form>
+        ) : (
+          children
+        )}
+      </td>
+    );
+  };
+  
+  
   
 
 
@@ -637,7 +834,7 @@ const TotalAsset = () => {
               icon={<PlusOutlined />}
               onClick={() => {
                 setIsModalVisible(true);
-                setModalType('assign');
+                setModalType('Audit');
               }}
             />
           </div>
@@ -653,6 +850,8 @@ const TotalAsset = () => {
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
+        width={modalType === 'Audit' ? 1500 : 500}
+
       >
         <Form form={form} layout="vertical">
           {modalType === 'building' && (
@@ -739,9 +938,11 @@ const TotalAsset = () => {
             <Form.Item 
               name="department" 
               label="Department" 
+              
               rules={[{ required: true, message: 'Please select a department!' }]}
             >
-              <Select>
+              <Select 
+                >
                 {departments.map((department) => (
                   <Option key={department.id} value={department.id}>
                     {department.name}
@@ -750,7 +951,64 @@ const TotalAsset = () => {
               </Select>
             </Form.Item>
           </>
-    )}
+          )}
+
+          {modalType === 'Audit' && (
+          <Form layout="vertical" style={{ maxWidth: '100%', margin: '0 auto', padding: 20 }}>
+            <div className="flex space-x-4 items-center mb-4"> {/* Flex container for form items */}
+        <Form.Item
+          name="department"
+          label="Department"
+          style={{ width: '200px' }} 
+          rules={[{ required: true, message: 'Please select a department!' }]}
+        >
+          <Select
+            onChange={handleDepartmentChange}
+            placeholder="Select a department"
+            className="w-full"
+          >
+            {departments.map((department) => (
+              <Option key={department.id} value={department.id}>
+                {department.name}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          name="date"
+          label="Date"
+          style={{ width: '200px' }} 
+          rules={[{ required: true, message: 'Please select a date!' }]}
+        >
+          <DatePicker className="w-full" />
+        </Form.Item>
+      </div>
+          {assetById.length > 0 ? (
+          assetById.length > 0 ? (
+          <Table
+            dataSource={assetById}
+            columns={columnscount}
+            rowKey="id"
+            pagination={false} // Optional: Adjust based on your needs
+            bordered
+             className="text-xs"
+             components={{
+              header: {
+                cell: (props) => (
+                  <th {...props} style={headerStyle} />
+                ),
+              },
+            }}
+          />
+        ) : (
+          <Card>No assets found for the selected department.</Card>
+        )
+        ) : (
+          <Card>No assets found for the selected department.</Card> // Message for no assets
+        )}
+        </Form>
+        )}
         </Form>
       </Modal>
     </>
