@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import com.twd.SpringSecurityJWT.entity.Category;
 import com.twd.SpringSecurityJWT.entity.FixedAsset;
 import com.twd.SpringSecurityJWT.repository.AssetHolderRepository;
 import com.twd.SpringSecurityJWT.repository.CategoryRepository;
+import com.twd.SpringSecurityJWT.repository.FixedAssetRepository;
 import com.twd.SpringSecurityJWT.service.FixedAssetService;
 
 @RestController
@@ -35,6 +37,9 @@ public class FixedAssetController {
 
     @Autowired
     private AssetHolderRepository assetHolderRepository;
+
+    @Autowired
+    private FixedAssetRepository fixedAssetRepository;
     
     @PostMapping("/createFixedAsset")
     public ResponseEntity<ReqRes> createFixedAsset(@RequestBody FixedAssetRequest fixedAssetRequest) {
@@ -134,56 +139,90 @@ public class FixedAssetController {
 
     @PutMapping("/updateFixedAsset/{id}")
     public ResponseEntity<ReqRes> updateFixedAsset(@PathVariable Long id, @RequestBody FixedAssetRequest fixedAssetRequest) {
-        ReqRes resp = new ReqRes();
-        try {
-            System.err.println(fixedAssetRequest);
-            System.err.println(fixedAssetRequest.getName());
+    ReqRes resp = new ReqRes();
+    try {
+        // Fetch the existing FixedAsset entity from the database
+        Optional<FixedAsset> existingFixedAssetOpt = fixedAssetRepository.findById(id);
+        if (!existingFixedAssetOpt.isPresent()) {
+            resp.setStatusCode(404);
+            resp.setMessage("Fixed Asset not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resp);
+        }
+        FixedAsset existingFixedAsset = existingFixedAssetOpt.get();
 
-            FixedAsset fixedAssetToUpdate = new FixedAsset();
-            fixedAssetToUpdate.setName(fixedAssetRequest.getName());
-            fixedAssetToUpdate.setModel(fixedAssetRequest.getModel());
-            fixedAssetToUpdate.setYear(fixedAssetRequest.getYear());
-            fixedAssetToUpdate.setPrice(fixedAssetRequest.getPrice());
-            fixedAssetToUpdate.setSerialNumber(fixedAssetRequest.getSerialNumber());
-            fixedAssetToUpdate.setPurchaseDate(fixedAssetRequest.getPurchaseDate());
-            fixedAssetToUpdate.setUnit(fixedAssetRequest.getUnit());
-            fixedAssetToUpdate.setQuantity(fixedAssetRequest.getQuantity());
-            fixedAssetToUpdate.setImage(fixedAssetRequest.getImage());
-            fixedAssetToUpdate.setStatus(fixedAssetRequest.getStatus());
-            fixedAssetToUpdate.setStatustext(fixedAssetRequest.getStatustext());
-            
-            Integer categoryId = fixedAssetRequest.getCategoryId();
+        // Update the fields that are present in the request
+        if (fixedAssetRequest.getName() != null) {
+            existingFixedAsset.setName(fixedAssetRequest.getName());
+        }
+        if (fixedAssetRequest.getModel() != null) {
+            existingFixedAsset.setModel(fixedAssetRequest.getModel());
+        }
+        if (fixedAssetRequest.getYear() != null) {
+            existingFixedAsset.setYear(fixedAssetRequest.getYear());
+        }
+        if (fixedAssetRequest.getPrice() != null) {
+            existingFixedAsset.setPrice(fixedAssetRequest.getPrice());
+        }
+        if (fixedAssetRequest.getSerialNumber() != null) {
+            existingFixedAsset.setSerialNumber(fixedAssetRequest.getSerialNumber());
+        }
+        if (fixedAssetRequest.getPurchaseDate() != null) {
+            existingFixedAsset.setPurchaseDate(fixedAssetRequest.getPurchaseDate());
+        }
+        if (fixedAssetRequest.getUnit() != null) {
+            existingFixedAsset.setUnit(fixedAssetRequest.getUnit());
+        }
+        if (fixedAssetRequest.getQuantity() != null) {
+            existingFixedAsset.setQuantity(fixedAssetRequest.getQuantity());
+        }
+        if (fixedAssetRequest.getImage() != null) {
+            existingFixedAsset.setImage(fixedAssetRequest.getImage());
+        }
+        if (fixedAssetRequest.getStatus() != null) {
+            existingFixedAsset.setStatus(fixedAssetRequest.getStatus());
+        }
+        if (fixedAssetRequest.getStatustext() != null) {
+            existingFixedAsset.setStatustext(fixedAssetRequest.getStatustext());
+        }
+
+        // Update the Category if present
+        Integer categoryId = fixedAssetRequest.getCategoryId();
+        if (categoryId != null) {
             Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
             if (categoryOpt.isPresent()) {
-                fixedAssetToUpdate.setCategory(categoryOpt.get());
+                existingFixedAsset.setCategory(categoryOpt.get());
             } else {
                 throw new RuntimeException("Category not found");
             }
-
-            Long assetHolderId = fixedAssetRequest.getAssetHolder();
-            if (assetHolderId != null) {
-                System.out.println(assetHolderId);
-                Optional<AssetHolder> assetHolderOpt = assetHolderRepository.findById(assetHolderId);
-                System.out.println(assetHolderOpt.get());
-                if (assetHolderOpt.isPresent()) {
-                    fixedAssetToUpdate.setAssetHolder(assetHolderOpt.get());
-                } else {
-                    throw new RuntimeException("AssetHolder not found");
-                }
-            } else {
-                fixedAssetToUpdate.setAssetHolder(null); // or handle as needed
-            }
-
-            FixedAsset updatedFixedAsset = fixedAssetService.updateFixedAsset(id, fixedAssetToUpdate);
-            resp.setFixedAsset(updatedFixedAsset);
-            resp.setMessage("Fixed Asset Updated Successfully");
-            resp.setStatusCode(200);
-        } catch (Exception e) {
-            resp.setStatusCode(500);
-            resp.setError(e.getMessage());
         }
-        return ResponseEntity.ok(resp);
+
+        // Update the AssetHolder if present
+        Long assetHolderId = fixedAssetRequest.getAssetHolder();
+        if (assetHolderId != null) {
+            Optional<AssetHolder> assetHolderOpt = assetHolderRepository.findById(assetHolderId);
+            if (assetHolderOpt.isPresent()) {
+                existingFixedAsset.setAssetHolder(assetHolderOpt.get());
+            } else {
+                throw new RuntimeException("AssetHolder not found");
+            }
+        } else {
+            existingFixedAsset.setAssetHolder(null); // or handle as needed
+        }
+
+        // Save the updated FixedAsset
+        FixedAsset updatedFixedAsset = fixedAssetRepository.save(existingFixedAsset);
+
+        // Prepare response
+        resp.setFixedAsset(updatedFixedAsset);
+        resp.setMessage("Fixed Asset Updated Successfully");
+        resp.setStatusCode(200);
+    } catch (Exception e) {
+        resp.setStatusCode(500);
+        resp.setError(e.getMessage());
     }
+    return ResponseEntity.ok(resp);
+}
+
 
 
 }
