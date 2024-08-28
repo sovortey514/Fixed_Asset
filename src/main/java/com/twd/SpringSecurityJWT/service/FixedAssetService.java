@@ -13,6 +13,8 @@ public interface FixedAssetService {
 
     List<FixedAsset> getAllFixedAssets();
 
+    List<FixedAsset> getAllFixedAssetsWithDepartment(Long departmentId);
+
     Optional<FixedAsset> getFixedAssetById(Long id);
 
     FixedAsset updateFixedAsset(Long id, FixedAsset fixedAsset);

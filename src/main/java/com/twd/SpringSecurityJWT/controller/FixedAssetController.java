@@ -139,90 +139,103 @@ public class FixedAssetController {
 
     @PutMapping("/updateFixedAsset/{id}")
     public ResponseEntity<ReqRes> updateFixedAsset(@PathVariable Long id, @RequestBody FixedAssetRequest fixedAssetRequest) {
-    ReqRes resp = new ReqRes();
-    try {
-        // Fetch the existing FixedAsset entity from the database
-        Optional<FixedAsset> existingFixedAssetOpt = fixedAssetRepository.findById(id);
-        if (!existingFixedAssetOpt.isPresent()) {
-            resp.setStatusCode(404);
-            resp.setMessage("Fixed Asset not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resp);
-        }
-        FixedAsset existingFixedAsset = existingFixedAssetOpt.get();
-
-        // Update the fields that are present in the request
-        if (fixedAssetRequest.getName() != null) {
-            existingFixedAsset.setName(fixedAssetRequest.getName());
-        }
-        if (fixedAssetRequest.getModel() != null) {
-            existingFixedAsset.setModel(fixedAssetRequest.getModel());
-        }
-        if (fixedAssetRequest.getYear() != null) {
-            existingFixedAsset.setYear(fixedAssetRequest.getYear());
-        }
-        if (fixedAssetRequest.getPrice() != null) {
-            existingFixedAsset.setPrice(fixedAssetRequest.getPrice());
-        }
-        if (fixedAssetRequest.getSerialNumber() != null) {
-            existingFixedAsset.setSerialNumber(fixedAssetRequest.getSerialNumber());
-        }
-        if (fixedAssetRequest.getPurchaseDate() != null) {
-            existingFixedAsset.setPurchaseDate(fixedAssetRequest.getPurchaseDate());
-        }
-        if (fixedAssetRequest.getUnit() != null) {
-            existingFixedAsset.setUnit(fixedAssetRequest.getUnit());
-        }
-        if (fixedAssetRequest.getQuantity() != null) {
-            existingFixedAsset.setQuantity(fixedAssetRequest.getQuantity());
-        }
-        if (fixedAssetRequest.getImage() != null) {
-            existingFixedAsset.setImage(fixedAssetRequest.getImage());
-        }
-        if (fixedAssetRequest.getStatus() != null) {
-            existingFixedAsset.setStatus(fixedAssetRequest.getStatus());
-        }
-        if (fixedAssetRequest.getStatustext() != null) {
-            existingFixedAsset.setStatustext(fixedAssetRequest.getStatustext());
-        }
-
-        // Update the Category if present
-        Integer categoryId = fixedAssetRequest.getCategoryId();
-        if (categoryId != null) {
-            Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
-            if (categoryOpt.isPresent()) {
-                existingFixedAsset.setCategory(categoryOpt.get());
-            } else {
-                throw new RuntimeException("Category not found");
+        ReqRes resp = new ReqRes();
+        try {
+            // Fetch the existing FixedAsset entity from the database
+            Optional<FixedAsset> existingFixedAssetOpt = fixedAssetRepository.findById(id);
+            if (!existingFixedAssetOpt.isPresent()) {
+                resp.setStatusCode(404);
+                resp.setMessage("Fixed Asset not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resp);
             }
-        }
+            FixedAsset existingFixedAsset = existingFixedAssetOpt.get();
 
-        // Update the AssetHolder if present
-        Long assetHolderId = fixedAssetRequest.getAssetHolder();
-        if (assetHolderId != null) {
-            Optional<AssetHolder> assetHolderOpt = assetHolderRepository.findById(assetHolderId);
-            if (assetHolderOpt.isPresent()) {
-                existingFixedAsset.setAssetHolder(assetHolderOpt.get());
-            } else {
-                throw new RuntimeException("AssetHolder not found");
+            // Update the fields that are present in the request
+            if (fixedAssetRequest.getName() != null) {
+                existingFixedAsset.setName(fixedAssetRequest.getName());
             }
-        } else {
-            existingFixedAsset.setAssetHolder(null); // or handle as needed
+            if (fixedAssetRequest.getModel() != null) {
+                existingFixedAsset.setModel(fixedAssetRequest.getModel());
+            }
+            if (fixedAssetRequest.getYear() != null) {
+                existingFixedAsset.setYear(fixedAssetRequest.getYear());
+            }
+            if (fixedAssetRequest.getPrice() != null) {
+                existingFixedAsset.setPrice(fixedAssetRequest.getPrice());
+            }
+            if (fixedAssetRequest.getSerialNumber() != null) {
+                existingFixedAsset.setSerialNumber(fixedAssetRequest.getSerialNumber());
+            }
+            if (fixedAssetRequest.getPurchaseDate() != null) {
+                existingFixedAsset.setPurchaseDate(fixedAssetRequest.getPurchaseDate());
+            }
+            if (fixedAssetRequest.getUnit() != null) {
+                existingFixedAsset.setUnit(fixedAssetRequest.getUnit());
+            }
+            if (fixedAssetRequest.getQuantity() != null) {
+                existingFixedAsset.setQuantity(fixedAssetRequest.getQuantity());
+            }
+            if (fixedAssetRequest.getImage() != null) {
+                existingFixedAsset.setImage(fixedAssetRequest.getImage());
+            }
+            if (fixedAssetRequest.getStatus() != null) {
+                existingFixedAsset.setStatus(fixedAssetRequest.getStatus());
+            }
+            if (fixedAssetRequest.getStatustext() != null) {
+                existingFixedAsset.setStatustext(fixedAssetRequest.getStatustext());
+            }
+
+            // Update the Category if present
+            Integer categoryId = fixedAssetRequest.getCategoryId();
+            if (categoryId != null) {
+                Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
+                if (categoryOpt.isPresent()) {
+                    existingFixedAsset.setCategory(categoryOpt.get());
+                } else {
+                    throw new RuntimeException("Category not found");
+                }
+            }
+
+            // Update the AssetHolder if present
+            Long assetHolderId = fixedAssetRequest.getAssetHolder();
+            if (assetHolderId != null) {
+                Optional<AssetHolder> assetHolderOpt = assetHolderRepository.findById(assetHolderId);
+                if (assetHolderOpt.isPresent()) {
+                    existingFixedAsset.setAssetHolder(assetHolderOpt.get());
+                } else {
+                    throw new RuntimeException("AssetHolder not found");
+                }
+            } else {
+                existingFixedAsset.setAssetHolder(null); // or handle as needed
+            }
+
+            // Save the updated FixedAsset
+            FixedAsset updatedFixedAsset = fixedAssetRepository.save(existingFixedAsset);
+
+            // Prepare response
+            resp.setFixedAsset(updatedFixedAsset);
+            resp.setMessage("Fixed Asset Updated Successfully");
+            resp.setStatusCode(200);
+        } catch (Exception e) {
+            resp.setStatusCode(500);
+            resp.setError(e.getMessage());
         }
-
-        // Save the updated FixedAsset
-        FixedAsset updatedFixedAsset = fixedAssetRepository.save(existingFixedAsset);
-
-        // Prepare response
-        resp.setFixedAsset(updatedFixedAsset);
-        resp.setMessage("Fixed Asset Updated Successfully");
-        resp.setStatusCode(200);
-    } catch (Exception e) {
-        resp.setStatusCode(500);
-        resp.setError(e.getMessage());
+        return ResponseEntity.ok(resp);
     }
-    return ResponseEntity.ok(resp);
-}
 
-
+    @GetMapping("/getFixedAssetsByDepartment/{departmentId}")
+    public ResponseEntity<ReqRes> getFixedAssetsByDepartment(@PathVariable Long departmentId) {
+        ReqRes resp = new ReqRes();
+        try {
+            List<FixedAsset> fixedAssets = fixedAssetService.getAllFixedAssetsWithDepartment(departmentId);
+            resp.setFixedAssets(fixedAssets);
+            resp.setMessage("Fixed Assets Retrieved Successfully");
+            resp.setStatusCode(200);
+        } catch (Exception e) {
+            resp.setStatusCode(500);
+            resp.setError(e.getMessage());
+        }
+        return ResponseEntity.ok(resp);
+    }
 
 }

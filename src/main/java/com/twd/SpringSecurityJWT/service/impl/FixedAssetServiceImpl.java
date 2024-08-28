@@ -86,6 +86,7 @@ public class FixedAssetServiceImpl implements FixedAssetService {
         return fixedAssetRepository.findAllWithCategory();
     }
 
+    
     @Override
     public Optional<FixedAsset> getFixedAssetById(Long id) {
        
@@ -115,6 +116,13 @@ public class FixedAssetServiceImpl implements FixedAssetService {
             return fixedAssetRepository.save(existingAsset);
         }).orElseThrow(() -> new RuntimeException("Fixed Asset not found"));
     }
+
+    @Override
+    public List<FixedAsset> getAllFixedAssetsWithDepartment(Long departmentId) {
+        return fixedAssetRepository.findFixedAssetsByDepartmentId(departmentId);
+    }
+
+
 
     // @Override
     // public List<Object[]> getAssetsCountInEachDepartment() {
