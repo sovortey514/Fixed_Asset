@@ -45,6 +45,7 @@ public class FixedAssetDetailServiceImpl implements FixedAssetDetailService{
 
 
         fixedAssetDetail.setConditions(fixedAssetDetail.getConditions());
+        fixedAssetDetail.setFixedAssetCount(fixedAssetDetail.getFixedAssetCount());
         fixedAssetDetail.setExistenceAsset(fixedAssetDetail.getExistenceAsset());
         fixedAssetDetail.setRemarks(fixedAssetDetail.getRemarks());
         fixedAssetDetail.setQuantityCounted(fixedAssetDetail.getQuantityCounted());

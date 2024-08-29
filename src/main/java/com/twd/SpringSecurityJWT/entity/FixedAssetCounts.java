@@ -15,8 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 // import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
-
-
+import jakarta.persistence.OneToMany;
 import lombok.Data;
 
 @Entity
@@ -43,7 +42,7 @@ public class FixedAssetCounts {
     @Column(name = "updated_by", nullable = false)
     private String updatedBy;
 
-    // @OneToMany(mappedBy = "fixedAssetCount", cascade = CascadeType.ALL, orphanRemoval = true)
-    // private List<FixedAssetDetail> assetDetails;
+    @OneToMany(mappedBy = "fixedAssetCount", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FixedAssetDetail> assetDetails;
 
 }

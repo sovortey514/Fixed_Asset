@@ -4,6 +4,7 @@ package com.twd.SpringSecurityJWT.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import java.util.List;
 
 @Entity
 @Data
@@ -33,5 +34,10 @@ public class FixedAssetDetail {
 
     @Column(columnDefinition = "TEXT")
     private String remarks;
+
+    
+    @ManyToOne
+    @JoinColumn(name = "fixedassetdetail", nullable = false)
+    private FixedAssetCounts fixedAssetCount;
 
 }
