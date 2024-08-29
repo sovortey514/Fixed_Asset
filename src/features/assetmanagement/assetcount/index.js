@@ -1,28 +1,47 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Button, Modal, Form, Input, Select, Dropdown, Menu, notification, Space ,Tag,Table,List,Spin,Card,DatePicker} from 'antd';
-import { DownOutlined } from '@ant-design/icons';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { PlusOutlined } from '@ant-design/icons';
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Button,
+  Modal,
+  Form,
+  Input,
+  Select,
+  Dropdown,
+  Menu,
+  notification,
+  Space,
+  Tag,
+  Table,
+  List,
+  Spin,
+  Card,
+  DatePicker,
+} from "antd";
+import { DownOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import {
   EditableProTable,
   ProCard,
   ProFormField,
-} from '@ant-design/pro-components';
+} from "@ant-design/pro-components";
 const { Option } = Select;
 
 const TotalAsset = () => {
-  const [size, setSize] = useState('large');
+  const [size, setSize] = useState("large");
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [modalType, setModalType] = useState(''); // 'building', 'department', or 'room'
+  const [modalType, setModalType] = useState(""); // 'building', 'department', or 'room'
   const [form] = Form.useForm();
   const [buildings, setBuildings] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [assetHolders, setAssetHolder] = useState([]);
-  const [selectedBuilding, setSelectedBuilding] = useState('Select Building');
-  const [selectedDepartment, setSelectedDepartment] = useState('Select Department');
-  const [selectedRoom, setSelectedRoom] = useState('Select Room');
-  const [selectedAssetHolder, setSelectedAssetHolder] = useState('Select Asset Holder');
+  const [selectedBuilding, setSelectedBuilding] = useState("Select Building");
+  const [selectedDepartment, setSelectedDepartment] =
+    useState("Select Department");
+  const [selectedRoom, setSelectedRoom] = useState("Select Room");
+  const [selectedAssetHolder, setSelectedAssetHolder] = useState(
+    "Select Asset Holder"
+  );
   const [showAssetDetails, setShowAssetDetails] = useState(false);
 
   const [editBuilding, setEditBuilding] = useState(null);
@@ -30,18 +49,14 @@ const TotalAsset = () => {
   const [editRoom, setEditRoom] = useState(null);
   const [editAssetHolder, setEditAssetHolder] = useState(null);
 
-  const [fixedassetwithdepartment, setFixedAssetwithdepartment] = useState(null);
- 
-  const [assetById, setAssetById]= useState([]);
+  const [fixedassetwithdepartment, setFixedAssetwithdepartment] =
+    useState(null);
+
+  const [assetById, setAssetById] = useState([]);
   const [departmentId, setDepartmentId] = useState(null);
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
 
-
-
-
-  // const [editBuilding, setEditBuilding] = useState(null);
-  // const [editBuilding, setEditBuilding] = useState(null);
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     fetchData();
@@ -49,39 +64,32 @@ const TotalAsset = () => {
 
   const columns = [
     {
-      title: 'No',
-      dataIndex: 'key',
-      render:(_,r,index)=>index+1
+      title: "No",
+      dataIndex: "key",
+      render: (_, r, index) => index + 1,
     },
     {
-      title: 'Department',
-      dataIndex: 'department',
-      key: 'department',
+      title: "Department",
+      dataIndex: "department",
+      key: "department",
       render: (text) => <a>{text}</a>,
     },
     {
-      title: 'Total Asset',
-      dataIndex: 'total asset',
-      key: 'total asset',
+      title: "Total Asset",
+      dataIndex: "total asset",
+      key: "total asset",
     },
     {
-      title: 'Count By',
-      dataIndex: 'count by',
-      key: 'count by',
+      title: "Count Date",
+      dataIndex: "count date",
+      key: "count date",
     },
     {
-      title: 'Count Date',
-      dataIndex: 'count date',
-      key: 'count date',
+      title: "Remark",
+      dataIndex: "remarks",
+      key: "remarks",
     },
-    {
-      title: 'Remark',
-      dataIndex: 'remarks',
-      key: 'remarks',
-    },
-    
   ];
-
 
   useEffect(() => {
     if (departmentId) {
@@ -89,35 +97,63 @@ const TotalAsset = () => {
         setLoading(true);
         try {
           const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           };
 
-          const response = await fetch(`http://localhost:6060/admin/getFixedAssetsByDepartment/${departmentId}`, {
-            method: 'GET',
-            headers,
-          });
+          // Log the departmentId and headers for debugging
+          console.log("Fetching assets for departmentId:", departmentId);
+          console.log("Headers:", headers);
 
-          console.log(departmentId)
+          const response = await fetch(
+            `http://localhost:6060/admin/getFixedAssetsByDepartment/${departmentId}`,
+            {
+              method: "GET",
+              headers,
+            }
+          );
+
+          // Log the raw response to inspect status and headers
+          console.log("Raw Response:", response);
 
           if (response.ok) {
             const assetDetails = await response.json();
-            console.log('API Response:', assetDetails); // Debugging: Log API response
+
+            // Log the full response data
+            console.log("API Response:", assetDetails);
+
+            // Log the specific data fields you are setting in state
+            console.log("Fixed Assets:", assetDetails.fixedAssets);
+            console.log(
+              "Editable Row Keys:",
+              assetDetails.fixedAssets.map((item) => item.id)
+            );
+
             setAssetById(assetDetails.fixedAssets || []);
-            setEditableRowKeys(assetDetails.fixedAssets.map(item => item.id));
+            setEditableRowKeys(assetDetails.fixedAssets.map((item) => item.id));
           } else {
             const errorData = await response.json();
+
+            // Log the error response data
+            console.error("Error Response Data:", errorData);
+
             notification.error({
-              message: 'Failed to Fetch Asset Details',
-              description: errorData.message || 'There was an error fetching the asset details.',
+              message: "Failed to Fetch Asset Details",
+              description:
+                errorData.message ||
+                "There was an error fetching the asset details.",
             });
           }
         } catch (error) {
+          // Log the error object for debugging
+          console.error("Error fetching asset details:", error);
+
           notification.error({
-            message: 'Failed to Fetch Asset Details',
-            description: 'There was an error fetching the asset details.',
+            message: "Failed to Fetch Asset Details",
+            description: "There was an error fetching the asset details.",
           });
-          console.error('Error fetching asset details:', error);
+        } finally {
+          setLoading(false);
         }
       };
 
@@ -125,31 +161,40 @@ const TotalAsset = () => {
     }
   }, [departmentId, token]);
 
-
   const fetchData = async () => {
     try {
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
 
-      const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
-      
-      let response = await fetch('http://localhost:6060/admin/getAllBuildings', { headers });
+      let response = await fetch(
+        "http://localhost:6060/admin/getAllBuildings",
+        { headers }
+      );
       let data = await response.json();
       if (response.ok) setBuildings(data.buildings || []);
-      
-      response = await fetch('http://localhost:6060/admin/getAllDepartments', { headers });
+
+      response = await fetch("http://localhost:6060/admin/getAllDepartments", {
+        headers,
+      });
       data = await response.json();
       if (response.ok) setDepartments(data.departments || []);
-      console.log(departments)
-      
-      response = await fetch('http://localhost:6060/admin/getAllRooms', { headers });
+      console.log(departments);
+
+      response = await fetch("http://localhost:6060/admin/getAllRooms", {
+        headers,
+      });
       data = await response.json();
       if (response.ok) setRooms(data.rooms || []);
 
-      response = await fetch('http://localhost:6060/admin/getallassetholders', { headers });
+      response = await fetch("http://localhost:6060/admin/getallassetholders", {
+        headers,
+      });
       data = await response.json();
       if (response.ok) setAssetHolder(data.assetHolders || []);
-      
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error("Failed to fetch data:", error);
     }
   };
 
@@ -158,13 +203,13 @@ const TotalAsset = () => {
     form.resetFields(); // Reset form fields when opening the modal
     setIsModalVisible(true);
     setEditBuilding(null);
-    setEditDepartment(null)
+    setEditDepartment(null);
     setEditRoom(null);
     setEditAssetHolder(null);
   };
 
   const handleEditBuilding = (building) => {
-    setModalType('building');
+    setModalType("building");
     setEditBuilding(building);
     form.setFieldsValue({
       name: building.name,
@@ -172,8 +217,8 @@ const TotalAsset = () => {
     setIsModalVisible(true);
   };
   const handleEditDepartment = (department) => {
-    console.log(department.building.name)
-    setModalType('department');
+    console.log(department.building.name);
+    setModalType("department");
     setEditDepartment(department);
     form.setFieldsValue({
       name: department.name,
@@ -185,11 +230,11 @@ const TotalAsset = () => {
   };
 
   const handleEditRoom = (room) => {
-    setModalType('room');
+    setModalType("room");
     setEditRoom(room);
     form.setFieldsValue({
       name: room.name,
-      building: room.building.id, 
+      building: room.building.id,
       department: room.department.id,
       floorNumber: room.floorNumber,
       description: room.description,
@@ -198,7 +243,7 @@ const TotalAsset = () => {
   };
 
   const handleEditAssetHolder = (assetholder) => {
-    setModalType('assetholder');
+    setModalType("assetholder");
     setEditAssetHolder(assetholder);
     form.setFieldsValue({
       name: assetholder.name,
@@ -208,320 +253,492 @@ const TotalAsset = () => {
     });
     setIsModalVisible(true);
   };
-  
 
   const handleCancel = () => {
     setIsModalVisible(false);
   };
 
   const handleOk = async () => {
-  try {
-    const values = await form.validateFields(); // Validate form fields
-    const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
-    console.log('Form Values:', values);
-    let response;
-    let data;
+    try {
+      const values = await form.validateFields(); // Validate form fields
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+      console.log("Form Values:", values);
+      let response;
+      let data;
 
-    if (modalType === 'building') {
-      if (editBuilding) {
-        // Edit existing building
-        response = await fetch(`http://localhost:6060/admin/updateBuilding/${editBuilding.id}`, {
-          method: 'PUT',
-          headers,
-          body: JSON.stringify(values),
-        });
-
-        data = await response.json();
-        if (response.ok) {
-          setBuildings(prevBuildings =>
-            prevBuildings.map(building =>
-              building.id === editBuilding.id ? { ...building, ...values } : building
-            )
+      if (modalType === "building") {
+        if (editBuilding) {
+          // Edit existing building
+          response = await fetch(
+            `http://localhost:6060/admin/updateBuilding/${editBuilding.id}`,
+            {
+              method: "PUT",
+              headers,
+              body: JSON.stringify(values),
+            }
           );
-          setSelectedBuilding(data.building.name); // Update selection
-          notification.success({
-            message: 'Building updated successfully!',
-            duration: 1,
-          });
-          setIsModalVisible(false);
+
+          data = await response.json();
+          if (response.ok) {
+            setBuildings((prevBuildings) =>
+              prevBuildings.map((building) =>
+                building.id === editBuilding.id
+                  ? { ...building, ...values }
+                  : building
+              )
+            );
+            setSelectedBuilding(data.building.name); // Update selection
+            notification.success({
+              message: "Building updated successfully!",
+              duration: 1,
+            });
+            setIsModalVisible(false);
+          } else {
+            throw new Error(data.error || "Failed to update building");
+          }
         } else {
-          throw new Error(data.error || 'Failed to update building');
+          // Create new building
+          response = await fetch("http://localhost:6060/admin/createBuilding", {
+            method: "POST",
+            headers,
+            body: JSON.stringify(values),
+          });
+
+          data = await response.json();
+
+          if (response.ok) {
+            setBuildings([...buildings, data.building]); // Update state
+            setSelectedBuilding(data.building.name); // Update selection
+            notification.success({
+              message: "Building created successfully!",
+              duration: 1,
+            });
+            setIsModalVisible(false);
+          } else {
+            throw new Error(data.error || "Failed to create building");
+          }
         }
-      } else {
-        // Create new building
-        response = await fetch('http://localhost:6060/admin/createBuilding', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify(values),
-        });
+      } else if (modalType === "department") {
+        if (editDepartment) {
+          // Edit existing department
+          response = await fetch(
+            `http://localhost:6060/admin/updateDepartment/${editDepartment.id}`,
+            {
+              method: "PUT",
+              headers,
+              body: JSON.stringify({
+                ...values,
+                building: { id: values.building },
+              }),
+            }
+          );
 
-        data = await response.json();
+          data = await response.json();
+          if (response.ok) {
+            setDepartments((prevDepartments) =>
+              prevDepartments.map((department) =>
+                department.id === editDepartment.id
+                  ? { ...department, ...values }
+                  : department
+              )
+            );
+            setSelectedDepartment(data.department.name);
+            notification.success({
+              message: "Department updated successfully!",
+              duration: 1,
+            });
+            setIsModalVisible(false);
+          } else {
+            throw new Error(data.error || "Failed to update department");
+          }
+        } else {
+          response = await fetch(
+            "http://localhost:6060/admin/createDepartment",
+            {
+              method: "POST",
+              headers,
+              body: JSON.stringify({
+                ...values,
+                building: { id: values.building },
+              }),
+            }
+          );
 
-        if (response.ok) {
-          setBuildings([...buildings, data.building]); // Update state
-          setSelectedBuilding(data.building.name); // Update selection
-          notification.success({
-            message: 'Building created successfully!',
+          data = await response.json();
+
+          if (response.ok && data.department) {
+            setDepartments((prev) => [...prev, data.department]);
+            setSelectedDepartment(data.department.name);
+            notification.success({
+              message: "Department created successfully!",
+              duration: 1,
+            });
+            setIsModalVisible(false);
+          } else {
+            throw new Error(data.error || "Failed to create department");
+          }
+        }
+      } else if (modalType === "room") {
+        if (editRoom) {
+          // Edit existing room
+          response = await fetch(
+            `http://localhost:6060/admin/updateRoom/${editRoom.id}`,
+            {
+              method: "PUT",
+              headers,
+              body: JSON.stringify({
+                ...values,
+                department: { id: values.department },
+                building: { id: values.building },
+              }),
+            }
+          );
+
+          data = await response.json();
+          if (response.ok) {
+            setRooms((prevRooms) =>
+              prevRooms.map((room) =>
+                room.id === editRoom.id ? { ...room, ...values } : room
+              )
+            );
+            setSelectedRoom(data.room.name); // Update selection
+            notification.success({
+              message: "Room updated successfully!",
+              duration: 1,
+            });
+            setIsModalVisible(false);
+          } else {
+            throw new Error(data.error || "Failed to update room");
+          }
+        } else {
+          // Create new room
+          response = await fetch("http://localhost:6060/admin/createRoom", {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+              ...values,
+              department: { id: values.department },
+              building: { id: values.building },
+            }),
+          });
+
+          data = await response.json();
+          if (response.ok && data.room) {
+            // setRooms([...rooms, data.room]); // Update state
+            setSelectedRoom(data.room.name); // Update selection
+            notification.success({
+              message: "Room created successfully!",
+              duration: 1,
+            });
+            setIsModalVisible(false);
+          } else {
+            throw new Error(data.error || "Failed to create room");
+          }
+        }
+      } else if (modalType === "assetholder") {
+        if (editAssetHolder) {
+          // Edit existing asset holder
+          response = await fetch(
+            `http://localhost:6060/admin/updateassetholderbyId/${editAssetHolder.id}`,
+            {
+              method: "PUT",
+              headers,
+              body: JSON.stringify({
+                ...values,
+                department: { id: values.department },
+              }),
+            }
+          );
+
+          data = await response.json();
+          if (response.ok) {
+            setAssetHolder((prevAssetHolders) =>
+              prevAssetHolders.map((assetholder) =>
+                assetholder.id === editAssetHolder.id
+                  ? { ...assetholder, ...values }
+                  : assetholder
+              )
+            );
+            setSelectedAssetHolder(data.assetholder);
+            notification.success({
+              message: "Asset holder updated successfully!",
+              duration: 1,
+            });
+            setIsModalVisible(false);
+            fetchData();
+          } else {
+            throw new Error(data.error || "Failed to update asset holder");
+          }
+        } else {
+          // Create new asset holder
+          response = await fetch(
+            "http://localhost:6060/admin/createassetholder",
+            {
+              method: "POST",
+              headers,
+              body: JSON.stringify({
+                ...values,
+                department: { id: values.department },
+              }),
+            }
+          );
+
+          data = await response.json();
+          console.log("Asset Holder Response:", data);
+          if (response.ok && data.assetHolder) {
+            // setAssetHolder([...assetHolders, data.assetholder]);
+            setSelectedAssetHolder(data.assetholder);
+            notification.success({
+              message: "Asset holder created successfully!",
+              duration: 1,
+            });
+            setIsModalVisible(false);
+            fetchData();
+          } else {
+            throw new Error(data.error || "Failed to create asset holder");
+          }
+        }
+      } else if (modalType === "Audit") {
+        try {
+          console.log(assetById);
+          console.log("department", departmentId);
+
+          const response = await fetch(
+            "http://localhost:6060/admin/createcount",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                ...values,
+                department: { id: departmentId },
+                createdBy: "admin",
+              }),
+            }
+          );
+          const data = await response.json();
+          console.log(data);
+
+          console.log("Department ID:", departmentId);
+
+          if (response.ok) {
+            notification.success({
+              message: "Fixed Asset Count created successfully!",
+              duration: 1,
+            });
+            let fixedAssetDetailPayload;
+            if (data) {
+              let detailResponse;
+              // console.log(data)
+              for (let i = 0; i < assetById.length; i++) {
+                const item = assetById[i];
+                fixedAssetDetailPayload = {
+                  fixedAssetCount: { id: data.fixedAssetCounts.id },
+                  assetHolder: { id: item.assetHolder.id },
+                  fixedAsset: { id: item.id },
+                  conditions: item.conditions,
+                  existenceAsset: item.existenceAsset,
+                  remarks: item.remarks,
+                  quantityCounted: item.quantityCounted,
+                };
+                // Access other properties as needed
+                detailResponse = await fetch(
+                  "http://localhost:6060/admin/createdetail",
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(fixedAssetDetailPayload),
+                  }
+                );
+
+                const detailData = await detailResponse.json();
+                console.log("Fixed Asset Detail Response:", detailData);
+
+                setIsModalVisible(false);
+                fetchData();
+              }
+              if (detailResponse.ok) {
+                notification.success({
+                  duration: 1,
+                });
+              } else {
+                throw new Error(
+                  detailData.error || "Failed to create Fixed Asset Detail"
+                );
+              }
+            }
+
+            const detailResponse = await fetch(
+              "http://localhost:6060/admin/createdetail",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(fixedAssetDetailPayload),
+              }
+            );
+
+            const detailData = await detailResponse.json();
+            console.log("Fixed Asset Detail Response:", detailData);
+
+            if (detailResponse.ok) {
+              notification.success({
+                duration: 1,
+              });
+            } else {
+              throw new Error(
+                detailData.error || "Failed to create Fixed Asset Detail"
+              );
+            }
+
+            setIsModalVisible(false);
+            fetchData();
+          } else {
+            throw new Error(data.error || "Failed to create Fixed Asset Count");
+          }
+        } catch (error) {
+          notification.error({
+            message: error.message,
             duration: 1,
           });
-          setIsModalVisible(false);
-        } else {
-          throw new Error(data.error || 'Failed to create building');
         }
       }
-    } else if (modalType === 'department') {
-      if (editDepartment) {
-        // Edit existing department
-        response = await fetch(`http://localhost:6060/admin/updateDepartment/${editDepartment.id}`, {
-          method: 'PUT',
-          headers,
-          body: JSON.stringify({ ...values, building: { id: values.building } }),
-        });
-    
-        data = await response.json();
-        if (response.ok) {
-          setDepartments(prevDepartments =>
-            prevDepartments.map(department =>
-              department.id === editDepartment.id ? { ...department, ...values } : department
-            )
-          );
-          setSelectedDepartment(data.department.name); // Update selection
-          notification.success({
-            message: 'Department updated successfully!',
-            duration: 1,
-          });
-          setIsModalVisible(false);
-        } else {
-          throw new Error(data.error || 'Failed to update department');
-        }
-      } else {
-        // Create new department
-        response = await fetch('http://localhost:6060/admin/createDepartment', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ ...values, building: { id: values.building } }),
-        });
-        
-        data = await response.json();
-        
-        if (response.ok && data.department) {
-          setDepartments(prev => [...prev, data.department]);
-          setSelectedDepartment(data.department.name);
-          notification.success({
-            message: 'Department created successfully!',
-            duration: 1,
-          });
-          setIsModalVisible(false);
-        } else {
-          throw new Error(data.error || 'Failed to create department');
-        }
-      }
-    }else if (modalType === 'room') {
-      if (editRoom) {
-        // Edit existing room
-        response = await fetch(`http://localhost:6060/admin/updateRoom/${editRoom.id}`, {
-          method: 'PUT',
-          headers,
-          body: JSON.stringify({ ...values, department: { id: values.department }, building: { id: values.building } }),
-        });
-        
-        data = await response.json();
-        if (response.ok) {
-          setRooms(prevRooms =>
-            prevRooms.map(room =>
-              room.id === editRoom.id ? { ...room, ...values } : room
-            )
-          );
-          setSelectedRoom(data.room.name); // Update selection
-          notification.success({
-            message: 'Room updated successfully!',
-            duration: 1,
-          });
-          setIsModalVisible(false);
-        } else {
-          throw new Error(data.error || 'Failed to update room');
-        }
-      } else {
-        // Create new room
-        response = await fetch('http://localhost:6060/admin/createRoom', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ ...values, department: { id: values.department }, building: { id: values.building } }),
-        });
-    
-        data = await response.json();
-        if (response.ok && data.room) {
-
-          // setRooms([...rooms, data.room]); // Update state
-          setSelectedRoom(data.room.name); // Update selection
-          notification.success({
-            message: 'Room created successfully!',
-            duration: 1,
-          });
-          setIsModalVisible(false);
-        } else {
-          throw new Error(data.error || 'Failed to create room');
-        }
-      }
+    } catch (error) {
+      console.error("Failed to submit form:", error);
+      notification.error({
+        message: "Failed to submit form",
+        description: error.message,
+        duration: 1,
+      });
     }
-    else if (modalType === 'assetholder') {
-      if (editAssetHolder) {
-        // Edit existing asset holder
-        response = await fetch(`http://localhost:6060/admin/updateassetholderbyId/${editAssetHolder.id}`, {
-          method: 'PUT',
-          headers,
-          body: JSON.stringify({ ...values, department: { id: values.department } }),
-        });
-    
-        data = await response.json();
-        if (response.ok) {
-          setAssetHolder(prevAssetHolders =>
-            prevAssetHolders.map(assetholder =>
-              assetholder.id === editAssetHolder.id ? { ...assetholder, ...values } : assetholder
-            )
-          );
-          setSelectedAssetHolder(data.assetholder); // Update selection
-          notification.success({
-            message: 'Asset holder updated successfully!',
-            duration: 1,
-          });
-          setIsModalVisible(false);
-          fetchData();
-        } else {
-          throw new Error(data.error || 'Failed to update asset holder');
-        }
-      } else {
-        // Create new asset holder
-        response = await fetch('http://localhost:6060/admin/createassetholder', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ ...values, department: { id: values.department } }),
-        });
-    
-        data = await response.json();
-        console.log('Asset Holder Response:', data);
-        if (response.ok && data.assetHolder) {
-          // setAssetHolder([...assetHolders, data.assetholder]);
-          setSelectedAssetHolder(data.assetholder); // Update selection
-          notification.success({
-            message: 'Asset holder created successfully!',
-            duration: 1,
-          });
-          setIsModalVisible(false);
-          fetchData();
-        } else {
-          throw new Error(data.error || 'Failed to create asset holder');
-        }
-      }
-    }
-    }catch (error) {
-    console.error('Failed to submit form:', error);
-    notification.error({
-      message: 'Failed to submit form',
-      description: error.message,
-      duration: 1,
-    });
-  }
-}; 
-
-
-  
+  };
 
   const handlebuildingDelete = async (building) => {
-
-    console.log('Building:', building);
+    console.log("Building:", building);
     try {
-      const token = localStorage.getItem('token');
-      const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+      const token = localStorage.getItem("token");
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
       await fetch(`http://localhost:6060/admin/deleteBuilding/${building.id}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers,
       });
-   
-      setBuildings((prevBuildings) => prevBuildings.filter((cat) => cat.id !== building.id));
+
+      setBuildings((prevBuildings) =>
+        prevBuildings.filter((cat) => cat.id !== building.id)
+      );
 
       notification.success({
-        message: 'Building  Deleted',
-        description: 'Building has been deleted successfully.',
-        duration: 1
+        message: "Building  Deleted",
+        description: "Building has been deleted successfully.",
+        duration: 1,
       });
     } catch (error) {
-      console.error('Error deleting building:', error);
+      console.error("Error deleting building:", error);
       notification.error({
-        message: 'Failed to delete building ',
+        message: "Failed to delete building ",
         description: error.message,
-        duration: 1
+        duration: 1,
       });
     }
-  }
+  };
 
   const handleDepartmentDelete = async (department) => {
-
     try {
-      const token = localStorage.getItem('token');
-      const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
-      await fetch(`http://localhost:6060/admin/deleteDepartment/${department.id}`, {
-        method: 'DELETE',
-        headers,
-      });
-   
-      setDepartments((prevDepartments) => prevDepartments.filter((cat) => cat.id !== department.id));
+      const token = localStorage.getItem("token");
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+      await fetch(
+        `http://localhost:6060/admin/deleteDepartment/${department.id}`,
+        {
+          method: "DELETE",
+          headers,
+        }
+      );
+
+      setDepartments((prevDepartments) =>
+        prevDepartments.filter((cat) => cat.id !== department.id)
+      );
 
       notification.success({
-        message: 'Department Deleted',
-        description: 'Department has been deleted successfully.',
-        duration: 1
+        message: "Department Deleted",
+        description: "Department has been deleted successfully.",
+        duration: 1,
       });
     } catch (error) {
-      console.error('Error deleting building:', error);
+      console.error("Error deleting building:", error);
       notification.error({
-        message: 'Failed to delete building ',
+        message: "Failed to delete building ",
         description: error.message,
-        duration: 1
+        duration: 1,
       });
     }
-  }
+  };
 
   const handleRoomDelete = async (room) => {
-
     try {
-      const token = localStorage.getItem('token');
-      const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+      const token = localStorage.getItem("token");
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
       await fetch(`http://localhost:6060/admin/deleteroom/${room.id}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers,
       });
-   
+
       setRooms((prevRooms) => prevRooms.filter((cat) => cat.id !== room.id));
     } catch (error) {
-      console.error('Error deleting room:', error);
+      console.error("Error deleting room:", error);
       notification.error({
-        message: 'Failed to delete room ',
+        message: "Failed to delete room ",
         description: error.message,
-        duration: 1
+        duration: 1,
       });
     }
-  }
+  };
 
   const handleAssetholderDelete = async (assetHolders) => {
     try {
-      const token = localStorage.getItem('token');
-      const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
-      await fetch(`http://localhost:6060/admin/deleteassetbyId/${assetHolders.id}`, {
-        method: 'DELETE',
-        headers,
-      });
-   
-      setAssetHolder((prevAssetHolders) => prevAssetHolders.filter((cat) => cat.id !== assetHolders.id));
+      const token = localStorage.getItem("token");
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+      await fetch(
+        `http://localhost:6060/admin/deleteassetbyId/${assetHolders.id}`,
+        {
+          method: "DELETE",
+          headers,
+        }
+      );
+
+      setAssetHolder((prevAssetHolders) =>
+        prevAssetHolders.filter((cat) => cat.id !== assetHolders.id)
+      );
     } catch (error) {
-      console.error('Error deleting assetholder:', error);
+      console.error("Error deleting assetholder:", error);
       notification.error({
-        message: 'Failed to delete assetholder',
+        message: "Failed to delete assetholder",
         description: error.message,
-        duration: 1
+        duration: 1,
       });
     }
-  }
+  };
 
   const handleDepartmentChange = (value) => {
     setDepartmentId(value);
@@ -530,319 +747,386 @@ const TotalAsset = () => {
   const createMenu = (
     <Menu>
       <Menu.Item key="1">
-        <Button type="link" onClick={() => showModal('building')}>Create Building</Button>
+        <Button type="link" onClick={() => showModal("building")}>
+          Create Building
+        </Button>
       </Menu.Item>
       <Menu.Item key="2">
-        <Button type="link" onClick={() => showModal('department')}>Create Department</Button>
+        <Button type="link" onClick={() => showModal("department")}>
+          Create Department
+        </Button>
       </Menu.Item>
       <Menu.Item key="3">
-        <Button type="link" onClick={() => showModal('room')}>Create Room</Button>
+        <Button type="link" onClick={() => showModal("room")}>
+          Create Room
+        </Button>
       </Menu.Item>
       <Menu.Item key="4">
-        <Button type="link" onClick={() => showModal('assetholder')}>Create Assetholder</Button>
+        <Button type="link" onClick={() => showModal("assetholder")}>
+          Create Assetholder
+        </Button>
       </Menu.Item>
     </Menu>
   );
 
   const buildingMenu = (
     <Menu>
-    {buildings.map((building) => (
-      <Menu.Item key={building.id}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Button type="link" onClick={() => setSelectedBuilding(building.name)}>
-            {building.name}
-          </Button>
-          <div>
-            <Button 
-              type="link" 
-              icon={<EditOutlined />} 
-              onClick={() => handleEditBuilding(building)} 
-            />
-            <Button 
-              type="link" 
-              icon={<DeleteOutlined />} 
-              onClick={() =>  handlebuildingDelete(building)} 
-            />
+      {buildings.map((building) => (
+        <Menu.Item key={building.id}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Button
+              type="link"
+              onClick={() => setSelectedBuilding(building.name)}
+            >
+              {building.name}
+            </Button>
+            <div>
+              <Button
+                type="link"
+                icon={<EditOutlined />}
+                onClick={() => handleEditBuilding(building)}
+              />
+              <Button
+                type="link"
+                icon={<DeleteOutlined />}
+                onClick={() => handlebuildingDelete(building)}
+              />
+            </div>
           </div>
-        </div>
-      </Menu.Item>
-    ))}
-  </Menu>
+        </Menu.Item>
+      ))}
+    </Menu>
   );
 
   const departmentMenu = (
     <Menu>
-    {departments.map((department) => (
-      <Menu.Item key={department.id}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Button 
-            type="link" 
-            onClick={() => setSelectedDepartment(department.name)}
+      {departments.map((department) => (
+        <Menu.Item key={department.id}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
           >
-            {department.name}
-          </Button>
-          <div>
-            <Button 
-              type="link" 
-              icon={<EditOutlined />} 
-              onClick={() => handleEditDepartment(department)} 
-            />
-            <Button 
-              type="link" 
-              icon={<DeleteOutlined />} 
-              onClick={() => handleDepartmentDelete(department)} 
-            />
+            <Button
+              type="link"
+              onClick={() => setSelectedDepartment(department.name)}
+            >
+              {department.name}
+            </Button>
+            <div>
+              <Button
+                type="link"
+                icon={<EditOutlined />}
+                onClick={() => handleEditDepartment(department)}
+              />
+              <Button
+                type="link"
+                icon={<DeleteOutlined />}
+                onClick={() => handleDepartmentDelete(department)}
+              />
+            </div>
           </div>
-        </div>
-      </Menu.Item>
-    ))}
-  </Menu>
+        </Menu.Item>
+      ))}
+    </Menu>
   );
 
   const roomMenu = (
     <Menu>
-    {rooms.map((room) => (
-      <Menu.Item key={room.id}>
-        <div className="flex justify-between items-center w-full">
-          <Button
-            type="link"
-            onClick={() => setSelectedRoom(room.name)}
-          >
-            {room.name}
-          </Button>
-          <div className="flex gap-2">
-            <Button
-              type="link"
-              onClick={() => handleEditRoom(room)}
-              icon={<EditOutlined />}
-            />
-            <Button
-              type="link"
-              icon={<DeleteOutlined />}
-              onClick={() => handleRoomDelete(room)}
-            />
+      {rooms.map((room) => (
+        <Menu.Item key={room.id}>
+          <div className="flex justify-between items-center w-full">
+            <Button type="link" onClick={() => setSelectedRoom(room.name)}>
+              {room.name}
+            </Button>
+            <div className="flex gap-2">
+              <Button
+                type="link"
+                onClick={() => handleEditRoom(room)}
+                icon={<EditOutlined />}
+              />
+              <Button
+                type="link"
+                icon={<DeleteOutlined />}
+                onClick={() => handleRoomDelete(room)}
+              />
+            </div>
           </div>
-        </div>
-      </Menu.Item>
-    ))}
-  </Menu>
+        </Menu.Item>
+      ))}
+    </Menu>
   );
   const assetholderMenu = (
     <Menu>
-    {assetHolders.map((assetHolder) => (
-      <Menu.Item key={assetHolder.id}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Button 
-            type="link" 
-            onClick={() => setSelectedAssetHolder(assetHolder)}
+      {assetHolders.map((assetHolder) => (
+        <Menu.Item key={assetHolder.id}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
           >
-            {assetHolder.name}
-          </Button>
-          <div>
-            <Button 
-              type="link" 
-              icon={<EditOutlined />} 
-              onClick={() => handleEditAssetHolder(assetHolder)} 
-            />
-            <Button 
-              type="link" 
-              icon={<DeleteOutlined />} 
-              onClick={() => handleAssetholderDelete(assetHolder)} 
-            />
+            <Button
+              type="link"
+              onClick={() => setSelectedAssetHolder(assetHolder)}
+            >
+              {assetHolder.name}
+            </Button>
+            <div>
+              <Button
+                type="link"
+                icon={<EditOutlined />}
+                onClick={() => handleEditAssetHolder(assetHolder)}
+              />
+              <Button
+                type="link"
+                icon={<DeleteOutlined />}
+                onClick={() => handleAssetholderDelete(assetHolder)}
+              />
+            </div>
           </div>
-        </div>
-      </Menu.Item>
-    ))}
-  </Menu>
+        </Menu.Item>
+      ))}
+    </Menu>
   );
-
-  const headerStyle = {
-    fontSize: '0.75rem', // Tailwind's text-xs equivalent
-  };
 
   const [editableKeys, setEditableRowKeys] = useState(() =>
-    assetById.map((item) => item.id),
-
+    assetById.map((item) => item.id)
   );
- 
 
   const columnscount = [
     {
-      title: 'No',
-      dataIndex: 'key',
-      render: (_, __, index) => index + 1,
+      title: "No",
+      dataIndex: "key",
+      render: (_, __, index) => <span className="text-sm">{index + 1}</span>,
       editable: false,
     },
     {
-      title: 'Fixed Asset Name',
-      dataIndex: 'name',
-      key: 'name',
+      title: "Fixed Asset Name",
+      dataIndex: "name",
+      key: "name",
+      render: (text) => <span className="text-sm">{text}</span>,
       editable: false,
     },
     {
-      title: 'Category',
-      dataIndex: ['category', 'name'],
-      key: 'category',
+      title: "Category",
+      dataIndex: ["category", "name"],
+      key: "category",
+      render: (text) => <span className="text-sm">{text}</span>,
       editable: false,
     },
     {
-      title: 'Model',
-      dataIndex: 'model',
-      key: 'model',
+      title: "Model",
+      dataIndex: "model",
+      key: "model",
+      render: (text) => <span className="text-sm">{text}</span>,
       editable: false,
     },
     {
-      title: 'Year',
-      dataIndex: 'year',
-      key: 'year',
+      title: "Year",
+      dataIndex: "year",
+      key: "year",
+      render: (text) => <span className="text-sm">{text}</span>,
       editable: false,
     },
     {
-      title: 'Price',
-      dataIndex: 'price',
-      key: 'price',
-      render: (text) => `$${text}`,
+      title: "Price",
+      dataIndex: "price",
+      key: "price",
+      render: (text) => <span className="text-sm">{`$${text}`}</span>,
       editable: false,
     },
     {
-      title: 'Serial Number',
-      dataIndex: 'serialNumber',
-      key: 'serialNumber',
+      title: "Serial Number",
+      dataIndex: "serialNumber",
+      key: "serialNumber",
+      render: (text) => <span className="text-sm">{text}</span>,
       editable: false,
     },
     {
-      title: 'Purchase Date',
-      dataIndex: 'purchaseDate',
-      key: 'purchaseDate',
+      title: "Purchase Date",
+      dataIndex: "purchaseDate",
+      key: "purchaseDate",
+      render: (text) => <span className="text-sm">{text}</span>,
       editable: false,
     },
     {
-      title: 'Unit',
-      dataIndex: 'unit',
-      key: 'unit',
+      title: "Unit",
+      dataIndex: "unit",
+      key: "unit",
+      render: (text) => <span className="text-sm">{text}</span>,
       editable: false,
     },
     {
-      title: 'Asset Holder',
-      dataIndex: ['assetHolder', 'name'],
-      key: 'assetHolder',
-      render: (text, record) => (record.assetHolder ? text : 'N/A'),
+      title: "Asset Holder",
+      dataIndex: ["assetHolder", "name"],
+      key: "assetHolder",
+      render: (text, record) => (
+        <span className="text-sm">{record.assetHolder ? text : "N/A"}</span>
+      ),
       editable: false,
     },
     {
-      title: 'Quantity Counted',
-      dataIndex: 'quantityCounted',
-      key: 'quantityCounted',
+      title: "Quantity Counted",
+      dataIndex: "quantityCounted",
+      key: "quantityCounted",
       editable: true,
       fieldProps: {
-        placeholder: 'Enter quantity', 
+        placeholder: "Enter quantity",
+        className: "text-sm", // Tailwind class for input fields
       },
     },
     {
-      title: 'Conditions',
-      dataIndex: 'conditions',
-      key: 'conditions',
+      title: "Conditions",
+      dataIndex: "conditions",
+      key: "conditions",
       editable: true,
       fieldProps: {
-        placeholder: 'Enter quantity', 
+        placeholder: "Enter conditions",
+        className: "text-sm", // Tailwind class for input fields
       },
     },
     {
-      title: 'Existence Asset',
-      dataIndex: 'existenceAsset',
-      key: 'existenceAsset',
+      title: "Existence Asset",
+      dataIndex: "existenceAsset",
+      key: "existenceAsset",
       editable: true,
       fieldProps: {
-        placeholder: 'Enter quantity', 
+        placeholder: "Enter existence status",
+        className: "text-sm", // Tailwind class for input fields
       },
     },
     {
-      title: 'Remarks',
-      dataIndex: 'remarks',
-      key: 'remarks',
+      title: "Remarks",
+      dataIndex: "remarks",
+      key: "remarks",
       editable: true,
       fieldProps: {
-        placeholder: 'Enter quantity', 
+        placeholder: "Enter remarks",
+        className: "text-sm", // Tailwind class for input fields
       },
     },
   ];
 
-  // const [dataSource, setDataSource] = useState(() => defaultData);
-
   return (
     <>
       <div className="flex justify-between items-center">
-          <div className="flex">
-            <Dropdown overlay={createMenu} placement="bottomLeft">
-              <Button size="middle" className="bg-yellow-500 text-white hover:bg-white hover:text-yellow-500 border-none">
-                Create <DownOutlined />
-              </Button>
-            </Dropdown>
-
-            <Dropdown overlay={buildingMenu} placement="bottomLeft">
-              <Button size="middle" className="ml-2 text-gray-700 hover:bg-yellow-50">
-                Building <DownOutlined />
-              </Button>
-            </Dropdown>
-
-            <Dropdown overlay={departmentMenu} placement="bottomLeft">
-              <Button size="middle" className="ml-2 text-gray-700 hover:bg-yellow-50">
-                Department <DownOutlined />
-              </Button>
-            </Dropdown>
-
-            <Dropdown overlay={roomMenu} placement="bottomLeft">
-              <Button size="middle" className="ml-2 text-gray-700 hover:bg-yellow-50">
-                Room <DownOutlined />
-              </Button>
-            </Dropdown>
-
-            <Dropdown overlay={assetholderMenu} placement="bottomLeft">
-              <Button size="middle" className="ml-2 text-gray-700 hover:bg-yellow-50">
-                AssetHolder <DownOutlined />
-              </Button>
-            </Dropdown>
-
+        <div className="flex">
+          <Dropdown overlay={createMenu} placement="bottomLeft">
             <Button
               size="middle"
-              className="ml-2 bg-gray-100 hover:bg-yellow-500 hover:text-white rounded-full"
-              shape="circle"
-              icon={<PlusOutlined />}
-              onClick={() => {
-                setIsModalVisible(true);
-                setModalType('Audit');
-              }}
-            />
-          </div>
-        
+              className="bg-yellow-500 text-white hover:bg-white hover:text-yellow-500 border-none"
+            >
+              Create <DownOutlined />
+            </Button>
+          </Dropdown>
+
+          <Dropdown overlay={buildingMenu} placement="bottomLeft">
+            <Button
+              size="middle"
+              className="ml-2 text-gray-700 hover:bg-yellow-50"
+            >
+              Building <DownOutlined />
+            </Button>
+          </Dropdown>
+
+          <Dropdown overlay={departmentMenu} placement="bottomLeft">
+            <Button
+              size="middle"
+              className="ml-2 text-gray-700 hover:bg-yellow-50"
+            >
+              Department <DownOutlined />
+            </Button>
+          </Dropdown>
+
+          <Dropdown overlay={roomMenu} placement="bottomLeft">
+            <Button
+              size="middle"
+              className="ml-2 text-gray-700 hover:bg-yellow-50"
+            >
+              Room <DownOutlined />
+            </Button>
+          </Dropdown>
+
+          <Dropdown overlay={assetholderMenu} placement="bottomLeft">
+            <Button
+              size="middle"
+              className="ml-2 text-gray-700 hover:bg-yellow-50"
+            >
+              AssetHolder <DownOutlined />
+            </Button>
+          </Dropdown>
+
+          <Button
+            size="middle"
+            className="ml-2 bg-gray-100 hover:bg-yellow-500 hover:text-white rounded-full"
+            shape="circle"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              setIsModalVisible(true);
+              setModalType("Audit");
+            }}
+          />
         </div>
-        <div className="flex-1 overflow-auto pt-4 ">
-          <Table columns={columns} />;
-        </div>
-      
+      </div>
+      <div className="flex-1 overflow-auto pt-4 ">
+        <Table columns={columns} />;
+      </div>
 
       <Modal
         title={modalType.charAt(0).toUpperCase() + modalType.slice(1)}
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
-        width={modalType === 'Audit' ? 1400 : 500}
-
+        width={modalType === "Audit" ? 1400 : 500}
       >
         <Form form={form} layout="vertical">
-          {modalType === 'building' && (
+          {modalType === "building" && (
             <>
-              <Form.Item name="name" label="Building Name" rules={[{ required: true, message: 'Please input the building name!' }]}>
+              <Form.Item
+                name="name"
+                label="Building Name"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input the building name!",
+                  },
+                ]}
+              >
                 <Input />
               </Form.Item>
             </>
           )}
-         {modalType === 'department' && (
+          {modalType === "department" && (
             <>
-              <Form.Item name="name" label="Department Name" rules={[{ required: true, message: 'Please input the department name!' }]}>
+              <Form.Item
+                name="name"
+                label="Department Name"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input the department name!",
+                  },
+                ]}
+              >
                 <Input />
               </Form.Item>
-              <Form.Item name="building" label="Building" rules={[{ required: true, message: 'Please select a building!' }]}>
+              <Form.Item
+                name="building"
+                label="Building"
+                rules={[
+                  { required: true, message: "Please select a building!" },
+                ]}
+              >
                 <Select>
                   {buildings.map((building) => (
                     <Option key={building.id} value={building.id}>
@@ -858,13 +1142,25 @@ const TotalAsset = () => {
                 <Input.TextArea />
               </Form.Item>
             </>
-          )}  
-          {modalType === 'room' && (
+          )}
+          {modalType === "room" && (
             <>
-              <Form.Item name="name" label="Room Name" rules={[{ required: true, message: 'Please input the room name!' }]}>
+              <Form.Item
+                name="name"
+                label="Room Name"
+                rules={[
+                  { required: true, message: "Please input the room name!" },
+                ]}
+              >
                 <Input />
               </Form.Item>
-              <Form.Item name="building" label="Building" rules={[{ required: true, message: 'Please select a building!' }]}>
+              <Form.Item
+                name="building"
+                label="Building"
+                rules={[
+                  { required: true, message: "Please select a building!" },
+                ]}
+              >
                 <Select>
                   {buildings.map((building) => (
                     <Option key={building.id} value={building.id}>
@@ -873,7 +1169,13 @@ const TotalAsset = () => {
                   ))}
                 </Select>
               </Form.Item>
-              <Form.Item name="department" label="Department" rules={[{ required: true, message: 'Please select a department!' }]}>
+              <Form.Item
+                name="department"
+                label="Department"
+                rules={[
+                  { required: true, message: "Please select a department!" },
+                ]}
+              >
                 <Select>
                   {departments.map((department) => (
                     <Option key={department.id} value={department.id}>
@@ -882,114 +1184,132 @@ const TotalAsset = () => {
                   ))}
                 </Select>
               </Form.Item>
-              
+
               <Form.Item name="description" label="Description">
                 <Input.TextArea />
               </Form.Item>
             </>
-          )} 
-          {modalType === 'assetholder' && (
-          <>
-            <Form.Item 
-              name="name" 
-              label="Asset Holder Name" 
-              rules={[{ required: true, message: 'Please input the asset holder\'s name!' }]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item 
-              name="email" 
-              label="Email" 
-              rules={[{ required: true, type: 'email', message: 'Please input a valid email!' }]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item 
-              name="phoneNumber" 
-              label="Phone Number" 
-              rules={[{ required: true, message: 'Please input the phone number!' }]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item 
-              name="department" 
-              label="Department" 
-              
-              rules={[{ required: true, message: 'Please select a department!' }]}
-            >
-              <Select 
-                >
-                {departments.map((department) => (
-                  <Option key={department.id} value={department.id}>
-                    {department.name}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </>
+          )}
+          {modalType === "assetholder" && (
+            <>
+              <Form.Item
+                name="name"
+                label="Asset Holder Name"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input the asset holder's name!",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                name="email"
+                label="Email"
+                rules={[
+                  {
+                    required: true,
+                    type: "email",
+                    message: "Please input a valid email!",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                name="phoneNumber"
+                label="Phone Number"
+                rules={[
+                  { required: true, message: "Please input the phone number!" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                name="department"
+                label="Department"
+                rules={[
+                  { required: true, message: "Please select a department!" },
+                ]}
+              >
+                <Select>
+                  {departments.map((department) => (
+                    <Option key={department.id} value={department.id}>
+                      {department.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </>
           )}
 
-          {modalType === 'Audit' && (
-          <Form layout="vertical" style={{ maxWidth: '100%', margin: '0 auto', padding: 20 }}>
-            <div className="flex space-x-4 items-center mb-4"> {/* Flex container for form items */}
-        <Form.Item
-          name="department"
-          label="Department"
-          style={{ width: '200px' }} 
-          rules={[{ required: true, message: 'Please select a department!' }]}
-        >
-          <Select
-            onChange={handleDepartmentChange}
-            placeholder="Select a department"
-            className="w-full"
-          >
-            {departments.map((department) => (
-              <Option key={department.id} value={department.id}>
-                {department.name}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
-
-        <Form.Item
-          name="date"
-          label="Date"
-          style={{ width: '200px' }} 
-          rules={[{ required: true, message: 'Please select a date!' }]}
-        >
-          <DatePicker className="w-full" />
-        </Form.Item>
-      </div>
-      {assetById.length > 0 ? (
-        <EditableProTable
-          columns={columnscount}
-          rowKey="id"
-          scroll={{
-            x: 1200,
-          }}
-          value={assetById}
-          onChange={setAssetById}
-          recordCreatorProps={false}
-
-          editable={{
-            type: 'multiple',
-            editableKeys,
-            actionRender: (row, config, defaultDoms) => {
-              return [defaultDoms.delete];
-            },
-            onValuesChange: (record, recordList) => setAssetById(recordList),
-            onChange: setEditableRowKeys,
-            
-          
-          }}
-           className="text-sm"
-        />
-      ) : (
-        <Card>No assets found for the selected department.</Card>
-      )}
-    
-        </Form>
-        )}
+          {modalType === "Audit" && (
+            <Form
+              layout="vertical"
+              style={{ maxWidth: "100%", margin: "0 auto", padding: 20 }}
+            >
+              <div className="flex space-x-4 items-center mb-4">
+                {" "}
+                {/* Flex container for form items */}
+                <Form.Item
+                  name="department"
+                  label="Department"
+                  style={{ width: "200px" }}
+                  rules={[
+                    { required: true, message: "Please select a department!" },
+                  ]}
+                >
+                  <Select
+                    onChange={handleDepartmentChange}
+                    placeholder="Select a department"
+                    className="w-full"
+                  >
+                    {departments.map((department) => (
+                      <Option key={department.id} value={department.id}>
+                        {department.name}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+                <Form.Item
+                  name="date"
+                  label="Date"
+                  style={{ width: "200px" }}
+                  rules={[{ required: true, message: "Please select a date!" }]}
+                >
+                  <DatePicker className="w-full" />
+                </Form.Item>
+              </div>
+              <div className="text-sm">
+                {assetById.length > 0 ? (
+                  <EditableProTable
+                    columns={columnscount}
+                    rowKey="id"
+                    scroll={{
+                      x: 1200,
+                    }}
+                    value={assetById}
+                    onChange={setAssetById}
+                    recordCreatorProps={false}
+                    editable={{
+                      type: "multiple",
+                      editableKeys,
+                      actionRender: (row, config, defaultDoms) => {
+                        return [defaultDoms.delete];
+                      },
+                      onValuesChange: (record, recordList) =>
+                        setAssetById(recordList),
+                      onChange: setEditableRowKeys,
+                    }}
+                    className="text-sm"
+                  />
+                ) : (
+                  <Card>No assets found for the selected department.</Card>
+                )}
+              </div>
+            </Form>
+          )}
         </Form>
       </Modal>
     </>

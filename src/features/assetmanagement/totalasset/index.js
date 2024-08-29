@@ -1039,7 +1039,7 @@ useEffect(()=>{
             </div>
 
             <div className="text-gray-600 font-semibold">Asset Holder:</div>
-            <div className="text-gray-800">{viewAsset?.fixedAsset?.assetHolder}</div>
+            <div className="text-gray-800">{viewAsset?.fixedAsset?.assetHolder.name}</div>
           </div>
         </div>
 
