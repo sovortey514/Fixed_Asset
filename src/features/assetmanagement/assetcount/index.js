@@ -16,7 +16,7 @@ import {
   Card,
   DatePicker,
 } from "antd";
-import { DownOutlined } from "@ant-design/icons";
+import { DownOutlined, EyeOutlined } from "@ant-design/icons";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { PlusOutlined } from "@ant-design/icons";
 import {
@@ -27,7 +27,7 @@ import {
 const { Option } = Select;
 
 const TotalAsset = () => {
-  const [size, setSize] = useState("large");
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalType, setModalType] = useState(""); // 'building', 'department', or 'room'
   const [form] = Form.useForm();
@@ -48,10 +48,11 @@ const TotalAsset = () => {
   const [editDepartment, setEditDepartment] = useState(null);
   const [editRoom, setEditRoom] = useState(null);
   const [editAssetHolder, setEditAssetHolder] = useState(null);
+  const [fixedAssetCounts2, setFixedAssetcount] = useState([]);
 
   const [fixedassetwithdepartment, setFixedAssetwithdepartment] =
     useState(null);
-
+  const [data, setData] = useState([]);
   const [assetById, setAssetById] = useState([]);
   const [departmentId, setDepartmentId] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -60,34 +61,40 @@ const TotalAsset = () => {
 
   useEffect(() => {
     fetchData();
+    fetchAssetCount();
   }, []);
 
   const columns = [
     {
       title: "No",
       dataIndex: "key",
-      render: (_, r, index) => index + 1,
+      render: (_, record, index) => index + 1,
     },
     {
       title: "Department",
-      dataIndex: "department",
+      dataIndex: "departmentName",
       key: "department",
       render: (text) => <a>{text}</a>,
     },
     {
-      title: "Total Asset",
-      dataIndex: "total asset",
-      key: "total asset",
-    },
-    {
       title: "Count Date",
-      dataIndex: "count date",
+      dataIndex: "countDate",
       key: "count date",
     },
     {
-      title: "Remark",
-      dataIndex: "remarks",
-      key: "remarks",
+      title: "Count By",
+      dataIndex: "countBy",
+      key: "count by",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Button
+          icon={<EyeOutlined />}
+          className="bg-white hover:bg-yellow-500 text-yellow-500 border-none rounded-full p-2 shadow-md"
+        />
+      ),
     },
   ];
 
@@ -161,42 +168,98 @@ const TotalAsset = () => {
     }
   }, [departmentId, token]);
 
+  const [fixedAssetCountData, setFixedAssetCountData] = useState([]);
+  const fetchAssetCount = async () => {
+    try {
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+      const response = await fetch("http://localhost:6060/admin/getcreatecount", { headers });
+      const result = await response.json();
+
+      if (response.ok && result.statusCode === 200) {
+        // Transform the API data to match the table columns
+        const transformedData = result.fixedAssetCounts2.map((item) => ({
+          key: item.id,
+          departmentName: item.department.name, // Assuming department name is to be displayed
+          countDate: new Date(item.createdAt).toLocaleDateString(), // Format date as needed
+          countBy: item.createdBy,
+          remark: '', // Assuming there's no remark in the provided data
+        }));
+
+        setFixedAssetCountData(transformedData);
+      } else {
+        notification.error({
+          message: "Failed to fetch fixed assets",
+          description: result.error || "Unexpected error occurred.",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching fixed assets:", error);
+    }
+  };
+
+
   const fetchData = async () => {
     try {
       const headers = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       };
-
-      let response = await fetch(
-        "http://localhost:6060/admin/getAllBuildings",
-        { headers }
-      );
+  
+      // Fetch buildings
+      let response = await fetch("http://localhost:6060/admin/getAllBuildings", {
+        headers,
+      });
       let data = await response.json();
       if (response.ok) setBuildings(data.buildings || []);
-
+  
+      // Fetch departments
       response = await fetch("http://localhost:6060/admin/getAllDepartments", {
         headers,
       });
       data = await response.json();
       if (response.ok) setDepartments(data.departments || []);
       console.log(departments);
-
+  
+      // Fetch rooms
       response = await fetch("http://localhost:6060/admin/getAllRooms", {
         headers,
       });
       data = await response.json();
       if (response.ok) setRooms(data.rooms || []);
-
+  
+      // Fetch asset holders
       response = await fetch("http://localhost:6060/admin/getallassetholders", {
         headers,
       });
       data = await response.json();
       if (response.ok) setAssetHolder(data.assetHolders || []);
+  
+      // Fetch fixed asset count
+      response = await fetch("http://localhost:6060/admin/getcreatecount", {
+        headers,
+      });
+      data = await response.json();
+      if (data.statusCode === 200) {
+        console.log(data.fixedAssetCount);
+        setFixedAssetcount(data.fixedAssetCount || []);
+        console.log(data.fixedAssetCount);
+      } else {
+        notification.error({
+          message: "Failed to fetch fixed assets",
+          description: data.error,
+        });
+      }
+  
     } catch (error) {
       console.error("Failed to fetch data:", error);
     }
   };
+ 
+
+  
 
   const showModal = (type) => {
     setModalType(type);
@@ -1078,9 +1141,9 @@ const TotalAsset = () => {
           />
         </div>
       </div>
-      <div className="flex-1 overflow-auto pt-4 ">
-        <Table columns={columns} />;
-      </div>
+      <div className="flex-1 overflow-auto pt-4">
+      <Table columns={columns} dataSource={fixedAssetCountData} rowKey="key" />
+    </div>
 
       <Modal
         title={modalType.charAt(0).toUpperCase() + modalType.slice(1)}
