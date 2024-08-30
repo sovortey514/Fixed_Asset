@@ -43,19 +43,23 @@ public class FixedAssetDetailController {
     }
 
     @GetMapping("/getcreatedetail")
-    public ResponseEntity<ReqRes> getAllFixedAssetDetail() {
+    public ResponseEntity<ReqRes> getAllFixedAssetCounts() {
         ReqRes resp = new ReqRes();
         try {
+            // Fetching the list of FixedAssetCounts from the service
             List<FixedAssetDetail> fixedAssetDetails = fixedAssetDetailService.getAllFixedAssetDetails();
+            
+            // Setting the list to the response object
             resp.setFixedAssetDetails(fixedAssetDetails);
             resp.setMessage("Fixed Asset Counts retrieved successfully");
             resp.setStatusCode(200);
+            
+            // Returning the response entity with the populated DTO
             return ResponseEntity.ok(resp);
         } catch (Exception e) {
+            // Handling errors and setting error details in the response
             resp.setStatusCode(500);
-            resp.setError(e.getMessage());
-            // Log the exception (consider using a logging framework)
-            System.err.println("Error retrieving fixed asset counts: " + e.getMessage());
+            resp.setError("Error retrieving fixed asset counts: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(resp);
         }
     }

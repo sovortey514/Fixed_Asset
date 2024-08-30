@@ -40,6 +40,7 @@ public class FixedAssetCountServiceImpl implements FixedAssetCountService {
 
     @Override
     public FixedAssetCounts createFixedAssetCounts(FixedAssetCounts fixedAssetCounts) {
+
         if (fixedAssetCounts.getDepartment() == null || !departmentRepository.existsById(fixedAssetCounts.getDepartment().getId())) {
             throw new IllegalArgumentException("Invalid department ID");
         }
@@ -64,12 +65,6 @@ public class FixedAssetCountServiceImpl implements FixedAssetCountService {
     }
     
     
-
-    // @Override
-    // public void deleteFixedAssetCount(Long id) {
-    //     // Implementation here
-    // }
-
     @Override
     public List<FixedAssetCounts> getAllFixedAssetCounts() {
         return fixedAssetCountsRepository.findAll();

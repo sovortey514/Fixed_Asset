@@ -75,23 +75,4 @@ public ResponseEntity<ReqRes> getAllFixedAssetCounts() {
                 .map(holder -> new ResponseEntity<>(holder, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-    
-    // @DeleteMapping("/deleteassetbyId/{id}")
-    // public ResponseEntity<ReqRes> deleteFixedAssetCount(@PathVariable Long id) {
-    //     ReqRes resp = new ReqRes();
-    //     try {
-    //         fixedAssetCountService.deleteFixedAssetCount(id);
-    //         resp.setMessage("Assetholder Deleted Successfully");
-    //         resp.setStatusCode(200);
-    //     } catch (IllegalArgumentException e) {
-    //         resp.setStatusCode(404);
-    //         resp.setError(e.getMessage());
-    //     }catch (Exception e) {
-    //         resp.setStatusCode(500);
-    //         resp.setError(e.getMessage());
-    //     }
-    //     return ResponseEntity.ok(resp);
-    // }
-    
-
 }
