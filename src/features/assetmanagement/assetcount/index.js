@@ -609,34 +609,34 @@ const TotalAsset = () => {
                   remarks: item.remarks,
                   quantityCounted: item.quantityCounted,
                 };
-                // Access other properties as needed
-                detailResponse = await fetch(
-                  "http://localhost:6060/admin/createdetail",
-                  {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify(fixedAssetDetailPayload),
-                  }
-                );
+                // // Access other properties as needed
+                // detailResponse = await fetch(
+                //   "http://localhost:6060/admin/createdetail",
+                //   {
+                //     method: "POST",
+                //     headers: {
+                //       "Content-Type": "application/json",
+                //       Authorization: `Bearer ${token}`,
+                //     },
+                //     body: JSON.stringify(fixedAssetDetailPayload),
+                //   }
+                // );
 
-                const detailData = await detailResponse.json();
-                console.log("Fixed Asset Detail Response:", detailData);
+                // const detailData = await detailResponse.json();
+                // console.log("Fixed Asset Detail Response:", detailData);
 
-                setIsModalVisible(false);
-                fetchData();
+                // setIsModalVisible(false);
+                // fetchData();
               }
-              if (detailResponse.ok) {
-                notification.success({
-                  duration: 1,
-                });
-              } else {
-                throw new Error(
-                  detailData.error || "Failed to create Fixed Asset Detail"
-                );
-              }
+              // if (detailResponse.ok) {
+              //   notification.success({
+              //     duration: 1,
+              //   });
+              // } else {
+              //   throw new Error(
+              //     detailData.error || "Failed to create Fixed Asset Detail"
+              //   );
+              // }
             }
 
             const detailResponse = await fetch(
@@ -665,7 +665,8 @@ const TotalAsset = () => {
             }
 
             setIsModalVisible(false);
-            fetchData();
+            fetchAssetCount();
+
           } else {
             throw new Error(data.error || "Failed to create Fixed Asset Count");
           }
