@@ -43,7 +43,7 @@ public class FixedAssetDetailController {
     }
 
     @GetMapping("/getcreatedetail")
-    public ResponseEntity<ReqRes> getAllFixedAssetCounts() {
+    public ResponseEntity<ReqRes> getAllFixedAssetDetails() {
         ReqRes resp = new ReqRes();
         try {
             // Fetching the list of FixedAssetCounts from the service
