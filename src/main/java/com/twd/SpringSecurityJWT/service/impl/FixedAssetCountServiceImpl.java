@@ -40,7 +40,6 @@ public class FixedAssetCountServiceImpl implements FixedAssetCountService {
 
     @Override
     public FixedAssetCounts createFixedAssetCounts(FixedAssetCounts fixedAssetCounts) {
-     
         if (fixedAssetCounts.getDepartment() == null || !departmentRepository.existsById(fixedAssetCounts.getDepartment().getId())) {
             throw new IllegalArgumentException("Invalid department ID");
         }
@@ -48,10 +47,20 @@ public class FixedAssetCountServiceImpl implements FixedAssetCountService {
         if (fixedAssetCounts.getCreatedBy() == null || fixedAssetCounts.getCreatedBy().isEmpty()) {
             throw new IllegalArgumentException("Created By must be provided");
         }
+    
+        // Logging the creation attempt
+        System.out.println("Creating FixedAssetCounts: " + fixedAssetCounts);
+    
         fixedAssetCounts.setCreatedAt(LocalDateTime.now());
         fixedAssetCounts.setUpdatedAt(LocalDateTime.now());
         fixedAssetCounts.setUpdatedBy(fixedAssetCounts.getCreatedBy());
-        return fixedAssetCountsRepository.save(fixedAssetCounts);
+        
+        FixedAssetCounts savedEntity = fixedAssetCountsRepository.save(fixedAssetCounts);
+        
+        // Logging the saved entity
+        System.out.println("Saved FixedAssetCounts: " + savedEntity);
+    
+        return savedEntity;
     }
     
     
@@ -83,13 +92,5 @@ public class FixedAssetCountServiceImpl implements FixedAssetCountService {
                 .orElseThrow(() -> new RuntimeException("FixedAssetCount not found with ID: " + id));
     }
 
-    // @Override
-    // public void deleteFixedAssetCount(Long id) {
-    //     if (fixedAssetCountsRepository.existsById(id)) {
-    //         fixedAssetCountsRepository.deleteById(id);
-    //     } else {
-    //         throw new IllegalArgumentException("AssetHolder with ID " + id + " does not exist.");
-    //     }
-    // }
  
 }

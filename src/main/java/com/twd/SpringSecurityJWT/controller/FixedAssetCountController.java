@@ -47,22 +47,27 @@ public class FixedAssetCountController {
     }
 
     @GetMapping("/getcreatecount")
-    public ResponseEntity<ReqRes> getAllFixedAssetCounts() {
-        ReqRes resp = new ReqRes();
-        try {
-            List<FixedAssetCounts> fixedAssetCountsList = fixedAssetCountService.getAllFixedAssetCounts();
-            resp.setFixedAssetCounts2(fixedAssetCountsList);
-            resp.setMessage("Fixed Asset Counts retrieved successfully");
-            resp.setStatusCode(200);
-            return ResponseEntity.ok(resp);
-        } catch (Exception e) {
-            resp.setStatusCode(500);
-            resp.setError(e.getMessage());
-            // Log the exception (consider using a logging framework)
-            System.err.println("Error retrieving fixed asset counts: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(resp);
-        }
+public ResponseEntity<ReqRes> getAllFixedAssetCounts() {
+    ReqRes resp = new ReqRes();
+    try {
+        // Fetching the list of FixedAssetCounts from the service
+        List<FixedAssetCounts> fixedAssetCountsList = fixedAssetCountService.getAllFixedAssetCounts();
+        
+        // Setting the list to the response object
+        resp.setFixedAssetCounts2(fixedAssetCountsList);
+        resp.setMessage("Fixed Asset Counts retrieved successfully");
+        resp.setStatusCode(200);
+        
+        // Returning the response entity with the populated DTO
+        return ResponseEntity.ok(resp);
+    } catch (Exception e) {
+        // Handling errors and setting error details in the response
+        resp.setStatusCode(500);
+        resp.setError("Error retrieving fixed asset counts: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(resp);
     }
+}
+
     @GetMapping("/getfixedassetcountbyId/{id}")
     public ResponseEntity<FixedAssetCounts> getAllFixedAssetCountsById(@PathVariable Long id) {
         Optional<FixedAssetCounts> optionalFixedAssetCounts = fixedAssetCountService.getAllFixedAssetCountsById(id);
