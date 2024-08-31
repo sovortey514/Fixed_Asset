@@ -596,7 +596,6 @@ const TotalAsset = () => {
             });
             let fixedAssetDetailPayload;
             if (data) {
-              let detailResponse;
               // console.log(data)
               for (let i = 0; i < assetById.length; i++) {
                 const item = assetById[i];
@@ -609,34 +608,8 @@ const TotalAsset = () => {
                   remarks: item.remarks,
                   quantityCounted: item.quantityCounted,
                 };
-                // // Access other properties as needed
-                // detailResponse = await fetch(
-                //   "http://localhost:6060/admin/createdetail",
-                //   {
-                //     method: "POST",
-                //     headers: {
-                //       "Content-Type": "application/json",
-                //       Authorization: `Bearer ${token}`,
-                //     },
-                //     body: JSON.stringify(fixedAssetDetailPayload),
-                //   }
-                // );
-
-                // const detailData = await detailResponse.json();
-                // console.log("Fixed Asset Detail Response:", detailData);
-
-                // setIsModalVisible(false);
-                // fetchData();
+               
               }
-              // if (detailResponse.ok) {
-              //   notification.success({
-              //     duration: 1,
-              //   });
-              // } else {
-              //   throw new Error(
-              //     detailData.error || "Failed to create Fixed Asset Detail"
-              //   );
-              // }
             }
 
             const detailResponse = await fetch(
