@@ -5,6 +5,8 @@ import java.util.Date;
 // import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,6 +45,7 @@ public class FixedAssetCounts {
     private String updatedBy;
 
     @OneToMany(mappedBy = "fixedAssetCount", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<FixedAssetDetail> assetDetails;
 
 }

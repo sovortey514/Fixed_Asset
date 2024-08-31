@@ -49,7 +49,6 @@ public class FixedAssetCountServiceImpl implements FixedAssetCountService {
             throw new IllegalArgumentException("Created By must be provided");
         }
     
-        // Logging the creation attempt
         System.out.println("Creating FixedAssetCounts: " + fixedAssetCounts);
     
         fixedAssetCounts.setCreatedAt(LocalDateTime.now());
@@ -58,7 +57,7 @@ public class FixedAssetCountServiceImpl implements FixedAssetCountService {
         
         FixedAssetCounts savedEntity = fixedAssetCountsRepository.save(fixedAssetCounts);
         
-        // Logging the saved entity
+      
         System.out.println("Saved FixedAssetCounts: " + savedEntity);
     
         return savedEntity;

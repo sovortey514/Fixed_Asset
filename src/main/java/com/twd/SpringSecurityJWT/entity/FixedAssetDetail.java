@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Data
 @Table(name = "fixed_asset_details")
@@ -38,6 +40,7 @@ public class FixedAssetDetail {
     
     @ManyToOne
     @JoinColumn(name = "fixedassetdetail", nullable = false)
+    // @JsonIgnore
     private FixedAssetCounts fixedAssetCount;
 
 }
