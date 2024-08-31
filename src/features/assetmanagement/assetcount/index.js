@@ -56,12 +56,14 @@ const TotalAsset = () => {
   const [assetById, setAssetById] = useState([]);
   const [departmentId, setDepartmentId] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  const [fixedAssetDetail, setFixedAssetDetail] = useState(null);
+  
   const token = localStorage.getItem("token");
 
   useEffect(() => {
     fetchData();
     fetchAssetCount();
+    fetchAssetDetails();
   }, []);
 
   const columns = [
@@ -93,10 +95,17 @@ const TotalAsset = () => {
         <Button
           icon={<EyeOutlined />}
           className="bg-white hover:bg-yellow-500 text-yellow-500 border-none rounded-full p-2 shadow-md"
+          
+          onClick={() => handleViewClick(record)}
         />
       ),
     },
   ];
+  const handleViewClick = (record) => {
+    setModalType("fixedAssetDetail"); // Set the modal type to fixed asset detail
+    setIsModalVisible(true); // Show the modal
+    fetchAssetDetails(record.id); // Fetch details for the selected asset
+  };
 
   useEffect(() => {
     if (departmentId) {
@@ -200,6 +209,35 @@ const TotalAsset = () => {
     }
   };
 
+  const fetchAssetDetails = async () => {
+    try {
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // Ensure token is correctly defined
+      };
+      const response = await fetch("http://localhost:6060/admin/getcreatedetail", { headers });
+      const result = await response.json();
+  
+      if (response.ok && result.statusCode === 200) {
+        if (result.fixedAssetDetails) {
+          setFixedAssetDetail(result.fixedAssetDetails);
+          setIsModalVisible(true);
+          console.log(result.fixedAssetDetails); // Log the result to check its structure
+        } else {
+          console.warn("Fixed asset details not found in the response.");
+        }
+      } else {
+        notification.error({
+          message: "Failed to fetch fixed asset details",
+          description: result.message || "Unexpected error occurred.",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching fixed asset details:", error);
+    }
+  };
+
+  
 
   const fetchData = async () => {
     try {
@@ -237,21 +275,21 @@ const TotalAsset = () => {
       data = await response.json();
       if (response.ok) setAssetHolder(data.assetHolders || []);
   
-      // Fetch fixed asset count
-      response = await fetch("http://localhost:6060/admin/getcreatecount", {
-        headers,
-      });
-      data = await response.json();
-      if (data.statusCode === 200) {
-        console.log(data.fixedAssetCount);
-        setFixedAssetcount(data.fixedAssetCount || []);
-        console.log(data.fixedAssetCount);
-      } else {
-        notification.error({
-          message: "Failed to fetch fixed assets",
-          description: data.error,
-        });
-      }
+      // // Fetch fixed asset count
+      // response = await fetch("http://localhost:6060/admin/getcreatecount", {
+      //   headers,
+      // });
+      // data = await response.json();
+      // if (data.statusCode === 200) {
+      //   console.log(data.fixedAssetCount);
+      //   setFixedAssetcount(data.fixedAssetCount || []);
+      //   console.log(data.fixedAssetCount);
+      // } else {
+      //   notification.error({
+      //     message: "Failed to fetch fixed assets",
+      //     description: data.error,
+      //   });
+      // }
   
     } catch (error) {
       console.error("Failed to fetch data:", error);
@@ -269,6 +307,8 @@ const TotalAsset = () => {
     setEditDepartment(null);
     setEditRoom(null);
     setEditAssetHolder(null);
+    setFixedAssetDetail(null);
+
   };
 
   const handleEditBuilding = (building) => {
@@ -1124,7 +1164,7 @@ const TotalAsset = () => {
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
-        width={modalType === "Audit" ? 1400 : 500}
+        width={modalType === "Audit" || modalType === "fixedAssetDetail" ? 1400 : 500}
       >
         <Form form={form} layout="vertical">
           {modalType === "building" && (
@@ -1347,6 +1387,43 @@ const TotalAsset = () => {
               </div>
             </Form>
           )}
+         {modalType === "fixedAssetDetail" && fixedAssetDetail && (
+         <div className="w-full overflow-x-auto">
+         <table className="min-w-full table-auto">
+           <thead className="bg-gray-100">
+             <tr>
+               <th className="px-4 py-2 border">Department</th>
+               <th className="px-4 py-2 border">Asset Holder</th>
+               <th className="px-4 py-2 border">Fixed Asset</th>
+               <th className="px-4 py-2 border">Quantity Counted</th>
+               <th className="px-4 py-2 border">Conditions</th>
+               <th className="px-4 py-2 border">Existence Asset</th>
+               <th className="px-4 py-2 border">Remarks</th>
+               <th className="px-4 py-2 border">Fixed Asset Count ID</th>
+             </tr>
+           </thead>
+           <tbody>
+             {fixedAssetDetail.map((detail) => (
+               <tr key={detail.id} className="odd:bg-white even:bg-gray-50">
+                 <td className="px-4 py-2 border">{detail.fixedAssetCount.department.name}</td>
+                 <td className="px-4 py-2 border">
+                   {detail.assetHolder.name} ({detail.assetHolder.email})
+                 </td>
+                 <td className="px-4 py-2 border">
+                   {detail.fixedAsset.name} - {detail.fixedAsset.model}
+                 </td>
+                 <td className="px-4 py-2 border">{detail.quantityCounted}</td>
+                 <td className="px-4 py-2 border">{detail.conditions}</td>
+                 <td className="px-4 py-2 border">{detail.existenceAsset}</td>
+                 <td className="px-4 py-2 border">{detail.remarks}</td>
+                 <td className="px-4 py-2 border">{detail.fixedAssetCount.createdBy}</td>
+               </tr>
+             ))}
+           </tbody>
+         </table>
+       </div>
+       
+      )}
         </Form>
       </Modal>
     </>
