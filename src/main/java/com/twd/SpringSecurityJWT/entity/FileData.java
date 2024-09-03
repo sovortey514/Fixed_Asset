@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,4 +29,8 @@ public class FileData {
     private String type;
     
     private String filePath;
+
+    @OneToOne
+    @JoinColumn(name = "fixed_asset_id")
+    private FixedAsset fixedAsset;
 }

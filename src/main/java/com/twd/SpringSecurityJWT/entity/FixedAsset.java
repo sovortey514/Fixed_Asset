@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -74,6 +75,9 @@ public class FixedAsset {
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "building_id")
     private Building building;
+
+    @OneToOne(mappedBy = "fixedAsset")
+    private FileData fileData;
 
     @ManyToOne(cascade= CascadeType.PERSIST)
     @JoinColumn(name = "asset_holder_id", insertable = true, updatable = true)
