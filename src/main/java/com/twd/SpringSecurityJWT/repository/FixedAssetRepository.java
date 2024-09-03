@@ -26,4 +26,5 @@ public interface FixedAssetRepository extends JpaRepository<FixedAsset, Long> {
     List<FixedAsset> findFixedAssetsByDepartmentId(@Param("departmentId") Long departmentId);
     
     boolean existsBySerialNumber(String serialNumber);
+    
 }
