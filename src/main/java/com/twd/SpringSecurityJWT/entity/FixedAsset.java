@@ -3,6 +3,8 @@ package com.twd.SpringSecurityJWT.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -77,6 +79,7 @@ public class FixedAsset {
     private Building building;
 
     @OneToOne(mappedBy = "fixedAsset")
+    @JsonIgnore
     private FileData fileData;
 
     @ManyToOne(cascade= CascadeType.PERSIST)

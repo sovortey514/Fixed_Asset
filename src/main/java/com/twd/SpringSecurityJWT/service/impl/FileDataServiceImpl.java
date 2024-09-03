@@ -138,7 +138,6 @@ responseDTO.setFixedAssetBuilding(fixedAsset.getBuilding() != null ? fixedAsset.
 responseDTO.setFixedAssetAssetHolder(fixedAsset.getAssetHolder() != null ? fixedAsset.getAssetHolder().getName() : null);
          // Adjust based on your FixedAsset entity
         responseDTO.setFiles(fileDataDTOs);
-
         return responseDTO;
     }
 
