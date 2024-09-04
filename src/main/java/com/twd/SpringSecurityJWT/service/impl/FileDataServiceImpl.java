@@ -21,62 +21,63 @@ import com.twd.SpringSecurityJWT.repository.FixedAssetRepository;
 import com.twd.SpringSecurityJWT.service.FileDataService;
 
 @Service
-public class FileDataServiceImpl implements FileDataService{
-	
-	@Autowired
-	private FileDataRepository fileDataRepository;
+public class FileDataServiceImpl implements FileDataService {
+
+    @Autowired
+    private FileDataRepository fileDataRepository;
 
     @Autowired
     private FixedAssetRepository fixedAssetRepository;
-	
-	
-	private final String FILE_PATH = "D:\\Year4\\project_Intern\\Fixed_Asset\\src\\Uploads\\";
+
+    private final String FILE_PATH = "D:\\Year4\\project_Intern\\Fixed_Asset\\src\\Uploads\\";
 
     @Override
-public String uploadFileToFileDirectory(MultipartFile file, Long fixedAssetId) throws IOException {
-    // Check if fixedAssetId is provided
-    if (fixedAssetId == null) {
-        throw new IllegalArgumentException("FixedAsset ID must not be null");
+    public String uploadFileToFileDirectory(MultipartFile file, Long fixedAssetId) throws IOException {
+        // Check if fixedAssetId is provided
+        if (fixedAssetId == null) {
+            throw new IllegalArgumentException("FixedAsset ID must not be null");
+        }
+
+        // Retrieve FixedAsset from the database
+        Optional<FixedAsset> fixedAssetOpt = fixedAssetRepository.findById(fixedAssetId);
+        if (!fixedAssetOpt.isPresent()) {
+            throw new IOException("FixedAsset not found with ID: " + fixedAssetId);
+        }
+
+        FixedAsset fixedAsset = fixedAssetOpt.get();
+        String filePath = FILE_PATH + file.getOriginalFilename(); // Absolute path
+
+        // Create and save FileData with the fixed asset association
+        FileData fileData = FileData.builder()
+                .name(file.getOriginalFilename())
+                .type(file.getContentType())
+                .filePath(filePath)
+                .fixedAsset(fixedAsset) // Associate the file with the fixed asset
+                .build();
+
+        // Save file data to the database
+        FileData savedFileData = fileDataRepository.save(fileData);
+
+        // Save the file to the file system
+        file.transferTo(new java.io.File(filePath));
+
+        if (savedFileData != null) {
+            return "File uploaded successfully: " + file.getOriginalFilename() + " and Files uploaded path is: "
+                    + filePath;
+        } else {
+            throw new IOException("Failed to save file data to the database");
+        }
     }
-
-    // Retrieve FixedAsset from the database
-    Optional<FixedAsset> fixedAssetOpt = fixedAssetRepository.findById(fixedAssetId);
-    if (!fixedAssetOpt.isPresent()) {
-        throw new IOException("FixedAsset not found with ID: " + fixedAssetId);
-    }
-
-    FixedAsset fixedAsset = fixedAssetOpt.get();
-    String filePath = FILE_PATH + file.getOriginalFilename(); // Absolute path
-
-    // Create and save FileData with the fixed asset association
-    FileData fileData = FileData.builder()
-            .name(file.getOriginalFilename())
-            .type(file.getContentType())
-            .filePath(filePath)
-            .fixedAsset(fixedAsset) // Associate the file with the fixed asset
-            .build();
-
-    // Save file data to the database
-    FileData savedFileData = fileDataRepository.save(fileData);
-    
-    // Save the file to the file system
-    file.transferTo(new java.io.File(filePath)); 
-    
-    if (savedFileData != null) {
-        return "File uploaded successfully: " + file.getOriginalFilename() + " and Files uploaded path is: " + filePath;
-    } else {
-        throw new IOException("Failed to save file data to the database");
-    }
-}
 
     @Override
     public byte[] downloadFileFromFileDirectory(String fileName) throws IOException {
+
         Optional<FileData> fileDataObj = fileDataRepository.findByName(fileName);
-        
+
         if (fileDataObj.isPresent()) {
             String filePath = fileDataObj.get().getFilePath();
             Path path = Paths.get(filePath);
-            
+
             // Check if file exists before reading
             if (Files.exists(path)) {
                 return Files.readAllBytes(path);
@@ -88,7 +89,7 @@ public String uploadFileToFileDirectory(MultipartFile file, Long fixedAssetId) t
         }
     }
 
-     @Override
+    @Override
     public FixedAssetFileResponseDTO downloadAllFilesByFixedAssetId(Long fixedAssetId) throws IOException {
         // Check if fixedAssetId is provided
         if (fixedAssetId == null) {
@@ -111,7 +112,11 @@ public String uploadFileToFileDirectory(MultipartFile file, Long fixedAssetId) t
                 FileDataDTO fileDataDTO = new FileDataDTO();
                 fileDataDTO.setFileName(fileData.getName());
                 fileDataDTO.setFileType(fileData.getType());
-                fileDataDTO.setFileContent(Files.readAllBytes(path));
+
+                // Construct the URL or path to the file
+                String fileUrl = "http://localhost:6060/admin/get_image/" + fileData.getName();
+                fileDataDTO.setFileUrl(fileUrl);
+
                 fileDataDTOs.add(fileDataDTO);
             } else {
                 throw new IOException("File not found at path: " + fileData.getFilePath());
@@ -120,27 +125,27 @@ public String uploadFileToFileDirectory(MultipartFile file, Long fixedAssetId) t
 
         // Create the response DTO
         FixedAssetFileResponseDTO responseDTO = new FixedAssetFileResponseDTO();
-responseDTO.setFixedAssetId(fixedAsset.getId());
-responseDTO.setFixedAssetName(fixedAsset.getName());
-responseDTO.setFixedAssetCategory(fixedAsset.getCategory().getName());
-responseDTO.setFixedAssetModel(fixedAsset.getModel());
-responseDTO.setFixedAssetYear(fixedAsset.getYear());
-responseDTO.setFixedAssetPrice(fixedAsset.getPrice());
-responseDTO.setFixedAssetSerialNumber(fixedAsset.getSerialNumber());
-responseDTO.setFixedAssetPurchaseDate(fixedAsset.getPurchaseDate());
-responseDTO.setFixedAssetUnit(fixedAsset.getUnit());
-responseDTO.setFixedAssetQuantity(fixedAsset.getQuantity());
-responseDTO.setFixedAssetRemarks(fixedAsset.getRemarks());
-responseDTO.setFixedAssetStatus(fixedAsset.getStatus());
-responseDTO.setFixedAssetStatusText(fixedAsset.getStatustext());
-// responseDTO.setFixedAssetUser(fixedAsset.getUser() != null ? fixedAsset.getUser().getName() : null);
-responseDTO.setFixedAssetBuilding(fixedAsset.getBuilding() != null ? fixedAsset.getBuilding().getName() : null);
-responseDTO.setFixedAssetAssetHolder(fixedAsset.getAssetHolder() != null ? fixedAsset.getAssetHolder().getName() : null);
-         // Adjust based on your FixedAsset entity
+        responseDTO.setFixedAssetId(fixedAsset.getId());
+        responseDTO.setFixedAssetName(fixedAsset.getName());
+        responseDTO.setFixedAssetCategory(fixedAsset.getCategory().getName());
+        responseDTO.setFixedAssetModel(fixedAsset.getModel());
+        responseDTO.setFixedAssetYear(fixedAsset.getYear());
+        responseDTO.setFixedAssetPrice(fixedAsset.getPrice());
+        responseDTO.setFixedAssetSerialNumber(fixedAsset.getSerialNumber());
+        responseDTO.setFixedAssetPurchaseDate(fixedAsset.getPurchaseDate());
+        responseDTO.setFixedAssetUnit(fixedAsset.getUnit());
+        responseDTO.setFixedAssetQuantity(fixedAsset.getQuantity());
+        responseDTO.setFixedAssetRemarks(fixedAsset.getRemarks());
+        responseDTO.setFixedAssetStatus(fixedAsset.getStatus());
+        responseDTO.setFixedAssetStatusText(fixedAsset.getStatustext());
+        // responseDTO.setFixedAssetUser(fixedAsset.getUser() != null ?
+        // fixedAsset.getUser().getName() : null);
+        responseDTO.setFixedAssetBuilding(fixedAsset.getBuilding() != null ? fixedAsset.getBuilding().getName() : null);
+        responseDTO.setFixedAssetAssetHolder(
+                fixedAsset.getAssetHolder() != null ? fixedAsset.getAssetHolder().getName() : null);
+        // Adjust based on your FixedAsset entity
         responseDTO.setFiles(fileDataDTOs);
         return responseDTO;
     }
-
-	
 
 }

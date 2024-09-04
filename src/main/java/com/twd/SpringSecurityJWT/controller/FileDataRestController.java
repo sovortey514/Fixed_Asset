@@ -48,25 +48,27 @@ public class FileDataRestController {
     }
 
     @GetMapping("/get_image/{fileName}")
-    public ResponseEntity<?> downloadImageFromFileDirectory(@PathVariable String fileName) {
-        try {
-            byte[] downloadFile = fileDataService.downloadFileFromFileDirectory(fileName);
-            
-            
-            MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM; 
-            if (fileName.endsWith(".png")) {
-                mediaType = MediaType.IMAGE_PNG;
-            } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
-                mediaType = MediaType.IMAGE_JPEG;
-            }
-            
-            return ResponseEntity.status(HttpStatus.OK)
-                    .contentType(mediaType)
-                    .body(downloadFile);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error downloading file: " + e.getMessage());
+public ResponseEntity<?> downloadImageFromFileDirectory(@PathVariable String fileName) {
+    try {
+        byte[] downloadFile = fileDataService.downloadFileFromFileDirectory(fileName);
+
+        MediaType mediaType;
+        if (fileName.endsWith(".png")) {
+            mediaType = MediaType.IMAGE_PNG;
+        } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+            mediaType = MediaType.IMAGE_JPEG;
+        } else {
+            mediaType = MediaType.APPLICATION_OCTET_STREAM; // Fallback
         }
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(mediaType)
+                .body(downloadFile);
+    } catch (IOException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error downloading file: " + e.getMessage());
     }
+}
+
 
 }

@@ -7,7 +7,7 @@ public class FileDataDTO {
 
     private String fileName;
     private String fileType;
-    private byte[] fileContent;
+    private String fileUrl;
 
     // Constructors, Getters, and Setters
 }
