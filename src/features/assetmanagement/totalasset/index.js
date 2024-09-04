@@ -43,7 +43,7 @@ const TotalAsset = () => {
   const [data, setData] = useState([]);
   const token = localStorage.getItem("token");
   const [visibleAssets, setVisibleAssets] = useState([]);
-  const [viewAsset, setViewAsset] = useState(null);
+  const [assetDetails, setViewAsset] = useState(null);
   const [item, setItem] = useState([]);
   const [assignasset, setAssignasset] = useState([]);
   const [assetHolders, setAssetHolder] = useState([]);
@@ -57,7 +57,7 @@ const TotalAsset = () => {
   const [a, setA] = useState(0);
   const [assetById, setAssetById] = useState([]);
   const [file, setFile] = useState(null);
-  const [fixedAssetId, setFixdAssetId] = useState(0);
+
   // Define table columns
   const columns = (handleEdit, handleDelete, handleViewHide) => [
     {
@@ -155,7 +155,7 @@ const TotalAsset = () => {
                 <Menu.Item key="view">
                   <Button
                     type="link"
-                    onChange={(e) => setFixdAssetId(e)}
+                    
                     onClick={() => handleViewHide(record, "view")}
                   >
                     View
@@ -240,41 +240,40 @@ const TotalAsset = () => {
     fetchCategories();
     fetchFixedAssets();
     fetchAssetHolder();
-    // fetchAssetImages();
   }, []);
 
-  useEffect(() => {
-    console.log("FixedAssetId:", fixedAssetId);
-    const fetchAssetImages = async (fixedAssetId) => {
-      try {
-        const headers = {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        };
-        const response = await fetch(
-          `http://localhost:6060/admin/get_images_by_asset/${fixedAssetId}`,
-          { headers }
-        );
-        const result = await response.json();
-        if (response.ok) {
-          console.log(result);
-          setFile(result.fixedAssetId || []);
-        } else {
-          notification.error({
-            message: "Failed to fetch asset images",
-            description: result.error || "Unknown error",
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching asset images:", error);
-        notification.error({
-          message: "Error",
-          description: "Failed to fetch asset images.",
-        });
-      }
-    };
-    fetchAssetImages();
-  }, [fixedAssetId]);
+  // useEffect(() => {
+  //   console.log("FixedAssetId:", fixedAssetId);
+  //   const fetchAssetImages = async (fixedAssetId) => {
+  //     try {
+  //       const headers = {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${token}`,
+  //       };
+  //       const response = await fetch(
+  //         `http://localhost:6060/admin/get_images_by_asset/${fixedAssetId}`,
+  //         { headers }
+  //       );
+  //       const result = await response.json();
+  //       if (response.ok) {
+  //         console.log(result);
+  //         setFile(result.fixedAssetId || []);
+  //       } else {
+  //         notification.error({
+  //           message: "Failed to fetch asset images",
+  //           description: result.error || "Unknown error",
+  //         });
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching asset images:", error);
+  //       notification.error({
+  //         message: "Error",
+  //         description: "Failed to fetch asset images.",
+  //       });
+  //     }
+  //   };
+  //   fetchAssetImages();
+  // }, [fixedAssetId]);
 
   const fetchCategories = async () => {
     try {
@@ -448,7 +447,7 @@ const TotalAsset = () => {
                 body: JSON.stringify({
                   ...values,
                   status: "1",
-                  statustext: "Available",
+                  statustext: "Avaliable",
                 }),
               }
             );
@@ -483,10 +482,6 @@ const TotalAsset = () => {
             );
 
             const createResult = await createResponse.json();
-            console.log(createResult);
-            console.log(createResponse);
-            console.log(images);
-
             if (createResponse.ok) {
               if (images) {
                 let uploadResult;
@@ -511,8 +506,8 @@ const TotalAsset = () => {
 
                 if (uploadResponse.ok) {
                   notification.success({
-                    message: "Image Uploaded",
-                    description: `Image for Fixed Asset "${values.name}" has been uploaded successfully.`,
+                    // message: "Image Uploaded",
+                    // description: `Image for Fixed Asset "${values.name}" has been uploaded successfully.`,
                     duration: 1,
                   });
                 } else {
@@ -849,8 +844,10 @@ const TotalAsset = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         };
+        console.log(record);
         const response = await fetch(
-          `http://localhost:6060/admin/getFixedAssetById/${record.id}`,
+          // `http://localhost:6060/admin/getFixedAssetById/${record.id}`,
+          `http://localhost:6060/admin/get_images_by_asset/${record.id}`,
           {
             method: "GET",
             headers,
@@ -858,6 +855,8 @@ const TotalAsset = () => {
         );
         if (response.ok) {
           const assetDetails = await response.json();
+
+          console.log(assetDetails);
           setViewAsset(assetDetails);
           setIsViewModalVisible(true);
         } else {
@@ -1217,105 +1216,112 @@ const TotalAsset = () => {
             Asset Details
           </h2>
           <div className="mb-8 text-center">
+          {assetDetails?.files?.map((file, index) => (
             <img
-              src={
-                viewAsset?.fixedAsset?.imageUrl || "/path/to/default-image.jpg"
-              } // Replace with your image URL
-              alt="Asset"
+              key={index}
+              src={file.fileUrl}
+              alt={file.fileName}
               className="w-100 h-100 mx-auto rounded-lg border border-gray-300 shadow-md object-cover"
               style={{ width: "100px", height: "100px" }}
             />
-          </div>
-
+          ))}
+        </div>
           {/* Grid Layout */}
           <div className="grid grid-cols-2 gap-6">
-            {/* Grid Item */}
-            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-              <div className="text-gray-700 font-semibold w-1/3">No:</div>
-              <div className="text-gray-800 w-2/3">
-                {viewAsset?.fixedAsset?.id}
-              </div>
-            </div>
+  {/* Grid Item */}
+  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+    <div className="text-gray-700 font-semibold w-1/3 pr-4">No:</div>
+    <div className="text-gray-800 w-2/3">
+      {assetDetails?.fixedAssetId}
+    </div>
+  </div>
 
-            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-              <div className="text-gray-700 font-semibold">Name:</div>
-              <div className="text-gray-800">{viewAsset?.fixedAsset?.name}</div>
-            </div>
+  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+    <div className="text-gray-700 font-semibold mr-4">Name:</div>
+    <div className="text-gray-800">
+      {assetDetails?.fixedAssetName}
+    </div>
+  </div>
 
-            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-              <div className="text-gray-700 font-semibold">Category:</div>
-              <div className="text-gray-800">
-                {viewAsset?.fixedAsset?.category?.name}
-              </div>
-            </div>
+  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+    <div className="text-gray-700 font-semibold mr-4">Category:</div>
+    <div className="text-gray-800">
+      {assetDetails?.fixedAssetCategory}
+    </div>
+  </div>
 
-            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-              <div className="text-gray-700 font-semibold">Model:</div>
-              <div className="text-gray-800">
-                {viewAsset?.fixedAsset?.model}
-              </div>
-            </div>
+  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+    <div className="text-gray-700 font-semibold mr-4">Model:</div>
+    <div className="text-gray-800">
+      {assetDetails?.fixedAssetModel}
+    </div>
+  </div>
 
-            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-              <div className="text-gray-700 font-semibold">Year:</div>
-              <div className="text-gray-800">{viewAsset?.fixedAsset?.year}</div>
-            </div>
+  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+    <div className="text-gray-700 font-semibold mr-4">Year:</div>
+    <div className="text-gray-800">
+      {assetDetails?.fixedAssetYear}
+    </div>
+  </div>
 
-            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-              <div className="text-gray-700 font-semibold">Serial Number:</div>
-              <div className="text-gray-800">
-                {viewAsset?.fixedAsset?.serialNumber}
-              </div>
-            </div>
+  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+    <div className="text-gray-700 font-semibold mr-4">Serial Number:</div>
+    <div className="text-gray-800">
+      {assetDetails?.fixedAssetSerialNumber}
+    </div>
+  </div>
 
-            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-              <div className="text-gray-700 font-semibold">Purchase Date:</div>
-              <div className="text-gray-800">
-                {viewAsset?.fixedAsset?.purchaseDate}
-              </div>
-            </div>
+  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+    <div className="text-gray-700 font-semibold mr-4">Purchase Date:</div>
+    <div className="text-gray-800">
+      {assetDetails?.fixedAssetPurchaseDate}
+    </div>
+  </div>
 
-            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-              <div className="text-gray-700 font-semibold">Price ($):</div>
-              <div className="text-gray-800">
-                {viewAsset?.fixedAsset?.price}
-              </div>
-            </div>
+  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+    <div className="text-gray-700 font-semibold mr-4">Price ($):</div>
+    <div className="text-gray-800">
+      {assetDetails?.fixedAssetPrice}
+    </div>
+  </div>
 
-            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-              <div className="text-gray-700 font-semibold">Unit:</div>
-              <div className="text-gray-800">{viewAsset?.fixedAsset?.unit}</div>
-            </div>
+  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+    <div className="text-gray-700 font-semibold mr-4">Unit:</div>
+    <div className="text-gray-800">
+      {assetDetails?.fixedAssetUnit}
+    </div>
+  </div>
 
-            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-              <div className="text-gray-700 font-semibold">Quantity:</div>
-              <div className="text-gray-800">
-                {viewAsset?.fixedAsset?.quantity}
-              </div>
-            </div>
+  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+    <div className="text-gray-700 font-semibold mr-4">Quantity:</div>
+    <div className="text-gray-800">
+      {assetDetails?.fixedAssetQuantity}
+    </div>
+  </div>
 
-            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-              <div className="text-gray-700 font-semibold">Status:</div>
-              <div
-                className={`text-gray-800 ${
-                  viewAsset?.fixedAsset?.statustext === "Available"
-                    ? "text-green-600"
-                    : viewAsset?.fixedAsset?.statustext === "In Use"
-                    ? "text-red-600"
-                    : ""
-                }`}
-              >
-                {viewAsset?.fixedAsset?.statustext}
-              </div>
-            </div>
+  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+    <div className="text-gray-700 font-semibold mr-4">Status:</div>
+    <div
+      className={`text-gray-800 ${
+        assetDetails?.fixedAssetStatusText === "Available"
+          ? "text-green-600"
+          : assetDetails?.fixedAssetStatusText === "In Use"
+          ? "text-red-600"
+          : ""
+      }`}
+    >
+      {assetDetails?.fixedAssetStatusText}
+    </div>
+  </div>
 
-            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-              <div className="text-gray-700 font-semibold">Asset Holder:</div>
-              <div className="text-gray-800">
-                {viewAsset?.fixedAsset?.assetHolder?.name}
-              </div>
-            </div>
-          </div>
+  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+    <div className="text-gray-700 font-semibold mr-4">Asset Holder:</div>
+    <div className="text-gray-800">
+      {assetDetails?.fixedAssetAssetHolder}
+    </div>
+  </div>
+</div>
+
         </div>
       </Modal>
     </>
