@@ -128,17 +128,11 @@ const TotalAsset = () => {
               headers,
             }
           );
-
-          // Log the raw response to inspect status and headers
           console.log("Raw Response:", response);
 
           if (response.ok) {
             const assetDetails = await response.json();
-
-            // Log the full response data
             console.log("API Response:", assetDetails);
-
-            // Log the specific data fields you are setting in state
             console.log("Fixed Assets:", assetDetails.fixedAssets);
             console.log(
               "Editable Row Keys:",
@@ -150,7 +144,6 @@ const TotalAsset = () => {
           } else {
             const errorData = await response.json();
 
-            // Log the error response data
             console.error("Error Response Data:", errorData);
 
             notification.error({
@@ -161,7 +154,7 @@ const TotalAsset = () => {
             });
           }
         } catch (error) {
-          // Log the error object for debugging
+        
           console.error("Error fetching asset details:", error);
 
           notification.error({

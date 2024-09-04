@@ -52,11 +52,12 @@ const TotalAsset = () => {
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [images,setImages]=useState(null);
+  const [images, setImages] = useState(null);
 
   const [a, setA] = useState(0);
   const [assetById, setAssetById] = useState([]);
   const [file, setFile] = useState(null);
+  const [fixedAssetId, setFixdAssetId] = useState(0);
   // Define table columns
   const columns = (handleEdit, handleDelete, handleViewHide) => [
     {
@@ -154,6 +155,7 @@ const TotalAsset = () => {
                 <Menu.Item key="view">
                   <Button
                     type="link"
+                    onChange={(e) => setFixdAssetId(e)}
                     onClick={() => handleViewHide(record, "view")}
                   >
                     View
@@ -238,7 +240,41 @@ const TotalAsset = () => {
     fetchCategories();
     fetchFixedAssets();
     fetchAssetHolder();
+    // fetchAssetImages();
   }, []);
+
+  useEffect(() => {
+    console.log("FixedAssetId:", fixedAssetId);
+    const fetchAssetImages = async (fixedAssetId) => {
+      try {
+        const headers = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        };
+        const response = await fetch(
+          `http://localhost:6060/admin/get_images_by_asset/${fixedAssetId}`,
+          { headers }
+        );
+        const result = await response.json();
+        if (response.ok) {
+          console.log(result);
+          setFile(result.fixedAssetId || []);
+        } else {
+          notification.error({
+            message: "Failed to fetch asset images",
+            description: result.error || "Unknown error",
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching asset images:", error);
+        notification.error({
+          message: "Error",
+          description: "Failed to fetch asset images.",
+        });
+      }
+    };
+    fetchAssetImages();
+  }, [fixedAssetId]);
 
   const fetchCategories = async () => {
     try {
@@ -325,12 +361,6 @@ const TotalAsset = () => {
     setViewAsset(null);
     setAssignasset(null);
     setCurrentRecord(null);
-  };
-  const handleUpload = (file) => {
-    // Handle file upload
-    // e.g., send the file to your backend server
-    console.log(file);
-    return false; // Prevent default upload behavior
   };
 
   const handleOk = async () => {
@@ -438,7 +468,7 @@ const TotalAsset = () => {
             }
           } else {
             // Create new asset
-            delete values.image
+            delete values.image;
             const createResponse = await fetch(
               "http://localhost:6060/admin/createFixedAsset",
               {
@@ -453,24 +483,19 @@ const TotalAsset = () => {
             );
 
             const createResult = await createResponse.json();
-            console.log(createResult)
-            console.log(createResponse)
-            console.log(images)
-            
-            
+            console.log(createResult);
+            console.log(createResponse);
+            console.log(images);
+
             if (createResponse.ok) {
               if (images) {
-                const nameImage = images.map(i=>i)
-                let uploadResult
-                let uploadResponse
-                for (let i = 0; i < nameImage.length; i++) {
-                  console.log(nameImage[i])
+                let uploadResult;
+                let uploadResponse;
+                for (let i = 0; i < images.length; i++) {
+                  console.log(images[i]);
                   const formData = new FormData();
-                  formData.append("file", nameImage[i]);
-                  // formData.append("type", nameImage[i].type);
-                  // formData.append("filePath", "D:\\Year4\\project_Intern\\Fixed_Asset\\src\\Uploads\\"+nameImage[i].name);
+                  formData.append("file", images[i]);
                   formData.append("fixedAssetId", createResult.fixedAsset.id);
-  
                   uploadResponse = await fetch(
                     "http://localhost:6060/admin/upload_image",
                     {
@@ -482,8 +507,6 @@ const TotalAsset = () => {
                     }
                   );
                 }
-                
-
                 uploadResult = await uploadResponse.json();
 
                 if (uploadResponse.ok) {
@@ -835,7 +858,7 @@ const TotalAsset = () => {
         );
         if (response.ok) {
           const assetDetails = await response.json();
-          setViewAsset(assetDetails); // Update the state with the fetched data
+          setViewAsset(assetDetails);
           setIsViewModalVisible(true);
         } else {
           const errorData = await response.json();
@@ -1089,30 +1112,12 @@ const TotalAsset = () => {
               >
                 <Input />
               </Form.Item>
-              <Form.Item
-                name="image"
-                label="Upload Image"
-                valuePropName="fileList"
-                getValueFromEvent={(e) => {
-                  if (Array.isArray(e)) {
-                    setImages(e)
-                    return e;
-                    
-                  }
-                  setImages(e && e.fileList)
-                  return e && e.fileList;
-                }}
-              >
-                <Upload
-                  name="image"
-                  listType="picture"
-                  className="upload-list-inline"
-                  customRequest={handleUpload}
-                  showUploadList={false}
-                  
-                >
-                  <Button icon={<UploadOutlined />}>Upload Image</Button>
-                </Upload>
+              <Form.Item label="Upload Image">
+                <input
+                  type="file"
+                  multiple
+                  onChange={(e) => setImages([...e.target.files])}
+                />
               </Form.Item>
             </>
           )}
@@ -1205,66 +1210,110 @@ const TotalAsset = () => {
         onOk={handleCancel}
         onCancel={handleCancel}
         cancelText="Cancel"
+        width={800}
       >
-        <div className="p-6 border rounded-lg bg-gradient-to-r from-blue-50 to-white shadow-lg">
-          <h2 className="text-xl font-bold text-blue-800 mb-6">
+        <div className="p-8 border rounded-lg bg-gradient-to-r from-blue-50 to-white shadow-xl">
+          <h2 className="text-3xl font-semibold text-yellow-500 mb-8 text-center">
             Asset Details
           </h2>
+          <div className="mb-8 text-center">
+            <img
+              src={
+                viewAsset?.fixedAsset?.imageUrl || "/path/to/default-image.jpg"
+              } // Replace with your image URL
+              alt="Asset"
+              className="w-100 h-100 mx-auto rounded-lg border border-gray-300 shadow-md object-cover"
+              style={{ width: "100px", height: "100px" }}
+            />
+          </div>
+
+          {/* Grid Layout */}
           <div className="grid grid-cols-2 gap-6">
-            <div className="text-gray-600 font-semibold">No:</div>
-            <div className="text-gray-800">{viewAsset?.fixedAsset?.id}</div>
-
-            <div className="text-gray-600 font-semibold">Name:</div>
-            <div className="text-gray-800">{viewAsset?.fixedAsset?.name}</div>
-
-            <div className="text-gray-600 font-semibold">Category:</div>
-            <div className="text-gray-800">
-              {viewAsset?.fixedAsset?.category?.name}
+            {/* Grid Item */}
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold w-1/3">No:</div>
+              <div className="text-gray-800 w-2/3">
+                {viewAsset?.fixedAsset?.id}
+              </div>
             </div>
 
-            <div className="text-gray-600 font-semibold">Model:</div>
-            <div className="text-gray-800">{viewAsset?.fixedAsset?.model}</div>
-
-            <div className="text-gray-600 font-semibold">Year:</div>
-            <div className="text-gray-800">{viewAsset?.fixedAsset?.year}</div>
-
-            <div className="text-gray-600 font-semibold">Serial Number:</div>
-            <div className="text-gray-800">
-              {viewAsset?.fixedAsset?.serialNumber}
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold">Name:</div>
+              <div className="text-gray-800">{viewAsset?.fixedAsset?.name}</div>
             </div>
 
-            <div className="text-gray-600 font-semibold">Purchase Date:</div>
-            <div className="text-gray-800">
-              {viewAsset?.fixedAsset?.purchaseDate}
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold">Category:</div>
+              <div className="text-gray-800">
+                {viewAsset?.fixedAsset?.category?.name}
+              </div>
             </div>
 
-            <div className="text-gray-600 font-semibold">Price ($):</div>
-            <div className="text-gray-800">{viewAsset?.fixedAsset?.price}</div>
-
-            <div className="text-gray-600 font-semibold">Unit:</div>
-            <div className="text-gray-800">{viewAsset?.fixedAsset?.unit}</div>
-
-            <div className="text-gray-600 font-semibold">Quantity:</div>
-            <div className="text-gray-800">
-              {viewAsset?.fixedAsset?.quantity}
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold">Model:</div>
+              <div className="text-gray-800">
+                {viewAsset?.fixedAsset?.model}
+              </div>
             </div>
 
-            <div className="text-gray-600 font-semibold">Status:</div>
-            <div
-              className={`text-gray-800 ${
-                viewAsset?.fixedAsset?.statustext === "Available"
-                  ? "text-green-600"
-                  : viewAsset?.fixedAsset?.statustext === "In Use"
-                  ? "text-red-600"
-                  : ""
-              }`}
-            >
-              {viewAsset?.fixedAsset?.statustext}
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold">Year:</div>
+              <div className="text-gray-800">{viewAsset?.fixedAsset?.year}</div>
             </div>
 
-            <div className="text-gray-600 font-semibold">Asset Holder:</div>
-            <div className="text-gray-800">
-              {viewAsset?.fixedAsset?.assetHolder?.name}
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold">Serial Number:</div>
+              <div className="text-gray-800">
+                {viewAsset?.fixedAsset?.serialNumber}
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold">Purchase Date:</div>
+              <div className="text-gray-800">
+                {viewAsset?.fixedAsset?.purchaseDate}
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold">Price ($):</div>
+              <div className="text-gray-800">
+                {viewAsset?.fixedAsset?.price}
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold">Unit:</div>
+              <div className="text-gray-800">{viewAsset?.fixedAsset?.unit}</div>
+            </div>
+
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold">Quantity:</div>
+              <div className="text-gray-800">
+                {viewAsset?.fixedAsset?.quantity}
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold">Status:</div>
+              <div
+                className={`text-gray-800 ${
+                  viewAsset?.fixedAsset?.statustext === "Available"
+                    ? "text-green-600"
+                    : viewAsset?.fixedAsset?.statustext === "In Use"
+                    ? "text-red-600"
+                    : ""
+                }`}
+              >
+                {viewAsset?.fixedAsset?.statustext}
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold">Asset Holder:</div>
+              <div className="text-gray-800">
+                {viewAsset?.fixedAsset?.assetHolder?.name}
+              </div>
             </div>
           </div>
         </div>
