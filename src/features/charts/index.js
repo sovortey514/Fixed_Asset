@@ -1,5 +1,5 @@
 import LineChart from './components/LineChart'
-import BarChart from './components/BarChart'
+// import BarChart from './components/BarChart'
 import DoughnutChart from './components/DoughnutChart'
 import PieChart from './components/PieChart'
 import ScatterChart from './components/ScatterChart'

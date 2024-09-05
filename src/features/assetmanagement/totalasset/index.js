@@ -155,7 +155,6 @@ const TotalAsset = () => {
                 <Menu.Item key="view">
                   <Button
                     type="link"
-                    
                     onClick={() => handleViewHide(record, "view")}
                   >
                     View
@@ -241,39 +240,6 @@ const TotalAsset = () => {
     fetchFixedAssets();
     fetchAssetHolder();
   }, []);
-
-  // useEffect(() => {
-  //   console.log("FixedAssetId:", fixedAssetId);
-  //   const fetchAssetImages = async (fixedAssetId) => {
-  //     try {
-  //       const headers = {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${token}`,
-  //       };
-  //       const response = await fetch(
-  //         `http://localhost:6060/admin/get_images_by_asset/${fixedAssetId}`,
-  //         { headers }
-  //       );
-  //       const result = await response.json();
-  //       if (response.ok) {
-  //         console.log(result);
-  //         setFile(result.fixedAssetId || []);
-  //       } else {
-  //         notification.error({
-  //           message: "Failed to fetch asset images",
-  //           description: result.error || "Unknown error",
-  //         });
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching asset images:", error);
-  //       notification.error({
-  //         message: "Error",
-  //         description: "Failed to fetch asset images.",
-  //       });
-  //     }
-  //   };
-  //   fetchAssetImages();
-  // }, [fixedAssetId]);
 
   const fetchCategories = async () => {
     try {
@@ -875,7 +841,15 @@ const TotalAsset = () => {
         });
         console.error("Error updating visibility:", error);
       }
-    } else if (type === "hide") {
+     
+    }
+      // useEffect(() => {
+  //   if (assetDetails && token) {
+  //     handleViewHide(assetDetails, 'view', token); // Assuming you want to view asset details when record or token changes
+  //   }
+  // }, [assetDetails, token]);
+
+     else if (type === "hide") {
       try {
         const headers = {
           "Content-Type": "application/json",
@@ -921,6 +895,13 @@ const TotalAsset = () => {
     }
   };
 
+  // useEffect(() => {
+  //   if (assetDetails && token) {
+  //     handleViewHide(assetDetails, 'view', token); // Assuming you want to view asset details when record or token changes
+  //   }
+  // }, [assetDetails, token]);
+
+ 
   const handleRefresh = async () => {
     setLoading(true);
     try {
@@ -1216,112 +1197,117 @@ const TotalAsset = () => {
             Asset Details
           </h2>
           <div className="mb-8 text-center">
-          {assetDetails?.files?.map((file, index) => (
-            <img
-              key={index}
-              src={file.fileUrl}
-              alt={file.fileName}
-              className="w-100 h-100 mx-auto rounded-lg border border-gray-300 shadow-md object-cover"
-              style={{ width: "100px", height: "100px" }}
-            />
-          ))}
-        </div>
+            {assetDetails?.files?.map((file, index) => (
+              <img
+                key={index}
+                src={file.fileUrl}
+                alt={file.fileName}
+                className="w-100 h-100 mx-auto rounded-lg border border-gray-300 shadow-md object-cover"
+                style={{ width: "100px", height: "100px" }}
+              />
+            ))}
+          </div>
           {/* Grid Layout */}
           <div className="grid grid-cols-2 gap-6">
-  {/* Grid Item */}
-  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-    <div className="text-gray-700 font-semibold w-1/3 pr-4">No:</div>
-    <div className="text-gray-800 w-2/3">
-      {assetDetails?.fixedAssetId}
-    </div>
-  </div>
+            {/* Grid Item */}
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold w-1/3 pr-4">No:</div>
+              <div className="text-gray-800 w-2/3">
+                {assetDetails?.fixedAssetId}
+              </div>
+            </div>
 
-  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-    <div className="text-gray-700 font-semibold mr-4">Name:</div>
-    <div className="text-gray-800">
-      {assetDetails?.fixedAssetName}
-    </div>
-  </div>
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold mr-4">Name:</div>
+              <div className="text-gray-800">
+                {assetDetails?.fixedAssetName}
+              </div>
+            </div>
 
-  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-    <div className="text-gray-700 font-semibold mr-4">Category:</div>
-    <div className="text-gray-800">
-      {assetDetails?.fixedAssetCategory}
-    </div>
-  </div>
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold mr-4">Category:</div>
+              <div className="text-gray-800">
+                {assetDetails?.fixedAssetCategory}
+              </div>
+            </div>
 
-  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-    <div className="text-gray-700 font-semibold mr-4">Model:</div>
-    <div className="text-gray-800">
-      {assetDetails?.fixedAssetModel}
-    </div>
-  </div>
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold mr-4">Model:</div>
+              <div className="text-gray-800">
+                {assetDetails?.fixedAssetModel}
+              </div>
+            </div>
 
-  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-    <div className="text-gray-700 font-semibold mr-4">Year:</div>
-    <div className="text-gray-800">
-      {assetDetails?.fixedAssetYear}
-    </div>
-  </div>
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold mr-4">Year:</div>
+              <div className="text-gray-800">
+                {assetDetails?.fixedAssetYear}
+              </div>
+            </div>
 
-  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-    <div className="text-gray-700 font-semibold mr-4">Serial Number:</div>
-    <div className="text-gray-800">
-      {assetDetails?.fixedAssetSerialNumber}
-    </div>
-  </div>
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold mr-4">
+                Serial Number:
+              </div>
+              <div className="text-gray-800">
+                {assetDetails?.fixedAssetSerialNumber}
+              </div>
+            </div>
 
-  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-    <div className="text-gray-700 font-semibold mr-4">Purchase Date:</div>
-    <div className="text-gray-800">
-      {assetDetails?.fixedAssetPurchaseDate}
-    </div>
-  </div>
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold mr-4">
+                Purchase Date:
+              </div>
+              <div className="text-gray-800">
+                {assetDetails?.fixedAssetPurchaseDate}
+              </div>
+            </div>
 
-  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-    <div className="text-gray-700 font-semibold mr-4">Price ($):</div>
-    <div className="text-gray-800">
-      {assetDetails?.fixedAssetPrice}
-    </div>
-  </div>
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold mr-4">Price ($):</div>
+              <div className="text-gray-800">
+                {assetDetails?.fixedAssetPrice}
+              </div>
+            </div>
 
-  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-    <div className="text-gray-700 font-semibold mr-4">Unit:</div>
-    <div className="text-gray-800">
-      {assetDetails?.fixedAssetUnit}
-    </div>
-  </div>
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold mr-4">Unit:</div>
+              <div className="text-gray-800">
+                {assetDetails?.fixedAssetUnit}
+              </div>
+            </div>
 
-  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-    <div className="text-gray-700 font-semibold mr-4">Quantity:</div>
-    <div className="text-gray-800">
-      {assetDetails?.fixedAssetQuantity}
-    </div>
-  </div>
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold mr-4">Quantity:</div>
+              <div className="text-gray-800">
+                {assetDetails?.fixedAssetQuantity}
+              </div>
+            </div>
 
-  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-    <div className="text-gray-700 font-semibold mr-4">Status:</div>
-    <div
-      className={`text-gray-800 ${
-        assetDetails?.fixedAssetStatusText === "Available"
-          ? "text-green-600"
-          : assetDetails?.fixedAssetStatusText === "In Use"
-          ? "text-red-600"
-          : ""
-      }`}
-    >
-      {assetDetails?.fixedAssetStatusText}
-    </div>
-  </div>
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold mr-4">Status:</div>
+              <div
+                className={`text-gray-800 ${
+                  assetDetails?.fixedAssetStatusText === "Available"
+                    ? "text-green-600"
+                    : assetDetails?.fixedAssetStatusText === "In Use"
+                    ? "text-red-600"
+                    : ""
+                }`}
+              >
+                {assetDetails?.fixedAssetStatusText}
+              </div>
+            </div>
 
-  <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
-    <div className="text-gray-700 font-semibold mr-4">Asset Holder:</div>
-    <div className="text-gray-800">
-      {assetDetails?.fixedAssetAssetHolder}
-    </div>
-  </div>
-</div>
-
+            <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex items-center">
+              <div className="text-gray-700 font-semibold mr-4">
+                Asset Holder:
+              </div>
+              <div className="text-gray-800">
+                {assetDetails?.fixedAssetAssetHolder}
+              </div>
+            </div>
+          </div>
         </div>
       </Modal>
     </>

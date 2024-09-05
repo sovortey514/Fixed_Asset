@@ -40,6 +40,11 @@ function Header(){
         localStorage.clear();
         window.location.href = '/'
     }
+    const defaultImage = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKJQp8ndvEkIa-u1rMgJxVc7BBsR11uSLHGA&s';
+  const [profileImage, setProfileImage] = useState('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKJQp8ndvEkIa-u1rMgJxVc7BBsR11uSLHGA&s');
+  const handleImageError = () => {
+    setProfileImage(defaultImage);
+  };
 
     return(
         // navbar fixed  flex-none justify-between bg-base-300  z-10 shadow-md
@@ -93,8 +98,13 @@ function Header(){
                 <div className="dropdown dropdown-end ml-4">
                     <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
                         <div className="w-10 rounded-full">
-                        <img src="/Profile.jpg" alt="profile" />
-                        </div>
+                        <img
+                            src={profileImage}
+                            alt="Profile"
+                            className="w-32 h-32 rounded-full border-4 border-gray-200 shadow-lg transform transition-transform duration-300 ease-in-out hover:scale-105"
+                            onError={handleImageError} 
+                        />
+                                            </div>
                     </label>
                     <ul tabIndex={0} className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
                         <li className="justify-between">

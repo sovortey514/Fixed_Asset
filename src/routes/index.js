@@ -2,6 +2,8 @@
 
 import { User } from '@nextui-org/react'
 import { lazy } from 'react'
+// import UserManagement from '../pages/protected/usermanagement';
+
 const Dashboard = lazy(() => import('../pages/protected/Dashboard'))
 const Welcome = lazy(() => import('../pages/protected/Welcome'))
 const Page404 = lazy(() => import('../pages/protected/404'))

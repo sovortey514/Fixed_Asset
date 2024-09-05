@@ -41,6 +41,11 @@ const routes = [
       },
     ]
   },
+  {
+    path: '/app/usermanagement',
+    icon: <UserIcon className={iconClasses}/>, 
+    name: 'Usermanagement',
+  },
 
   {
     path: '', //no url needed as this has submenu
