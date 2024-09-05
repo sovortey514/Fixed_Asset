@@ -71,6 +71,30 @@ public class AuthService {
         return response;
     }
 
+    public List<OurUsers> getAllUsers() {
+        return ourUserRepo.findAll();
+    }
+
+    @Transactional
+    public ReqRes deleteUser(Long userId) {
+        ReqRes response = new ReqRes();
+        try {
+            if (!ourUserRepo.existsById(userId)) {
+                response.setMessage("User not found.");
+                response.setStatusCode(404);
+                return response;
+            }
+
+            ourUserRepo.deleteById(userId);
+            response.setMessage("User deleted successfully.");
+            response.setStatusCode(200);
+        } catch (Exception e) {
+            response.setStatusCode(500);
+            response.setError("Delete error: " + e.getMessage());
+        }
+        return response;
+    }
+
     public ReqRes signIn(ReqRes signinRequest) {
         ReqRes response = new ReqRes();
         try {
@@ -119,6 +143,34 @@ public class AuthService {
         } catch (Exception e) {
             response.setStatusCode(500);
             response.setError("Token refresh error: " + e.getMessage());
+        }
+        return response;
+    }
+
+     @Transactional
+    public ReqRes updateUser(Long userId, RegisterRequest updateRequest) {
+        ReqRes response = new ReqRes();
+        try {
+            OurUsers user = ourUserRepo.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            if (updateRequest.getEmail() != null) {
+                user.setEmail(updateRequest.getEmail());
+            }
+            if (updateRequest.getPassword() != null) {
+                user.setPassword(passwordEncoder.encode(updateRequest.getPassword()));
+            }
+            if (updateRequest.getRole() != null) {
+                user.setRole(updateRequest.getRole());
+            }
+
+            OurUsers updatedUser = ourUserRepo.save(user);
+            response.setOurUsers(updatedUser);
+            response.setMessage("User updated successfully.");
+            response.setStatusCode(200);
+        } catch (Exception e) {
+            response.setStatusCode(500);
+            response.setError("Update error: " + e.getMessage());
         }
         return response;
     }

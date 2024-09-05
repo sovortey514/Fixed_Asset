@@ -33,6 +33,7 @@ public class ReqRes {
     private String role;
     private String password;
     private String phoneNumber;
+    private List<OurUsers> allUsers;
     private List<Product> products;
     private Category category;
     private List<Category> categories;
