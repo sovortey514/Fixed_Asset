@@ -57,21 +57,21 @@ const routes = [
         icon: <UserIcon className={submenuIconClasses}/>, // icon component
         name: 'Profile', // name that appear in Sidebar
       },
-      {
-        path: '/register', //url
-        icon: <UserIcon className={submenuIconClasses}/>, // icon component
-        name: 'Register', // name that appear in Sidebar
-      },
+      // {
+      //   path: '/register', //url
+      //   icon: <UserIcon className={submenuIconClasses}/>, // icon component
+      //   name: 'Register', // name that appear in Sidebar
+      // },
       {
         path: '/login',
         icon: <ArrowRightOnRectangleIcon className={submenuIconClasses}/>,
         name: 'Logout',
       },
-      {
-        path: '/forgot-password',
-        icon: <KeyIcon className={submenuIconClasses}/>,
-        name: 'Forgot Password',
-      },
+      // {
+      //   path: '/forgot-password',
+      //   icon: <KeyIcon className={submenuIconClasses}/>,
+      //   name: 'Forgot Password',
+      // },
      
     ]
   },

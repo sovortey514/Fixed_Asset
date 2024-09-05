@@ -20,7 +20,7 @@ function Register() {
   const token = localStorage.getItem('token');
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const validRoles = ["Admin", "User", "Moderator"]; // Adjust as needed
+  // const validRoles = ["Admin", "User", "Moderator"]; // Adjust as needed
 
   const submitForm = async (e) => {
     e.preventDefault();

@@ -1,26 +1,26 @@
 
-import React, { useState } from 'react';
-
+import React, { useState, useEffect } from "react";
 import { Table, Button, Input,Modal ,Space,Tag} from 'antd';
 import {
   PlusOutlined
 } from "@ant-design/icons";
 import { useNavigate } from 'react-router-dom';
 import Register from '../user/Register';
-
+import { showNotification } from "../common/headerSlice";
+const token = localStorage.getItem("token");
 
 
 const columns = [
   {
     title: "No",
     dataIndex: "key",
-    render: (_, r, index) => index + 1,
+    render: (_, __, index) => index + 1,
   },
   {
     title: 'Name',
     dataIndex: 'name',
     key: 'name',
-    render: (text) => <a>{text}</a>,
+    render: (text) => <a>{text || 'N/A'}</a>, // Handle null values
   },
   {
     title: 'Email',
@@ -28,23 +28,18 @@ const columns = [
     key: 'email',
   },
   {
-    title: 'Password',
-    dataIndex: 'password',
-    key: 'password',
-  },
-  {
     title: 'Status',
     key: 'status',
-    dataIndex: 'status',
-    render: (_, { status }) => (
+    dataIndex: 'enabled', // Adjust based on the actual data field
+    render: (enabled) => (
       <>
-        {status === 'Active' ? (
+        {enabled ? (
           <Tag color="green">
-            {status.toUpperCase()}
+            Active
           </Tag>
         ) : (
           <Tag color="volcano">
-            {status.toUpperCase()}
+            Inactive
           </Tag>
         )}
       </>
@@ -55,35 +50,12 @@ const columns = [
     key: 'action',
     render: (_, record) => (
       <Space size="middle">
-        <a>Invite {record.name}</a>
+        <a>Invite {record.name || 'User'}</a>
         <a>Delete</a>
       </Space>
     ),
   },
 ];
-// const data = [
-//   {
-//     key: '1',
-//     name: 'John Brown',
-//     age: 32,
-//     address: 'New York No. 1 Lake Park',
-//     status: 'Active', // Status for John Brown
-//   },
-//   {
-//     key: '2',
-//     name: 'Jim Green',
-//     age: 42,
-//     address: 'London No. 1 Lake Park',
-//     status: 'Disable', // Status for Jim Green
-//   },
-//   {
-//     key: '3',
-//     name: 'Joe Black',
-//     age: 32,
-//     address: 'Sydney No. 1 Lake Park',
-//     status: 'Active', // Status for Joe Black
-//   },
-// ];
 
 
 function ToatalUser() {
@@ -91,16 +63,46 @@ function ToatalUser() {
   const handleCreateClick = () => {
     navigate('/register'); 
   };
+  const [user, setUser] = useState([]);
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+
+
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const showModal = () => {
     setIsModalVisible(true);
   };
 
-  const handleOk = () => {
-    setIsModalVisible(false);
-  };
+  const fetchUser = async () => {
+    try {
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
 
+      const response = await fetch("http://localhost:6060/auth/users", {
+        headers,
+      });
+      const result = await response.json();
+      console.log(result);
+      if (result) {
+        setUser(result || []);
+      
+      } else {
+        showNotification.error({
+          message: "Failed to fetch User",
+          description: result.error,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    }
+  };
+  console.log(user)
   const handleCancel = () => {
     setIsModalVisible(false);
   };
@@ -117,16 +119,14 @@ function ToatalUser() {
       </div>
 
       <div className='mt-4'>
-        <Table columns={columns} />
-      </div>
+      <Table columns={columns} dataSource={user.map((u, index) => ({ ...u, key: index }))} rowKey="id" />
+    </div>
 
       <Modal 
-        title="Register" 
         visible={isModalVisible} 
-        width={800}
+        width={500}
         footer={null}
         onCancel={handleCancel}
-        
       >
        <Register/>
       </Modal>
