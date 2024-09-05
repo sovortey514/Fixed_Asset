@@ -98,71 +98,54 @@ function Register() {
 };
 
   return (
-    <div className="min-h-screen bg-base-200 flex items-center">
-      <div className="card mx-auto w-full max-w-5xl shadow-xl">
-        <div className="grid md:grid-cols-2 grid-cols-1 bg-base-100 rounded-xl">
-          <div>
-            <LandingIntro />
-          </div>
-          <div className="py-24 px-10">
-            <h2 className="text-2xl font-semibold mb-2 text-center">Register</h2>
-            <form onSubmit={submitForm}>
-              <div className="mb-4">
-                <InputText
-                  name="name"
-                  updateType="name"
-                  value={registerObj.name}
-                  containerStyle="mt-4"
-                  labelTitle="Name"
-                  updateFormValue={updateFormValue}
-                />
-                <InputText
-                  name="email"
-                  updateType="email"
-                  value={registerObj.email}
-                  containerStyle="mt-4"
-                  labelTitle="Email"
-                  updateFormValue={updateFormValue}
-                />
-                <InputText
-                  name="password"
-                  type="password"
-                  updateType="password"
-                  value={registerObj.password}
-                  containerStyle="mt-4"
-                  labelTitle="Password"
-                  updateFormValue={updateFormValue}
-                />
-                <InputText
-                  name="role"
-                  updateType="role"
-                  value={registerObj.role}
-                  containerStyle="mt-4"
-                  labelTitle="Role"
-                  updateFormValue={updateFormValue}
-                />
-              </div>
-
-              <ErrorText styleClass="mt-8">{errorMessage}</ErrorText>
-              <button
-                type="submit"
-                className={`btn mt-2 w-full bg-yellow-500 hover:bg-yellow-200 text-white hover:text-black ${loading ? "loading" : ""}`}
-              >
-                Register
-              </button>
-
-              <div className="text-center mt-4">
-                Already have an account?{" "}
-                <Link to="/login">
-                  <span className="inline-block hover:text-primary hover:underline hover:cursor-pointer transition duration-200">
-                    Login
-                  </span>
-                </Link>
-              </div>
-            </form>
-          </div>
+    <div className="p-4">
+      <h2 className="text-2xl font-semibold mb-4 text-center">Create</h2>
+      <form onSubmit={submitForm} className="space-y-4">
+        <InputText
+          name="name"
+          updateType="name"
+          value={registerObj.name}
+          labelTitle="Name"
+          updateFormValue={updateFormValue}
+        />
+        <InputText
+          name="email"
+          updateType="email"
+          value={registerObj.email}
+          labelTitle="Email"
+          updateFormValue={updateFormValue}
+        />
+        <InputText
+          name="password"
+          type="password"
+          updateType="password"
+          value={registerObj.password}
+          labelTitle="Password"
+          updateFormValue={updateFormValue}
+        />
+        <InputText
+          name="role"
+          updateType="role"
+          value={registerObj.role}
+          labelTitle="Role"
+          updateFormValue={updateFormValue}
+        />
+        <ErrorText>{errorMessage}</ErrorText>
+        <button
+          type="submit"
+          className={`btn w-full bg-yellow-500 hover:bg-yellow-200 text-white hover:text-black ${loading ? "loading" : ""}`}
+        >
+          Create
+        </button>
+        <div className="text-center mt-4">
+          Already have an account?{" "}
+          <Link to="/login">
+            <span className="inline-block hover:text-primary hover:underline">
+              Login
+            </span>
+          </Link>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

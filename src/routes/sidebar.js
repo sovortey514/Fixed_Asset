@@ -44,7 +44,7 @@ const routes = [
   {
     path: '/app/usermanagement',
     icon: <UserIcon className={iconClasses}/>, 
-    name: 'Usermanagement',
+    name: 'User Management',
   },
 
   {

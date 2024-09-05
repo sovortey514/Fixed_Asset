@@ -895,12 +895,6 @@ const TotalAsset = () => {
     }
   };
 
-  // useEffect(() => {
-  //   if (assetDetails && token) {
-  //     handleViewHide(assetDetails, 'view', token); // Assuming you want to view asset details when record or token changes
-  //   }
-  // }, [assetDetails, token]);
-
  
   const handleRefresh = async () => {
     setLoading(true);
