@@ -54,6 +54,7 @@ public class AuthService {
             ourUsers.setEmail(registrationRequest.getEmail());
             ourUsers.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
             ourUsers.setRole(registrationRequest.getRole());
+            ourUsers.setName(registrationRequest.getName());
 
             OurUsers savedUser = ourUserRepo.save(ourUsers);
             if (savedUser != null && savedUser.getId() > 0) {
@@ -162,6 +163,9 @@ public class AuthService {
             }
             if (updateRequest.getRole() != null) {
                 user.setRole(updateRequest.getRole());
+            }
+            if (updateRequest.getName() != null) {
+                user.setRole(updateRequest.getName());
             }
 
             OurUsers updatedUser = ourUserRepo.save(user);

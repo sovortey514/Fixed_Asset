@@ -20,6 +20,9 @@ public class OurUsers implements UserDetails {
     private String email;
     private String password;
     private String role;
+    private String name;
+    
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role));
@@ -29,6 +32,11 @@ public class OurUsers implements UserDetails {
     @Override
     public String getUsername() {
         return email;
+    }
+
+   
+    public String getName() {
+        return name;
     }
 
     @Override
