@@ -6,7 +6,7 @@ import InputText from '../../components/Input/InputText';
 
 function Login() {
     const INITIAL_LOGIN_OBJ = {
-        emailId: "", 
+        username: "",  
         password: "" 
     };
 
@@ -14,24 +14,24 @@ function Login() {
     const [errorMessage, setErrorMessage] = useState("");
     const [loginObj, setLoginObj] = useState(INITIAL_LOGIN_OBJ);
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Basic email format validation
+ 
 
     const submitForm = async (e) => {
         e.preventDefault();
         setErrorMessage(""); // Clear any existing error message
 
-        // Check if email field is empty
-        if (loginObj.emailId.trim() === "" || loginObj.password.trim() === "") {
-            return setErrorMessage("Email and password are required!");
-        }
+       // Check if username or password fields are empty
+       if (loginObj.username.trim() === "" || loginObj.password.trim() === "") {
+        return setErrorMessage("Username and password are required!");
+    }
 
-        // Check if email format is valid
-        if (!emailRegex.test(loginObj.emailId.trim())) {
-            return setErrorMessage("Invalid email format");
-        }
+    // Check if password length is sufficient
+    if (loginObj.password.trim().length < 6) {
+        return setErrorMessage("Password must be at least 6 characters long");
+    }
 
         // Check if password length is sufficient
-        if (loginObj.password.trim().length < 6) {
+        if (loginObj.password.trim().length < 8) {
             return setErrorMessage("Password must be at least 6 characters long");
         }
 
@@ -43,7 +43,7 @@ function Login() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    email: loginObj.emailId,
+                    username: loginObj.username,
                     password: loginObj.password,
                 }),
             });
@@ -83,11 +83,11 @@ function Login() {
                         <form onSubmit={submitForm}>
                             <div className="mb-4">
                                 <InputText
-                                    type="email"
-                                    defaultValue={loginObj.emailId}
-                                    updateType="emailId"
+                                    type="text"
+                                    defaultValue={loginObj.username}
+                                    updateType="username"
                                     containerStyle="mt-4"
-                                    labelTitle="Email"
+                                    labelTitle="Username"
                                     updateFormValue={updateFormValue}
                                 />
                                 <InputText
