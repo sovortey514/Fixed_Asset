@@ -1,22 +1,65 @@
-import moment from "moment";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import TitleCard from "../../../components/Cards/TitleCard";
-import { showNotification } from "../../common/headerSlice";
-import InputText from "../../../components/Input/InputText";
-import TextAreaInput from "../../../components/Input/TextAreaInput";
-import ToogleInput from "../../../components/Input/ToogleInput";
+import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import TitleCard from '../../../components/Cards/TitleCard';
+import { showNotification } from '../../common/headerSlice';
+import InputText from '../../../components/Input/InputText';
+import TextAreaInput from '../../../components/Input/TextAreaInput';
+import ToogleInput from '../../../components/Input/ToogleInput';
 
-function ProfileSettings() {
+const ProfileSettings = ({ userId }) => {
   const dispatch = useDispatch();
+  const [profile, setProfile] = useState({
+    name: '',
+    username: '',
+    department: 'OFL',
+    language: 'English',
+    profileImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKJQp8ndvEkIa-u1rMgJxVc7BBsR11uSLHGA&s',
+  });
 
-  // Call API to update profile settings changes
+  const defaultImage = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKJQp8ndvEkIa-u1rMgJxVc7BBsR11uSLHGA&s';
+
+  const department = 'OFL';
+  const language ='English';
+
+
+
+    const fetchUserById = async (userId) => {
+      try {
+        const response = await fetch(`http://localhost:6060/auth/users/${userId}`);
+        if (response.ok) {
+          const userData = await response.json();
+          // Log the fetched data to the console
+          console.log('Fetched user data:', userData);
+          
+          setProfile({
+            name: userData.name || '',
+            username: userData.username || '', // Assuming 'username' should be used for email
+            profileImage: userData.profileImage || defaultImage, 
+            department: userData.department || department,
+            language: userData.language || language,
+           
+          });
+        } else {
+          console.error('Failed to fetch user:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+  
+  
+  
+  
+  const handleImageError = () => {
+    setProfile(prev => ({ ...prev, profileImage: defaultImage }));
+  };
+
   const updateProfile = () => {
     dispatch(showNotification({ message: "Profile Updated", status: 1 }));
   };
 
-  const updateFormValue = ({ updateType, value }) => {
-    console.log(updateType);
+  const updateFormValue = (updateType, value) => {
+    setProfile(prev => ({ ...prev, [updateType.toLowerCase()]: value }));
   };
 
   const InputText = ({ labelTitle, defaultValue, updateFormValue }) => (
@@ -37,86 +80,82 @@ function ProfileSettings() {
       {children}
     </div>
   );
-  const defaultImage = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKJQp8ndvEkIa-u1rMgJxVc7BBsR11uSLHGA&s';
-  const [profileImage, setProfileImage] = useState('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKJQp8ndvEkIa-u1rMgJxVc7BBsR11uSLHGA&s');
-  const handleImageError = () => {
-    setProfileImage(defaultImage);
-  };
+
   return (
     <>
-      <TitleCard  topMargin="mt-4">
-      {/* Profile Image Section */}
-      <div className="flex flex-col items-center mb-8">
-      <div className="relative group">
-      <img
-        src={profileImage}
-        alt="Profile"
-        className="w-32 h-32 rounded-full border-4 border-gray-200 shadow-lg transform transition-transform duration-300 ease-in-out hover:scale-105"
-        onError={handleImageError} 
-      />
-      {/* Edit Button */}
-      <button
-        className="absolute bottom-0 right-0 bg-white text-yellow-500 p-2 rounded-full shadow-lg transition-colors duration-300 ease-in-out hover:text-yellow-600"
-        aria-label="Edit Profile Picture"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M12 4v16m8-8H4"
+      <TitleCard topMargin="mt-4">
+        {/* Profile Image Section */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="relative group">
+            <img
+              src={profile.profileImage}
+              alt="Profile"
+              className="w-32 h-32 rounded-full border-4 border-gray-200 shadow-lg transform transition-transform duration-300 ease-in-out hover:scale-105"
+              onError={handleImageError}
+            />
+            {/* Edit Button */}
+            <button
+              className="absolute bottom-0 right-0 bg-white text-yellow-500 p-2 rounded-full shadow-lg transition-colors duration-300 ease-in-out hover:text-yellow-600"
+              aria-label="Edit Profile Picture"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+            </button>
+          </div>
+          <h2 className="text-2xl mt-4 font-semibold text-gray-800">{profile.name}</h2>
+        </div>
+
+        {/* Form Fields */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          <InputText
+            labelTitle="Name"
+            defaultValue={profile.name}
+            updateFormValue={updateFormValue}
           />
-        </svg>
-      </button>
-    </div>
-        <h2 className="text-2xl mt-4 font-semibold text-gray-800">Admin</h2>
-      </div>
+          <InputText
+            labelTitle="User name"
+            defaultValue={profile.username}
+            updateFormValue={updateFormValue}
+          />
+          <InputText
+            labelTitle="Department"
+            defaultValue={profile.department}
+            updateFormValue={updateFormValue}
+          />
+          <InputText
+            labelTitle="Language"
+            defaultValue={profile.language}
+            updateFormValue={updateFormValue}
+          />
+        </div>
 
-      {/* Form Fields */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        <InputText
-          labelTitle="Name"
-          defaultValue="Admin"
-          updateFormValue={updateFormValue}
-        />
-        <InputText
-          labelTitle="Email"
-          defaultValue="admin@gmail.com"
-          updateFormValue={updateFormValue}
-        />
-        <InputText
-          labelTitle="Department"
-          defaultValue="OFL"
-          updateFormValue={updateFormValue}
-        />
-        <InputText
-          labelTitle="Language"
-          defaultValue="English"
-          updateFormValue={updateFormValue}
-        />
-      </div>
+        {/* Divider */}
+        <div className="border-t border-gray-300 mt-6 mb-8"></div>
 
-      {/* Divider */}
-      <div className="border-t border-gray-300 mt-6 mb-8"></div>
-
-      {/* Save Button */}
-      <div className="flex justify-end">
-        <button
-          className="bg-yellow-500 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300 ease-in-out hover:bg-yellow-600"
-          onClick={updateProfile}
-        >
-          Update
-        </button>
-      </div>
-    </TitleCard>
+        {/* Save Button
+        <div className="flex justify-end">
+          <button
+            className="bg-yellow-500 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300 ease-in-out hover:bg-yellow-600"
+            onClick={updateProfile}
+          >
+            Update
+          </button>
+        </div> */}
+      </TitleCard>
     </>
   );
-}
+};
 
 export default ProfileSettings;

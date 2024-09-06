@@ -1,16 +1,14 @@
-
 import React, { useState, useEffect } from "react";
-import { Table, Button, Input,Modal ,Space,Tag, Tooltip} from 'antd';
-import {
-  PlusOutlined, EyeOutlined, EditOutlined, DeleteOutlined 
-} from "@ant-design/icons";
+import { Table, Button, Modal, Space } from 'antd';
+import { PlusOutlined, EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useNavigate } from 'react-router-dom';
 import Register from '../user/Register';
 import { showNotification } from "../common/headerSlice";
+import ProfileSettings from "../settings/profilesettings";
+
 const token = localStorage.getItem("token");
 
-
-const columns = [
+const columns = (handleUserDelete, handleClick) => [
   {
     title: "No",
     dataIndex: "key",
@@ -20,7 +18,7 @@ const columns = [
     title: 'Name',
     dataIndex: 'name',
     key: 'name',
-    render: (text) => <a>{text || 'N/A'}</a>, // Handle null values
+    render: (text) => <a>{text || 'N/A'}</a>,
   },
   {
     title: 'Username',
@@ -28,79 +26,57 @@ const columns = [
     key: 'username',
   },
   {
-  title: 'Status',
-  key: 'status',
-  dataIndex: 'enabled', // Adjust based on the actual data field
-  render: (enabled) => (
-    <>
-      {enabled ? (
-        <span
-          className="px-2 py-1 rounded-md  bg-green-200 text-green-800"
-        >
-          Active
-        </span>
-      ) : (
-        <span
-          className="px-2 py-1 rounded-md  bg-red-100 text-red-800  "
-        >
-          Inactive
-        </span>
-      )}
-    </>
-  ),
-}
-,
+    title: 'Status',
+    key: 'status',
+    dataIndex: 'enabled',
+    render: (enabled) => (
+      <>
+        {enabled ? (
+          <span className="px-2 py-1 rounded-md bg-green-200 text-green-800">
+            Active
+          </span>
+        ) : (
+          <span className="px-2 py-1 rounded-md bg-red-100 text-red-800">
+            Inactive
+          </span>
+        )}
+      </>
+    ),
+  },
   {
     title: "Action",
     key: "action",
-    render: (_, record) => (
+    render: (_, userId) => (
       <Space size="middle">
-        {/* Edit Button */}
         <Button
           icon={<EditOutlined />}
-          // onClick={() => (handleEdit(record), setItem(record))}
           className="bg-green-600 hover:bg-green-700 text-white border-none rounded-md p-2 shadow-md"
+          // onClick={() => handleEdit(record)} // Add your edit logic here
         />
-    
-        {/* View Button */}
         <Button
           icon={<EyeOutlined />}
-          // onClick={() => handleViewHide(record, "view")}
           className="bg-white hover:bg-yellow-500 text-yellow-500 border-none rounded-full p-2 shadow-md"
+          onClick={() => handleClick(userId)}
         />
-  
-        {/* Delete Button */}
         <Button
           icon={<DeleteOutlined />}
-          // onClick={() => handleDelete(record)}
-          className="bg-white hover:bg-red-700 text-red-600 border-none rounded-md p-2 shadow-md"
+          onClick={() => handleUserDelete(userId.id)}
+          className="bg-white hover:bg-red-700 text-red-600 border-none rounded-full p-2 shadow-md transition-colors duration-300 ease-in-out"
         />
       </Space>
     ),
   }
-  
-  
 ];
 
-
-function ToatalUser() {
+function TotalUser() {
   const navigate = useNavigate();
-  const handleCreateClick = () => {
-    navigate('/register'); 
-  };
   const [user, setUser] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
     fetchUser();
   }, []);
-
-
-
-  const [isModalVisible, setIsModalVisible] = useState(false);
-
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
 
   const fetchUser = async () => {
     try {
@@ -117,7 +93,6 @@ function ToatalUser() {
       if (result) {
         const filteredUsers = result.filter(user => user.role !== 'ADMIN');
         setUser(filteredUsers || []);
-      
       } else {
         showNotification.error({
           message: "Failed to fetch User",
@@ -128,36 +103,80 @@ function ToatalUser() {
       console.error("Error fetching user:", error);
     }
   };
-  console.log(user)
+
+  const handleUserDelete = async (userId) => {
+    try {
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+      await fetch(`http://localhost:6060/auth/users/${userId}`, {
+        method: "DELETE",
+        headers,
+      });
+
+      // Update user state after successful deletion
+      setUser((prevUser) => prevUser.filter((user) => user.id !== userId));
+
+      showNotification.success({
+        message: "User Deleted",
+        description: "User has been deleted successfully.",
+      });
+    } catch (error) {
+      console.error("Error deleting User:", error);
+      showNotification.error({
+        message: "Failed to delete User",
+        description: error.message,
+      });
+    }
+  };
+
   const handleCancel = () => {
     setIsModalVisible(false);
+    setSelectedUser(null);
   };
+
+  const handleCreateClick = () => {
+    navigate('/register'); 
+  };
+
+  const handleClick = (userId) => {
+    setSelectedUser(userId); // Set selected user
+    setIsModalVisible(true); // Show ProfileSystems modal
+  };
+
   return (
     <>
-     <div className="flex justify-between ">
+      <div className="flex justify-between mb-4">
         <Button
           size="middle"
-          style={{ marginLeft: 8 }}
           shape="circle"
           icon={<PlusOutlined />}
-          onClick={showModal}
+          onClick={() => setIsModalVisible(true)}
         />
       </div>
 
       <div className='mt-4'>
-      <Table columns={columns} dataSource={user.map((u, index) => ({ ...u, key: index }))} rowKey="id" />
-    </div>
-
+        <Table
+          columns={columns(handleUserDelete, handleClick)} // Pass handleClick to columns
+          dataSource={user.map((u, index) => ({ ...u, key: index }))}
+          rowKey="id"
+        />
+      </div>
       <Modal 
         visible={isModalVisible} 
         width={500}
         footer={null}
         onCancel={handleCancel}
       >
-       <Register/>
+        {selectedUser ? (
+          <ProfileSettings user={selectedUser} /> // Render ProfileSystems component with selected user data
+        ) : (
+          <Register /> // Fallback to Register if no user is selected
+        )}
       </Modal>
     </>
   );
 }
 
-export default ToatalUser;
+export default TotalUser;

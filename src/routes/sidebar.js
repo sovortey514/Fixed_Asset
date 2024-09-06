@@ -20,9 +20,9 @@ const routes = [
     name: 'Dashboard',
   },
   {
-    path: '', //no url needed as this has submenu
+    path: '',
     icon: <DocumentTextIcon className={`${iconClasses} inline` }/>, // icon component
-    name: 'Asset Mangement', // name that appear in Sidebar
+    name: 'Asset Mangement', 
     submenu : [
       {
         path: '/app/assetmanagement-totalasset',
@@ -30,9 +30,9 @@ const routes = [
         name: 'Total Asset',
       },
       {
-        path: '/app/assetmanagement-assetcount', // url
-        icon: <DocumentTextIcon className={submenuIconClasses}/>, // icon component
-        name: 'Asset Count', // name that appear in Sidebar
+        path: '/app/assetmanagement-assetcount', 
+        icon: <DocumentTextIcon className={submenuIconClasses}/>, 
+        name: 'Audit Asset',
       },
       {
         path: '/app/assetmanagement-historyasset',
