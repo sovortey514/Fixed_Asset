@@ -16,4 +16,6 @@ public interface OurUserRepo extends JpaRepository<OurUsers, Integer> {
     boolean existsById(Long userId);
 
     Optional<OurUsers> findById(Long userId);
+
+    OurUsers getUserById(Long userId);
 }

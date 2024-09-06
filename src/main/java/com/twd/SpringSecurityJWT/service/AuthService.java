@@ -178,4 +178,8 @@ public class AuthService {
         }
         return response;
     }
+
+    public OurUsers getUserById(Long userId) {
+        return ourUserRepo.findById(userId).orElse(null);
+    }
 }

@@ -54,5 +54,15 @@ public class AuthController {
         return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatusCode()));
     }
 
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<OurUsers> getUserById(@PathVariable Long userId) {
+        OurUsers user = authService.getUserById(userId);
+        if (user != null) {
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
 
 }
