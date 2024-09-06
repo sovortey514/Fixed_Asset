@@ -7,7 +7,7 @@ import InputText from "../../components/Input/InputText";
 function Register() {
   const INITIAL_REGISTER_OBJ = {
     name: "",
-    email: "",
+    username: "",
     password: "",
     role: "",
   };
@@ -19,14 +19,14 @@ function Register() {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   // const validRoles = ["Admin", "User", "Moderator"]; // Adjust as needed
 
   const submitForm = async (e) => {
     e.preventDefault();
     setErrorMessage("");
 
-    const { name, email, password, role } = registerObj;
+    const { name, username, password, role } = registerObj;
 
     // if (!name.trim()) {
     //   return setErrorMessage("Name is required!");
@@ -58,7 +58,7 @@ function Register() {
         headers:  { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
           name: registerObj.name,
-          email: registerObj.email,
+          username: registerObj.username,
           password: registerObj.password,
           role: registerObj.role
         }),
@@ -102,31 +102,31 @@ function Register() {
       <h2 className="text-2xl font-semibold mb-4 text-center">Create</h2>
       <form onSubmit={submitForm} className="space-y-4">
         <InputText
-          name="name"
+         
           updateType="name"
-          value={registerObj.name}
+          defaultValue={registerObj.name}
           labelTitle="Name"
           updateFormValue={updateFormValue}
         />
         <InputText
-          name="email"
-          updateType="email"
-          value={registerObj.email}
-          labelTitle="Email"
+          
+          type="text"
+          updateType="username"
+          defaultValue={registerObj.username}
+          labelTitle="username"
           updateFormValue={updateFormValue}
         />
         <InputText
-          name="password"
+          
           type="password"
           updateType="password"
-          value={registerObj.password}
+          defaultValue={registerObj.password}
           labelTitle="Password"
           updateFormValue={updateFormValue}
         />
         <InputText
-          name="role"
           updateType="role"
-          value={registerObj.role}
+          defaultValue={registerObj.role}
           labelTitle="Role"
           updateFormValue={updateFormValue}
         />

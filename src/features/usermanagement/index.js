@@ -23,9 +23,9 @@ const columns = [
     render: (text) => <a>{text || 'N/A'}</a>, // Handle null values
   },
   {
-    title: 'Email',
-    dataIndex: 'email',
-    key: 'email',
+    title: 'Username',
+    dataIndex: 'username',
+    key: 'username',
   },
   {
     title: 'Status',
