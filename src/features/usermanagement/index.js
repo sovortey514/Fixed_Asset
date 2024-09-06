@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from "react";
-import { Table, Button, Input,Modal ,Space,Tag} from 'antd';
+import { Table, Button, Input,Modal ,Space,Tag, Tooltip} from 'antd';
 import {
-  PlusOutlined
+  PlusOutlined, EyeOutlined, EditOutlined, DeleteOutlined 
 } from "@ant-design/icons";
 import { useNavigate } from 'react-router-dom';
 import Register from '../user/Register';
@@ -28,33 +28,58 @@ const columns = [
     key: 'username',
   },
   {
-    title: 'Status',
-    key: 'status',
-    dataIndex: 'enabled', // Adjust based on the actual data field
-    render: (enabled) => (
-      <>
-        {enabled ? (
-          <Tag color="green">
-            Active
-          </Tag>
-        ) : (
-          <Tag color="volcano">
-            Inactive
-          </Tag>
-        )}
-      </>
-    ),
-  },
+  title: 'Status',
+  key: 'status',
+  dataIndex: 'enabled', // Adjust based on the actual data field
+  render: (enabled) => (
+    <>
+      {enabled ? (
+        <span
+          className="px-2 py-1 rounded-md  bg-green-200 text-green-800"
+        >
+          Active
+        </span>
+      ) : (
+        <span
+          className="px-2 py-1 rounded-md  bg-red-100 text-red-800  "
+        >
+          Inactive
+        </span>
+      )}
+    </>
+  ),
+}
+,
   {
-    title: 'Action',
-    key: 'action',
+    title: "Action",
+    key: "action",
     render: (_, record) => (
       <Space size="middle">
-        <a>Invite {record.name || 'User'}</a>
-        <a>Delete</a>
+        {/* Edit Button */}
+        <Button
+          icon={<EditOutlined />}
+          // onClick={() => (handleEdit(record), setItem(record))}
+          className="bg-green-600 hover:bg-green-700 text-white border-none rounded-md p-2 shadow-md"
+        />
+    
+        {/* View Button */}
+        <Button
+          icon={<EyeOutlined />}
+          // onClick={() => handleViewHide(record, "view")}
+          className="bg-white hover:bg-yellow-500 text-yellow-500 border-none rounded-full p-2 shadow-md"
+        />
+  
+        {/* Delete Button */}
+        <Button
+          icon={<DeleteOutlined />}
+          // onClick={() => handleDelete(record)}
+          className="bg-white hover:bg-red-700 text-red-600 border-none rounded-md p-2 shadow-md"
+        />
       </Space>
     ),
-  },
+  }
+  
+  
 ];
 
 
@@ -90,7 +115,8 @@ function ToatalUser() {
       const result = await response.json();
       console.log(result);
       if (result) {
-        setUser(result || []);
+        const filteredUsers = result.filter(user => user.role !== 'ADMIN');
+        setUser(filteredUsers || []);
       
       } else {
         showNotification.error({

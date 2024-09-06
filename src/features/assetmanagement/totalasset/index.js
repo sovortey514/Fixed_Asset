@@ -656,6 +656,8 @@ const TotalAsset = () => {
     console.log(record.category.name);
     setModalType("fixedasset");
     setEditKey(record);
+
+
     form.setFieldsValue({
       name: record.name,
       categoryId: record.category.name,
@@ -666,6 +668,8 @@ const TotalAsset = () => {
       price: record.price,
       unit: record.unit,
       quantity: record.quantity,
+      file:record.file,
+
     });
     setIsModalVisible(true);
   };
