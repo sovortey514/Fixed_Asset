@@ -58,9 +58,4 @@ public class JWTUtils {
     }
 
 
-// 
-    // public String getUsernameFromToken(String token) {
-    //     return parseToken(token).getSubject();
-    // }
-
 }

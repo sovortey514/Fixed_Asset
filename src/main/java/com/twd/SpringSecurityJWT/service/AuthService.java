@@ -51,7 +51,7 @@ public class AuthService {
             }
 
             OurUsers ourUsers = new OurUsers();
-            ourUsers.setEmail(registrationRequest.getEmail());
+            ourUsers.setUsername(registrationRequest.getUsername());
             ourUsers.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
             ourUsers.setRole(registrationRequest.getRole());
             ourUsers.setName(registrationRequest.getName());
@@ -100,9 +100,9 @@ public class AuthService {
         ReqRes response = new ReqRes();
         try {
             authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(signinRequest.getEmail(), signinRequest.getPassword()));
+                new UsernamePasswordAuthenticationToken(signinRequest.getUsername(), signinRequest.getPassword()));
     
-            OurUsers user = ourUserRepo.findByEmail(signinRequest.getEmail())
+            OurUsers user = ourUserRepo.findByUsername(signinRequest.getUsername())
                     .orElseThrow(() -> new RuntimeException("User not found"));
     
             String jwt = jwtUtils.generateToken(user);
@@ -126,8 +126,8 @@ public class AuthService {
     public ReqRes refreshToken(ReqRes refreshTokenRequest) {
         ReqRes response = new ReqRes();
         try {
-            String email = jwtUtils.extractUsername(refreshTokenRequest.getToken());
-            OurUsers user = ourUserRepo.findByEmail(email)
+            String username = jwtUtils.extractUsername(refreshTokenRequest.getToken());
+            OurUsers user = ourUserRepo.findByUsername(username)
                     .orElseThrow(() -> new RuntimeException("User not found"));
             
             if (jwtUtils.isTokenValid(refreshTokenRequest.getToken(), user)) {
@@ -155,8 +155,8 @@ public class AuthService {
             OurUsers user = ourUserRepo.findById(userId)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            if (updateRequest.getEmail() != null) {
-                user.setEmail(updateRequest.getEmail());
+            if (updateRequest.getUsername() != null) {
+                user.setUsername(updateRequest.getUsername());
             }
             if (updateRequest.getPassword() != null) {
                 user.setPassword(passwordEncoder.encode(updateRequest.getPassword()));

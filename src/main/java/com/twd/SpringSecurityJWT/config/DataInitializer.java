@@ -22,9 +22,9 @@ public class DataInitializer {
     @Bean
     public ApplicationRunner init() {
         return (ApplicationArguments args) -> {
-            if (ourUserRepo.findByEmail("admin@gmail.com").isEmpty()) {
+            if (ourUserRepo.findByUsername("admin123").isEmpty()) {
                 OurUsers admin = new OurUsers();
-                admin.setEmail("admin@gmail.com");
+                admin.setUsername("admin123");
                 admin.setPassword(passwordEncoder.encode("admin@123"));
                 admin.setRole("ADMIN");
                 ourUserRepo.save(admin);
