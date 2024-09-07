@@ -217,7 +217,6 @@ const TotalAsset = () => {
       if (response.ok && result.statusCode === 200) {
         if (result.fixedAssetDetails) {
           setFixedAssetDetail(result.fixedAssetDetails);
-          setIsModalVisible(true);
           console.log(result.fixedAssetDetails); // Log the result to check its structure
         } else {
           console.warn("Fixed asset details not found in the response.");

@@ -102,7 +102,6 @@ function Register() {
       <h2 className="text-2xl font-semibold mb-4 text-center">Create</h2>
       <form onSubmit={submitForm} className="space-y-4">
         <InputText
-         
           updateType="name"
           defaultValue={registerObj.name}
           labelTitle="Name"
