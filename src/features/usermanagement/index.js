@@ -204,34 +204,11 @@ function TotalUser() {
   const submitForm = async (e) => {
     e.preventDefault();
     setErrorMessage("");
-
+  
     const { name, username, password, role } = registerObj;
-
-    // if (!name.trim()) {
-    //   return setErrorMessage("Name is required!");
-    // }
-    // if (!email.trim()) {
-    //   return setErrorMessage("Email is required!");
-    // }
-    // if (!emailRegex.test(email.trim())) {
-    //   return setErrorMessage("Invalid email format!");
-    // }
-    // if (!password.trim()) {
-    //   return setErrorMessage("Password is required!");
-    // }
-    // if (password.trim().length < 6) {
-    //   return setErrorMessage("Password must be at least 6 characters long!");
-    // }
-    // if (!role.trim()) {
-    //   return setErrorMessage("Role is required!");
-    // }
-    // if (!validRoles.includes(role.trim())) {
-    //   return setErrorMessage("Invalid role selected!");
-    // }
-
+  
     setLoading(true);
     try {
-      // const result = await response.json();
       const response = await fetch("http://localhost:6060/auth/signup", {
         method: "POST",
         headers: {
@@ -239,27 +216,23 @@ function TotalUser() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          name: registerObj.name,
-          username: registerObj.username,
-          password: registerObj.password,
-          role: registerObj.role,
+          name,
+          username,
+          password,
+          role,
         }),
       });
-
-      console.log({ response });
-
+  
       const responseData = await response.json();
       if (response.ok) {
-        // if (responseData.statusCode === 200) {
-        //   navigate('/login');
-        // } else {
-        //   setErrorMessage(responseData.message || "Registration failed");
-        // }
+
+        setRegisterObj({ name: "", username: "", password: "", role: "" });
+        
+        setIsModalVisible(false);
+        fetchUser();
       } else {
         setErrorMessage(responseData.message || "Registration failed");
       }
-      setIsModalVisible(false);
-      fetchUser();setRegisterObj({ ...INITIAL_REGISTER_OBJ, updateType: "value" });
     } catch (error) {
       console.error("Error:", error);
       setErrorMessage("An error occurred");
@@ -267,6 +240,7 @@ function TotalUser() {
       setLoading(false);
     }
   };
+  
 
   const handleCreateClick = () => {
     navigate("/register");
