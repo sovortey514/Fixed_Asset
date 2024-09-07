@@ -37,6 +37,7 @@ function Login() {
 
         setLoading(true);
         try {
+            console.log("jbudhugfed")
             const response = await fetch('http://localhost:6060/auth/signin', {
                 method: 'POST',
                 headers: {
@@ -52,6 +53,11 @@ function Login() {
             console.log(data);
             if (data.statusCode ===200) {
                 localStorage.setItem("token", data.token);
+                const user = JSON.parse(localStorage.getItem("user"));
+                localStorage.setItem("username", loginObj.username);
+     
+                console.log("Retrieved User Data:", user);
+
                 setLoading(false);
                 window.location.href = '/app/welcome';
             } else {

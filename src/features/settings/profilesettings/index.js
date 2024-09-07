@@ -20,6 +20,7 @@ const ProfileSettings = ({ userId }) => {
 
   const department = 'OFL';
   const language ='English';
+  const [username, setUsername]= useState("")
 
 
 
@@ -47,9 +48,11 @@ const ProfileSettings = ({ userId }) => {
       }
     };
   
-  
-  
-  
+    useEffect(()=>{
+      const user =localStorage.getItem("username");
+      setUsername(user)
+    },[])
+    
   const handleImageError = () => {
     setProfile(prev => ({ ...prev, profileImage: defaultImage }));
   };
@@ -126,7 +129,7 @@ const ProfileSettings = ({ userId }) => {
           />
           <InputText
             labelTitle="User name"
-            defaultValue={profile.username}
+            defaultValue={username}
             updateFormValue={updateFormValue}
           />
           <InputText
