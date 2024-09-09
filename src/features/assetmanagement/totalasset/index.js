@@ -524,7 +524,7 @@ const TotalAsset = () => {
             unit: assetById.unit,
             year: assetById.year,
           };
-          // Optionally include fixedAsset if needed
+        
           if (values.fixedAsset) {
             requestBody.fixedAsset = { id: values.fixedAsset };
           }
@@ -591,7 +591,7 @@ const TotalAsset = () => {
             unit: assetById.unit,
             year: assetById.year,
           };
-          // Optionally include fixedAsset if needed
+   
           if (values.fixedAsset) {
             requestBody.fixedAsset = { id: values.fixedAsset };
           }
@@ -640,7 +640,7 @@ const TotalAsset = () => {
         }
       }
 
-      // Close modal and reset form fields
+     
       form.resetFields();
       setIsModalVisible(false);
     } catch (info) {
@@ -900,11 +900,41 @@ const TotalAsset = () => {
     }
   };
 
+  const handleDownload = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      console.log("Token:", token); 
+      const response = await fetch('http://localhost:6060/admin/export', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'fixed_assets.xlsx'; 
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      } else {
+        console.error('Failed to download the file.', response.status);
+      }
+    } catch (error) {
+      console.error('Error during download:', error);
+    }
+  };
+
+
  
   const handleRefresh = async () => {
     setLoading(true);
     try {
-      await fetchFixedAssets(); // Call the function to refresh data
+      await fetchFixedAssets();
     } catch (error) {
       console.error("Failed to refresh data", error);
     } finally {
@@ -960,7 +990,7 @@ const TotalAsset = () => {
               size="middle"
               style={{ marginLeft: 8 }}
               icon={<DownloadOutlined />}
-              // onClick={handleDownload}
+              onClick={handleDownload}
             >
               Download
             </Button>

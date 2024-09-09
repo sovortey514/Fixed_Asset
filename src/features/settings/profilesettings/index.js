@@ -144,18 +144,9 @@ const ProfileSettings = ({ userId }) => {
           />
         </div>
 
-        {/* Divider */}
         <div className="border-t border-gray-300 mt-6 mb-8"></div>
 
-        {/* Save Button
-        <div className="flex justify-end">
-          <button
-            className="bg-yellow-500 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-300 ease-in-out hover:bg-yellow-600"
-            onClick={updateProfile}
-          >
-            Update
-          </button>
-        </div> */}
+        
       </TitleCard>
     </>
   );

@@ -16,7 +16,7 @@ import ErrorText from "../../components/Typography/ErrorText";
 
 const token = localStorage.getItem("token");
 
-const columns = (handleUserDelete, handleClick) => [
+const columns = (handleUserDelete, handleClick, handleEdit) => [
   {
     title: "No",
     dataIndex: "key",
@@ -54,21 +54,21 @@ const columns = (handleUserDelete, handleClick) => [
   {
     title: "Action",
     key: "action",
-    render: (_, userId) => (
+    render: (_, user) => (
       <Space size="middle">
         <Button
           icon={<EditOutlined />}
           className="bg-green-600 hover:bg-green-700 text-white border-none rounded-md p-2 shadow-md"
-          // onClick={() => handleEdit(record)} // Add your edit logic here
+          onClick={() => handleEdit(user)} // Pass the entire user object
         />
         <Button
           icon={<EyeOutlined />}
           className="bg-white hover:bg-yellow-500 text-yellow-500 border-none rounded-full p-2 shadow-md"
-          onClick={() => handleClick(userId)}
+          onClick={() => handleClick(user)}
         />
         <Button
           icon={<DeleteOutlined />}
-          onClick={() => handleUserDelete(userId.id)}
+          onClick={() => handleUserDelete(user.id)}
           className="bg-white hover:bg-red-700 text-red-600 border-none rounded-full p-2 shadow-md transition-colors duration-300 ease-in-out"
         />
       </Space>
@@ -111,6 +111,8 @@ function TotalUser() {
       console.error("Error fetching user:", error);
     }
   };
+
+  
 
   const handleUserDelete = async (userId) => {
     try {
@@ -198,7 +200,7 @@ function TotalUser() {
   const [errorMessage, setErrorMessage] = useState("");
   const [registerObj, setRegisterObj] = useState(INITIAL_REGISTER_OBJ);
 
-  // const navigate = useNavigate();
+
   const token = localStorage.getItem("token");
 
   const submitForm = async (e) => {
@@ -241,10 +243,6 @@ function TotalUser() {
     }
   };
   
-
-  const handleCreateClick = () => {
-    navigate("/register");
-  };
   const handleImageError = () => {
     setProfile((prev) => ({ ...prev, profileImage: defaultImage }));
   };
@@ -256,8 +254,8 @@ function TotalUser() {
   };
 
   const handleClick = (userId) => {
-    setSelectedUser(userId); // Set selected user
-    setIsModalVisible(true); // Show ProfileSystems modal
+    setSelectedUser(userId); 
+    setIsModalVisible(true); 
   };
 
   const handleInputChange = (e) => {
@@ -265,6 +263,7 @@ function TotalUser() {
     console.log("onchange", e);
     setRegisterObj((prev) => ({ ...prev, [name]: value }));
   };
+  
 
   return (
     <>
@@ -292,7 +291,7 @@ function TotalUser() {
       >
         {selectedUser ? (
           <TitleCard topMargin="mt-4">
-            {/* Profile Image Section */}
+            
             <div className="flex flex-col items-center mb-8">
               <div className="relative group">
                 <img
@@ -301,7 +300,7 @@ function TotalUser() {
                   className="w-32 h-32 rounded-full border-4 border-gray-200 shadow-lg transform transition-transform duration-300 ease-in-out hover:scale-105"
                   onError={handleImageError}
                 />
-                {/* Edit Button */}
+                
                 <button
                   className="absolute bottom-0 right-0 bg-white text-yellow-500 p-2 rounded-full shadow-lg transition-colors duration-300 ease-in-out hover:text-yellow-600"
                   aria-label="Edit Profile Picture"
@@ -327,7 +326,7 @@ function TotalUser() {
               </h2>
             </div>
 
-            {/* Form Fields */}
+          
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
               <InputText
                 labelTitle="Name"
@@ -353,9 +352,9 @@ function TotalUser() {
 
             {/* Divider */}
             <div className="border-t border-gray-300 mt-6 mb-8"></div>
-          </TitleCard> // Render ProfileSystems component with selected user data
+          </TitleCard> 
         ) : (
-          <TitleCard title={"Create"} topMargin="mt-4">
+          <TitleCard title={"Create Auditor"} topMargin="mt-4">
             <div className="p-4">
               <form onSubmit={submitForm} className="space-y-4">
                 <InputText
@@ -396,7 +395,7 @@ function TotalUser() {
                 </button>
               </form>
             </div>
-          </TitleCard> // Fallback to Register if no user is selected
+          </TitleCard> 
         )}
       </Modal>
     </>
