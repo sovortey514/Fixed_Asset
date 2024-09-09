@@ -51,11 +51,11 @@ public class AuthService {
             }
 
             OurUsers ourUsers = new OurUsers();
+            ourUsers.setName(registrationRequest.getName());
             ourUsers.setUsername(registrationRequest.getUsername());
             ourUsers.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
             ourUsers.setRole(registrationRequest.getRole());
-            ourUsers.setName(registrationRequest.getName());
-
+          
             OurUsers savedUser = ourUserRepo.save(ourUsers);
             if (savedUser != null && savedUser.getId() > 0) {
                 response.setOurUsers(savedUser);
@@ -148,36 +148,41 @@ public class AuthService {
         return response;
     }
 
-     @Transactional
+    @Transactional
     public ReqRes updateUser(Long userId, RegisterRequest updateRequest) {
-        ReqRes response = new ReqRes();
-        try {
-            OurUsers user = ourUserRepo.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+    ReqRes response = new ReqRes();
+    try {
+        // Retrieve user by ID, throw exception if not found
+        OurUsers user = ourUserRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-            if (updateRequest.getUsername() != null) {
-                user.setUsername(updateRequest.getUsername());
-            }
-            if (updateRequest.getPassword() != null) {
-                user.setPassword(passwordEncoder.encode(updateRequest.getPassword()));
-            }
-            if (updateRequest.getRole() != null) {
-                user.setRole(updateRequest.getRole());
-            }
-            if (updateRequest.getName() != null) {
-                user.setRole(updateRequest.getName());
-            }
-
-            OurUsers updatedUser = ourUserRepo.save(user);
-            response.setOurUsers(updatedUser);
-            response.setMessage("User updated successfully.");
-            response.setStatusCode(200);
-        } catch (Exception e) {
-            response.setStatusCode(500);
-            response.setError("Update error: " + e.getMessage());
+        
+        if (updateRequest.getName() != null) {
+            user.setName(updateRequest.getName());
         }
-        return response;
+        if (updateRequest.getUsername() != null) {
+            user.setUsername(updateRequest.getUsername());
+        }
+        if (updateRequest.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(updateRequest.getPassword()));
+        }
+        if (updateRequest.getRole() != null) {
+            user.setRole(updateRequest.getRole());
+        }
+
+        // Save the updated user to the database
+        OurUsers updatedUser = ourUserRepo.save(user);
+        response.setOurUsers(updatedUser);
+        response.setMessage("User updated successfully.");
+        response.setStatusCode(200);
+    } catch (Exception e) {
+        // Handle any exceptions that occur during the update process
+        response.setStatusCode(500);
+        response.setError("Update error: " + e.getMessage());
     }
+    return response;
+}
+
 
     public OurUsers getUserById(Long userId) {
         return ourUserRepo.findById(userId).orElse(null);
