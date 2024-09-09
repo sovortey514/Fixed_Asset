@@ -16,75 +16,77 @@ import ErrorText from "../../components/Typography/ErrorText";
 
 const token = localStorage.getItem("token");
 
-const columns = (handleUserDelete, handleClick, handleEdit) => [
-  {
-    title: "No",
-    dataIndex: "key",
-    render: (_, __, index) => index + 1,
-  },
-  {
-    title: "Name",
-    dataIndex: "name",
-    key: "name",
-    render: (text) => <a>{text || "N/A"}</a>,
-  },
-  {
-    title: "Username",
-    dataIndex: "username",
-    key: "username",
-  },
-  {
-    title: "Status",
-    key: "status",
-    dataIndex: "enabled",
-    render: (enabled) => (
-      <>
-        {enabled ? (
-          <span className="px-2 py-1 rounded-md bg-green-200 text-green-800">
-            Active
-          </span>
-        ) : (
-          <span className="px-2 py-1 rounded-md bg-red-100 text-red-800">
-            Inactive
-          </span>
-        )}
-      </>
-    ),
-  },
-  {
-    title: "Action",
-    key: "action",
-    render: (_, user) => (
-      <Space size="middle">
-        <Button
-          icon={<EditOutlined />}
-          className="bg-green-600 hover:bg-green-700 text-white border-none rounded-md p-2 shadow-md"
-          onClick={() => handleEdit(user)} // Pass the entire user object
-        />
-        <Button
-          icon={<EyeOutlined />}
-          className="bg-white hover:bg-yellow-500 text-yellow-500 border-none rounded-full p-2 shadow-md"
-          onClick={() => handleClick(user)}
-        />
-        <Button
-          icon={<DeleteOutlined />}
-          onClick={() => handleUserDelete(user.id)}
-          className="bg-white hover:bg-red-700 text-red-600 border-none rounded-full p-2 shadow-md transition-colors duration-300 ease-in-out"
-        />
-      </Space>
-    ),
-  },
-];
-
 function TotalUser() {
   const navigate = useNavigate();
   const [user, setUser] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [userData, setUserData] = useState([]);
 
   useEffect(() => {
-    fetchUser(1);
+    fetchUser();
   }, []);
+
+  const columns = (handleUserDelete, handleClick, handleEdit) => [
+    {
+      title: "No",
+      dataIndex: "key",
+      render: (_, __, index) => index + 1,
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+      render: (text) => <a>{text || "N/A"}</a>,
+    },
+    {
+      title: "Username",
+      dataIndex: "username",
+      key: "username",
+    },
+    {
+      title: "Status",
+      key: "status",
+      dataIndex: "enabled",
+      render: (enabled) => (
+        <>
+          {enabled ? (
+            <span className="px-2 py-1 rounded-md bg-green-200 text-green-800">
+              Active
+            </span>
+          ) : (
+            <span className="px-2 py-1 rounded-md bg-red-100 text-red-800">
+              Inactive
+            </span>
+          )}
+        </>
+      ),
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, user) => (
+        <Space size="middle">
+          <Button
+            icon={<EditOutlined />}
+            className="bg-green-600 hover:bg-green-700 text-white border-none rounded-md p-2 shadow-md"
+            // eslint-disable-next-line no-sequences
+            onClick={() => (setIsModalVisible(true), setUserData(user))} // Pass the entire user object
+          />
+          <Button
+            icon={<EyeOutlined />}
+            className="bg-white hover:bg-yellow-500 text-yellow-500 border-none rounded-full p-2 shadow-md"
+            onClick={() => handleClick(user)}
+          />
+          <Button
+            icon={<DeleteOutlined />}
+            onClick={() => handleUserDelete(user.id)}
+            className="bg-white hover:bg-red-700 text-red-600 border-none rounded-full p-2 shadow-md transition-colors duration-300 ease-in-out"
+          />
+        </Space>
+      ),
+    },
+  ];
 
   const fetchUser = async () => {
     try {
@@ -107,12 +109,11 @@ function TotalUser() {
           description: result.error,
         });
       }
+      console.log(result);
     } catch (error) {
       console.error("Error fetching user:", error);
     }
   };
-
-  
 
   const handleUserDelete = async (userId) => {
     try {
@@ -143,6 +144,7 @@ function TotalUser() {
   const handleCancel = () => {
     setIsModalVisible(false);
     setSelectedUser(null);
+    setUserData([]);
   };
 
   const [profile, setProfile] = useState({
@@ -200,15 +202,14 @@ function TotalUser() {
   const [errorMessage, setErrorMessage] = useState("");
   const [registerObj, setRegisterObj] = useState(INITIAL_REGISTER_OBJ);
 
-
   const token = localStorage.getItem("token");
 
   const submitForm = async (e) => {
     e.preventDefault();
     setErrorMessage("");
-  
+
     const { name, username, password, role } = registerObj;
-  
+
     setLoading(true);
     try {
       const response = await fetch("http://localhost:6060/auth/signup", {
@@ -224,12 +225,51 @@ function TotalUser() {
           role,
         }),
       });
-  
+      console.log(response);
       const responseData = await response.json();
       if (response.ok) {
-
         setRegisterObj({ name: "", username: "", password: "", role: "" });
-        
+        setUserData([]);
+        setIsModalVisible(false);
+      } else {
+        setErrorMessage(responseData.message || "Registration failed");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setErrorMessage("An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const Editform = async (e) => {
+    e.preventDefault();
+    setErrorMessage("");
+
+    const { name, username, password, role } = registerObj;
+
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `http://localhost:6060/auth/users/${userData.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            name,
+            username,
+            password,
+            role,
+          }),
+        }
+      );
+
+      const responseData = await response.json();
+      if (response.ok) {
+        setRegisterObj({ name: "", username: "", password: "", role: "" });
+        setUserData([])
         setIsModalVisible(false);
         fetchUser();
       } else {
@@ -242,7 +282,7 @@ function TotalUser() {
       setLoading(false);
     }
   };
-  
+
   const handleImageError = () => {
     setProfile((prev) => ({ ...prev, profileImage: defaultImage }));
   };
@@ -251,11 +291,12 @@ function TotalUser() {
     setErrorMessage("");
     setRegisterObj({ ...registerObj, [updateType]: value });
     console.log("registerObj ", registerObj);
+    setUserData([])
   };
 
   const handleClick = (userId) => {
-    setSelectedUser(userId); 
-    setIsModalVisible(true); 
+    setSelectedUser(userId);
+    setIsModalVisible(true);
   };
 
   const handleInputChange = (e) => {
@@ -263,8 +304,6 @@ function TotalUser() {
     console.log("onchange", e);
     setRegisterObj((prev) => ({ ...prev, [name]: value }));
   };
-  
-
   return (
     <>
       <div className="flex justify-between mb-4">
@@ -291,7 +330,6 @@ function TotalUser() {
       >
         {selectedUser ? (
           <TitleCard topMargin="mt-4">
-            
             <div className="flex flex-col items-center mb-8">
               <div className="relative group">
                 <img
@@ -300,7 +338,7 @@ function TotalUser() {
                   className="w-32 h-32 rounded-full border-4 border-gray-200 shadow-lg transform transition-transform duration-300 ease-in-out hover:scale-105"
                   onError={handleImageError}
                 />
-                
+
                 <button
                   className="absolute bottom-0 right-0 bg-white text-yellow-500 p-2 rounded-full shadow-lg transition-colors duration-300 ease-in-out hover:text-yellow-600"
                   aria-label="Edit Profile Picture"
@@ -326,7 +364,6 @@ function TotalUser() {
               </h2>
             </div>
 
-          
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
               <InputText
                 labelTitle="Name"
@@ -352,39 +389,77 @@ function TotalUser() {
 
             {/* Divider */}
             <div className="border-t border-gray-300 mt-6 mb-8"></div>
-          </TitleCard> 
+          </TitleCard>
         ) : (
           <TitleCard title={"Create Auditor"} topMargin="mt-4">
-            <div className="p-4">
+            {userData.length !== 0 ? (
+              <div className="p-4">
+                <form onSubmit={Editform} className="space-y-4">
+                  <InputText
+                    type="text"
+                    updateType="name"
+                    defaultValue={userData.length !== 0 ? userData.name : ""}
+                    labelTitle="Name"
+                    updateFormValue={updateFormValue}
+                  />
+                  <InputText
+                    type="text"
+                    updateType="username"
+                    defaultValue={userData.username ?? ""}
+                    labelTitle="Username"
+                    updateFormValue={updateFormValue}
+                  />
+                  <InputText
+                    type="password"
+                    updateType="password"
+                    defaultValue={userData.password ?? ""}
+                    labelTitle="Password"
+                    updateFormValue={updateFormValue}
+                  />
+                  <InputText
+                    updateType="role"
+                    defaultValue={userData.role ?? ""}
+                    labelTitle="Role"
+                    updateFormValue={updateFormValue}
+                  />
+                  <ErrorText>{errorMessage}</ErrorText>
+                  <button
+                    type="submit"
+                    className={`btn w-full bg-yellow-500 hover:bg-yellow-200 text-white hover:text-black ${
+                      loading ? "loading" : ""
+                    }`}
+                  >
+                    Update
+                  </button>
+                </form>
+              </div>
+            ) : (
               <form onSubmit={submitForm} className="space-y-4">
                 <InputText
                   type="text"
                   updateType="name"
-                  defaultValue={registerObj.name}
                   labelTitle="Name"
                   updateFormValue={updateFormValue}
                 />
                 <InputText
                   type="text"
                   updateType="username"
-                  defaultValue={registerObj.username}
                   labelTitle="Username"
                   updateFormValue={updateFormValue}
                 />
                 <InputText
                   type="password"
                   updateType="password"
-                  defaultValue={registerObj.password}
                   labelTitle="Password"
                   updateFormValue={updateFormValue}
                 />
                 <InputText
                   updateType="role"
-                  defaultValue={registerObj.role}
                   labelTitle="Role"
                   updateFormValue={updateFormValue}
                 />
                 <ErrorText>{errorMessage}</ErrorText>
+
                 <button
                   type="submit"
                   className={`btn w-full bg-yellow-500 hover:bg-yellow-200 text-white hover:text-black ${
@@ -394,8 +469,8 @@ function TotalUser() {
                   Create
                 </button>
               </form>
-            </div>
-          </TitleCard> 
+            )}
+          </TitleCard>
         )}
       </Modal>
     </>
