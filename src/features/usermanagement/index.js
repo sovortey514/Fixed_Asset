@@ -336,7 +336,7 @@ function TotalUser() {
               />
               <InputText
                 labelTitle="User name"
-                defaultValue={profile.username}
+                defaultValue={selectedUser.username}
                 updateFormValue={updateFormValue}
               />
               <InputText

@@ -621,10 +621,10 @@ const TotalAsset = () => {
           console.log("Department ID:", departmentId);
 
           if (response.ok) {
-            notification.success({
-              message: "Fixed Asset Count created successfully!",
-              duration: 1,
-            });
+            // notification.success({
+            //   // message: "Fixed Asset Count created successfully!",
+            //   duration: 1,
+            // });
             let fixedAssetDetailPayload;
             if (data) {
               // console.log(data)
@@ -659,6 +659,7 @@ const TotalAsset = () => {
 
             if (detailResponse.ok) {
               notification.success({
+              message: "Fixed Asset Count created successfully!",
                 duration: 1,
               });
             } else {

@@ -490,6 +490,7 @@ const TotalAsset = () => {
               });
 
               fetchFixedAssets();
+              setViewAsset();
             } else {
               // Handle error response from server
               throw new Error(
