@@ -223,7 +223,7 @@ function TotalUser() {
       const responseData = await response.json();
       if (response.ok) {
         setRegisterObj({ name: "", username: "", password: "", role: "" });
-        setUserData([]);
+        fetchUser();
         setIsModalVisible(false);
       } else {
         setErrorMessage(responseData.message || "Registration failed");
@@ -424,7 +424,7 @@ function TotalUser() {
             <div className="border-t border-gray-300 mt-8 mb-8"></div>
           </TitleCard>
         ) : (
-          <TitleCard title={"Create Auditor"} topMargin="mt-4">
+          <TitleCard title={"Update Auditor"} topMargin="mt-4">
             {userData.length !== 0 ? (
               <div className="p-4">
                 <form onSubmit={Editform} className="space-y-4">
