@@ -234,7 +234,7 @@ const TotalAsset = () => {
     data();
   }, [a]);
 
-  // Fetch categories and assets on component mount
+ 
   useEffect(() => {
     fetchCategories();
     fetchFixedAssets();
@@ -244,27 +244,27 @@ const TotalAsset = () => {
   const handleExport = () => {
     const headers = {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`, // Ensure token is correctly defined
+      Authorization: `Bearer ${token}`, 
     };
 
-    fetch("http://localhost:6060/admin/fixed-assets", { headers }) // Include headers in the fetch request
+    fetch("http://localhost:6060/admin/fixed-assets", { headers }) 
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-        return response.blob(); // Convert the response to a Blob
+        return response.blob(); 
       })
       .then((blob) => {
-        // Create a URL for the Blob and simulate a click to download it
+        
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", "fixed_assets.xlsx"); // Filename
+        link.setAttribute("download", "fixed_assets.xlsx"); 
         document.body.appendChild(link);
         link.click();
-        // Clean up and remove the link
+      
         document.body.removeChild(link);
-        window.URL.revokeObjectURL(url); // Clean up the URL object
+        window.URL.revokeObjectURL(url); 
       })
       .catch((error) => {
         console.error("Export failed:", error);
