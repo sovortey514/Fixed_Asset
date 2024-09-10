@@ -234,7 +234,7 @@ const TotalAsset = () => {
     data();
   }, [a]);
 
-
+  // Fetch categories and assets on component mount
   useEffect(() => {
     fetchCategories();
     fetchFixedAssets();
