@@ -241,6 +241,37 @@ const TotalAsset = () => {
     fetchAssetHolder();
   }, []);
 
+  
+const handleExport = () => {
+  const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`, // Ensure token is correctly defined
+  };
+  
+  fetch('http://localhost:6060/admin/fixed-assets', { headers }) // Include headers in the fetch request
+      .then(response => {
+          if (!response.ok) {
+              throw new Error('Network response was not ok');
+          }
+          return response.blob(); // Convert the response to a Blob
+      })
+      .then(blob => {
+          // Create a URL for the Blob and simulate a click to download it
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', 'fixed_assets.xlsx'); // Filename
+          document.body.appendChild(link);
+          link.click();
+          // Clean up and remove the link
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url); // Clean up the URL object
+      })
+      .catch(error => {
+          console.error('Export failed:', error);
+      });
+};
+
   const fetchCategories = async () => {
     try {
       const headers = {
@@ -986,15 +1017,14 @@ const TotalAsset = () => {
           </div>
 
           <div className="flex">
-            <Button
-              size="middle"
-              style={{ marginLeft: 8 }}
-              icon={<DownloadOutlined />}
-              onClick={handleDownload}
-            >
-              Download
-            </Button>
-
+          <Button
+        size="middle"
+        style={{ marginLeft: 8 }}
+        icon={<DownloadOutlined />}
+        onClick={handleExport}
+    >
+        Download
+    </Button>
             <Button
               size="middle"
               style={{ marginLeft: 8 }}
