@@ -76,7 +76,7 @@ function TotalUser() {
           <Button
             icon={<EyeOutlined />}
             className="bg-white hover:bg-yellow-500 text-yellow-500 border-none rounded-full p-2 shadow-md"
-            onClick={() => handleClick(user)}
+            onClick={() => (handleClick(user), fetchUserById(user.id))}
           />
           <Button
             icon={<DeleteOutlined />}
@@ -162,18 +162,18 @@ function TotalUser() {
   const department = "OFL";
   const language = "English";
 
-  useEffect(() => {
-    fetchUserById();
-  });
+  // useEffect(() => {
+  //   fetchUserById();
+  // });
 
   const fetchUserById = async (userId) => {
     try {
       const response = await fetch(
         `http://localhost:6060/auth/users/${userId}`
       );
+      console.log(response);
       if (response.ok) {
         const userData = await response.json();
-        // Log the fetched data to the console
         console.log("Fetched user data:", userData);
 
         setProfile({
@@ -269,7 +269,7 @@ function TotalUser() {
       const responseData = await response.json();
       if (response.ok) {
         setRegisterObj({ name: "", username: "", password: "", role: "" });
-        setUserData([])
+        setUserData([]);
         setIsModalVisible(false);
         fetchUser();
       } else {
@@ -291,7 +291,7 @@ function TotalUser() {
     setErrorMessage("");
     setRegisterObj({ ...registerObj, [updateType]: value });
     console.log("registerObj ", registerObj);
-    setUserData([])
+    setUserData([]);
   };
 
   const handleClick = (userId) => {
@@ -338,7 +338,6 @@ function TotalUser() {
                   className="w-32 h-32 rounded-full border-4 border-gray-200 shadow-lg transform transition-transform duration-300 ease-in-out hover:scale-105"
                   onError={handleImageError}
                 />
-
                 <button
                   className="absolute bottom-0 right-0 bg-white text-yellow-500 p-2 rounded-full shadow-lg transition-colors duration-300 ease-in-out hover:text-yellow-600"
                   aria-label="Edit Profile Picture"
@@ -359,36 +358,59 @@ function TotalUser() {
                   </svg>
                 </button>
               </div>
-              <h2 className="text-2xl mt-4 font-semibold text-gray-800">
-                {selectedUser.name}
+              <h2 className="text-xl mt-6 font-bold text-gray-700">
+                {profile.name}
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-              <InputText
-                labelTitle="Name"
-                defaultValue={selectedUser.name}
-                updateFormValue={updateFormValue}
-              />
-              <InputText
-                labelTitle="User name"
-                defaultValue={selectedUser.username}
-                updateFormValue={updateFormValue}
-              />
-              <InputText
-                labelTitle="Department"
-                defaultValue={profile.department}
-                updateFormValue={updateFormValue}
-              />
-              <InputText
-                labelTitle="Language"
-                defaultValue={profile.language}
-                updateFormValue={updateFormValue}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 ml-7">
+              <div className="flex flex-col items-start space-y-2">
+                <div className="flex w-full items-center">
+                  <label className="text-sm font-medium text-gray-700 mr-4">
+                    Name:
+                  </label>
+                  <h1 className="text-sm font-semibold text-gray-500">
+                    {profile.name}
+                  </h1>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-start space-y-2">
+                <div className="flex w-full items-center">
+                  <label className="text-sm font-medium text-gray-700 mr-4">
+                    Username:
+                  </label>
+                  <h2 className="text-sm font-semibold text-gray-500">
+                    {profile.username}
+                  </h2>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-start space-y-2">
+                <div className="flex w-full items-center">
+                  <label className="text-sm font-medium text-gray-700 mr-4">
+                    Department:
+                  </label>
+                  <h2 className="text-sm font-semibold text-gray-500">
+                    {profile.department}
+                  </h2>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-start space-y-2">
+                <div className="flex w-full items-center">
+                  <label className="text-sm font-medium text-gray-700 mr-4">
+                    Language:
+                  </label>
+                  <h2 className="text-sm font-semibold text-gray-500">
+                    {profile.language}
+                  </h2>
+                </div>
+              </div>
             </div>
 
             {/* Divider */}
-            <div className="border-t border-gray-300 mt-6 mb-8"></div>
+            <div className="border-t border-gray-300 mt-8 mb-8"></div>
           </TitleCard>
         ) : (
           <TitleCard title={"Create Auditor"} topMargin="mt-4">
