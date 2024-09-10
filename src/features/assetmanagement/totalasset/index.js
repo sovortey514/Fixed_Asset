@@ -58,7 +58,7 @@ const TotalAsset = () => {
   const [assetById, setAssetById] = useState([]);
   const [file, setFile] = useState(null);
 
-  // Define table columns
+ 
   const columns = (handleEdit, handleDelete, handleViewHide) => [
     {
       title: "No",
@@ -234,43 +234,42 @@ const TotalAsset = () => {
     data();
   }, [a]);
 
-  // Fetch categories and assets on component mount
+
   useEffect(() => {
     fetchCategories();
     fetchFixedAssets();
     fetchAssetHolder();
   }, []);
 
-  
-const handleExport = () => {
-  const headers = {
+  const handleExport = () => {
+    const headers = {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`, // Ensure token is correctly defined
-  };
-  
-  fetch('http://localhost:6060/admin/fixed-assets', { headers }) // Include headers in the fetch request
-      .then(response => {
-          if (!response.ok) {
-              throw new Error('Network response was not ok');
-          }
-          return response.blob(); // Convert the response to a Blob
+    };
+
+    fetch("http://localhost:6060/admin/fixed-assets", { headers }) // Include headers in the fetch request
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.blob(); // Convert the response to a Blob
       })
-      .then(blob => {
-          // Create a URL for the Blob and simulate a click to download it
-          const url = window.URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.setAttribute('download', 'fixed_assets.xlsx'); // Filename
-          document.body.appendChild(link);
-          link.click();
-          // Clean up and remove the link
-          document.body.removeChild(link);
-          window.URL.revokeObjectURL(url); // Clean up the URL object
+      .then((blob) => {
+        // Create a URL for the Blob and simulate a click to download it
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "fixed_assets.xlsx"); // Filename
+        document.body.appendChild(link);
+        link.click();
+        // Clean up and remove the link
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url); // Clean up the URL object
       })
-      .catch(error => {
-          console.error('Export failed:', error);
+      .catch((error) => {
+        console.error("Export failed:", error);
       });
-};
+  };
 
   const fetchCategories = async () => {
     try {
@@ -555,7 +554,7 @@ const handleExport = () => {
             unit: assetById.unit,
             year: assetById.year,
           };
-        
+
           if (values.fixedAsset) {
             requestBody.fixedAsset = { id: values.fixedAsset };
           }
@@ -622,7 +621,7 @@ const handleExport = () => {
             unit: assetById.unit,
             year: assetById.year,
           };
-   
+
           if (values.fixedAsset) {
             requestBody.fixedAsset = { id: values.fixedAsset };
           }
@@ -671,7 +670,6 @@ const handleExport = () => {
         }
       }
 
-     
       form.resetFields();
       setIsModalVisible(false);
     } catch (info) {
@@ -689,7 +687,6 @@ const handleExport = () => {
     setModalType("fixedasset");
     setEditKey(record);
 
-
     form.setFieldsValue({
       name: record.name,
       categoryId: record.category.name,
@@ -700,8 +697,7 @@ const handleExport = () => {
       price: record.price,
       unit: record.unit,
       quantity: record.quantity,
-      file:record.file,
-
+      file: record.file,
     });
     setIsModalVisible(true);
   };
@@ -877,15 +873,13 @@ const handleExport = () => {
         });
         console.error("Error updating visibility:", error);
       }
-     
     }
-      // useEffect(() => {
-  //   if (assetDetails && token) {
-  //     handleViewHide(assetDetails, 'view', token); // Assuming you want to view asset details when record or token changes
-  //   }
-  // }, [assetDetails, token]);
-
-     else if (type === "hide") {
+    // useEffect(() => {
+    //   if (assetDetails && token) {
+    //     handleViewHide(assetDetails, 'view', token); // Assuming you want to view asset details when record or token changes
+    //   }
+    // }, [assetDetails, token]);
+    else if (type === "hide") {
       try {
         const headers = {
           "Content-Type": "application/json",
@@ -931,37 +925,6 @@ const handleExport = () => {
     }
   };
 
-  const handleDownload = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      console.log("Token:", token); 
-      const response = await fetch('http://localhost:6060/admin/export', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'fixed_assets.xlsx'; 
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-      } else {
-        console.error('Failed to download the file.', response.status);
-      }
-    } catch (error) {
-      console.error('Error during download:', error);
-    }
-  };
-
-
- 
   const handleRefresh = async () => {
     setLoading(true);
     try {
@@ -1017,14 +980,14 @@ const handleExport = () => {
           </div>
 
           <div className="flex">
-          <Button
-        size="middle"
-        style={{ marginLeft: 8 }}
-        icon={<DownloadOutlined />}
-        onClick={handleExport}
-    >
-        Download
-    </Button>
+            <Button
+              size="middle"
+              style={{ marginLeft: 8 }}
+              icon={<DownloadOutlined />}
+              onClick={handleExport}
+            >
+              Download
+            </Button>
             <Button
               size="middle"
               style={{ marginLeft: 8 }}

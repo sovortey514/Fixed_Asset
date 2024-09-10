@@ -23,8 +23,8 @@ function TotalUser() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [userData, setUserData] = useState([]);
   const defaultImage =
-  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKJQp8ndvEkIa-u1rMgJxVc7BBsR11uSLHGA&s";
-    const department = "OFL";
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKJQp8ndvEkIa-u1rMgJxVc7BBsR11uSLHGA&s";
+  const department = "OFL";
   const language = "English";
 
   useEffect(() => {
@@ -83,10 +83,10 @@ function TotalUser() {
             onClick={() => (handleClick(user), fetchUserById(user.id))}
           />
           <Button
-                icon={<DeleteOutlined />}
-                onClick={() => handleDelete(user.id)}
-                className="bg-white hover:bg-red-700 text-red-600 border-none rounded-full p-2 shadow-md transition-colors duration-300 ease-in-out"
-              />
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(user.id)}
+            className="bg-white hover:bg-red-700 text-red-600 border-none rounded-full p-2 shadow-md transition-colors duration-300 ease-in-out"
+          />
         </Space>
       ),
     },
@@ -159,8 +159,6 @@ function TotalUser() {
     profileImage:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKJQp8ndvEkIa-u1rMgJxVc7BBsR11uSLHGA&s",
   });
-
- 
 
   const fetchUserById = async (userId) => {
     try {
@@ -297,11 +295,11 @@ function TotalUser() {
 
   const handleDelete = (userId) => {
     Modal.confirm({
-      title: 'Are you sure you want to delete this user?',
-      content: 'This action cannot be undone.',
-      okText: 'Yes',
-      okType: 'danger',
-      cancelText: 'No',
+      title: "Are you sure you want to delete this user?",
+      content: "This action cannot be undone.",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
       onOk: () => {
         // Call your delete function here
         handleUserDelete(userId);

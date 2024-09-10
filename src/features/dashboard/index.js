@@ -87,24 +87,16 @@ function Dashboard(){
         </div>
 
         {/** ---------------------- Different charts ------------------------- */}
-            <div className="grid lg:grid-cols-2 mt-4 grid-cols-1 gap-6">
-                <LineChart />
-                {/* <BarChart /> */}
-            </div>
-            
-        {/** ---------------------- Different stats content 2 ------------------------- */}
-        
-            <div className="grid lg:grid-cols-2 mt-10 grid-cols-1 gap-6">
-                {/* <AmountStats /> */}
-                {/* <PageStats /> */}
-            </div>
-
-        {/** ---------------------- User source channels table  ------------------------- */}
-        
-            <div className="grid lg:grid-cols-2 mt-4 grid-cols-1 gap-6">
-                <UserChannels />
-                {/* <DoughnutChart /> */}
-            </div>
+        <div className="flex flex-wrap mt-4 gap-6">
+        <div className="flex-1 min-w-[300px]">
+          <LineChart />
+          {/* <BarChart /> */}
+        </div>
+        <div className="flex-1 min-w-[300px]">
+          <UserChannels />
+          {/* <DoughnutChart /> */}
+        </div>
+      </div>
         </>
     )
 }
