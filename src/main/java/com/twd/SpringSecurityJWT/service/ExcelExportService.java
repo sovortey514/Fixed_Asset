@@ -23,7 +23,7 @@ public class ExcelExportService {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Fixed Assets");
 
-        // Create header row
+
         Row headerRow = sheet.createRow(0);
         String[] headers = {"ID", "Category", "Name", "Model", "Year", "Price", "Serial Number", "Purchase Date", "Unit", "Quantity", "Remarks", "Status", "Status Text", "User", "Building", "Image"};
         for (int i = 0; i < headers.length; i++) {
@@ -31,7 +31,7 @@ public class ExcelExportService {
             cell.setCellValue(headers[i]);
         }
 
-        // Create data rows
+  
         int rowNum = 1;
         for (FixedAsset asset : fixedAssets) {
             Row row = sheet.createRow(rowNum++);
