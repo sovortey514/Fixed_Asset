@@ -52,18 +52,17 @@ function TotalUser() {
       title: "Status",
       key: "status",
       dataIndex: "enabled",
-      render: (enabled) => (
-        <>
-          {enabled ? (
-            <span className="px-2 py-1 rounded-md bg-green-200 text-green-800">
-              Active
-            </span>
-          ) : (
-            <span className="px-2 py-1 rounded-md bg-red-100 text-red-800">
-              Inactive
-            </span>
-          )}
-        </>
+      render: (enabled, user) => (
+        <Space size="middle">
+          <Button
+            onClick={() => handleEnableDisable(user.id, enabled)}
+            className={`${
+              enabled ? " bg-green-200 text-green-800 " : " bg-red-200 text-red-800"
+            } border-none rounded-lg p-3 shadow-lg transition-transform duration-300 ease-in-out transform hover:scale-105 focus:outline-none`}
+          >
+            {enabled ? "Enable" : "Disable"}
+          </Button>
+        </Space>
       ),
     },
     {
@@ -74,7 +73,6 @@ function TotalUser() {
           <Button
             icon={<EditOutlined />}
             className="bg-green-600 hover:bg-green-700 text-white border-none rounded-md p-2 shadow-md"
-            // eslint-disable-next-line no-sequences
             onClick={() => (setIsModalVisible(true), setUserData(user))} // Pass the entire user object
           />
           <Button
@@ -91,6 +89,7 @@ function TotalUser() {
       ),
     },
   ];
+  
 
   const fetchUser = async () => {
     try {
@@ -144,6 +143,72 @@ function TotalUser() {
       });
     }
   };
+
+const API_BASE_URL = 'http://localhost:6060/auth'; 
+
+const enableUser = async (userId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/${userId}/enable`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error enabling user:", error);
+    // Display an error message or alert to the user if needed
+  }
+};
+
+
+const disableUser = async (userId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/${userId}/disable`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error disabling user:", error);
+    // Display an error message or alert to the user if needed
+  }
+};
+
+const handleEnableDisable = async (userId, isEnabled) => {
+  try {
+    if (isEnabled) {
+      
+      await disableUser(userId);
+    } else {
+   
+      await enableUser(userId);
+    }
+ 
+    fetchUser();
+  } catch (error) {
+    console.error("Error updating user status:", error);
+   
+  }
+};
+
+
 
   const handleCancel = () => {
     setIsModalVisible(false);
@@ -301,7 +366,7 @@ function TotalUser() {
   const handleDelete = (userId) => {
     Modal.confirm({
       title: "Are you sure you want to delete this user?",
-      content: "This action cannot be undone.",
+      // content: "This action cannot be undone.",
       okText: "Yes",
       okType: "danger",
       cancelText: "No",
