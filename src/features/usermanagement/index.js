@@ -238,9 +238,18 @@ function TotalUser() {
   const Editform = async (e) => {
     e.preventDefault();
     setErrorMessage("");
-
+  
+    // Only include fields that have changed
     const { name, username, password, role } = registerObj;
-
+  
+    // Create an object with only the fields that are not empty and different from userData
+    const updatedFields = {};
+  
+    if (name && name !== userData.name) updatedFields.name = name;
+    if (username && username !== userData.username) updatedFields.username = username;
+    if (password && password !== userData.password) updatedFields.password = password;
+    if (role && role !== userData.role) updatedFields.role = role;
+  
     setLoading(true);
     try {
       const response = await fetch(
@@ -251,15 +260,10 @@ function TotalUser() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            name,
-            username,
-            password,
-            role,
-          }),
+          body: JSON.stringify(updatedFields), // Only send the updated fields
         }
       );
-
+  
       const responseData = await response.json();
       if (response.ok) {
         setRegisterObj({ name: "", username: "", password: "", role: "" });
@@ -267,7 +271,7 @@ function TotalUser() {
         setIsModalVisible(false);
         fetchUser();
       } else {
-        setErrorMessage(responseData.message || "Registration failed");
+        setErrorMessage(responseData.message || "Update failed");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -276,6 +280,7 @@ function TotalUser() {
       setLoading(false);
     }
   };
+  
 
   const handleImageError = () => {
     setProfile((prev) => ({ ...prev, profileImage: defaultImage }));
@@ -285,7 +290,7 @@ function TotalUser() {
     setErrorMessage("");
     setRegisterObj({ ...registerObj, [updateType]: value });
     console.log("registerObj ", registerObj);
-    setUserData([]);
+   
   };
 
   const handleClick = (userId) => {
