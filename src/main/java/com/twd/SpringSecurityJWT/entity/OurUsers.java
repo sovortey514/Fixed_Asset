@@ -21,6 +21,7 @@ public class OurUsers implements UserDetails {
     private String password;
     private String role;
     private String name;
+    private boolean enabled;
     
 
     @Override
@@ -54,8 +55,12 @@ public class OurUsers implements UserDetails {
         return true;
     }
 
-    @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
 }
