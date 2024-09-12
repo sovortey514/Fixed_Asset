@@ -57,7 +57,9 @@ function TotalUser() {
           <Button
             onClick={() => handleEnableDisable(user.id, enabled)}
             className={`${
-              enabled ? " bg-green-200 text-green-800 " : " bg-red-200 text-red-800"
+              enabled
+                ? " bg-green-200 text-green-800 "
+                : " bg-red-200 text-red-800"
             } border-none rounded-lg p-3 shadow-lg transition-transform duration-300 ease-in-out transform hover:scale-105 focus:outline-none`}
           >
             {enabled ? "Enable" : "Disable"}
@@ -89,7 +91,6 @@ function TotalUser() {
       ),
     },
   ];
-  
 
   const fetchUser = async () => {
     try {
@@ -144,71 +145,65 @@ function TotalUser() {
     }
   };
 
-const API_BASE_URL = 'http://localhost:6060/auth'; 
+  const API_BASE_URL = "http://localhost:6060/auth";
 
-const enableUser = async (userId) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/users/${userId}/enable`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  const enableUser = async (userId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/${userId}/enable`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error enabling user:", error);
+      // Display an error message or alert to the user if needed
     }
+  };
 
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error enabling user:", error);
-    // Display an error message or alert to the user if needed
-  }
-};
+  const disableUser = async (userId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/${userId}/disable`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-const disableUser = async (userId) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/users/${userId}/disable`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error disabling user:", error);
+      // Display an error message or alert to the user if needed
     }
+  };
 
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error disabling user:", error);
-    // Display an error message or alert to the user if needed
-  }
-};
+  const handleEnableDisable = async (userId, isEnabled) => {
+    try {
+      if (isEnabled) {
+        await disableUser(userId);
+      } else {
+        await enableUser(userId);
+      }
 
-const handleEnableDisable = async (userId, isEnabled) => {
-  try {
-    if (isEnabled) {
-      
-      await disableUser(userId);
-    } else {
-   
-      await enableUser(userId);
+      fetchUser();
+    } catch (error) {
+      console.error("Error updating user status:", error);
     }
- 
-    fetchUser();
-  } catch (error) {
-    console.error("Error updating user status:", error);
-   
-  }
-};
-
-
+  };
 
   const handleCancel = () => {
     setIsModalVisible(false);
@@ -303,18 +298,20 @@ const handleEnableDisable = async (userId, isEnabled) => {
   const Editform = async (e) => {
     e.preventDefault();
     setErrorMessage("");
-  
+
     // Only include fields that have changed
     const { name, username, password, role } = registerObj;
-  
+
     // Create an object with only the fields that are not empty and different from userData
     const updatedFields = {};
-  
+
     if (name && name !== userData.name) updatedFields.name = name;
-    if (username && username !== userData.username) updatedFields.username = username;
-    if (password && password !== userData.password) updatedFields.password = password;
+    if (username && username !== userData.username)
+      updatedFields.username = username;
+    if (password && password !== userData.password)
+      updatedFields.password = password;
     if (role && role !== userData.role) updatedFields.role = role;
-  
+
     setLoading(true);
     try {
       const response = await fetch(
@@ -328,7 +325,7 @@ const handleEnableDisable = async (userId, isEnabled) => {
           body: JSON.stringify(updatedFields), // Only send the updated fields
         }
       );
-  
+
       const responseData = await response.json();
       if (response.ok) {
         setRegisterObj({ name: "", username: "", password: "", role: "" });
@@ -345,7 +342,6 @@ const handleEnableDisable = async (userId, isEnabled) => {
       setLoading(false);
     }
   };
-  
 
   const handleImageError = () => {
     setProfile((prev) => ({ ...prev, profileImage: defaultImage }));
@@ -355,7 +351,6 @@ const handleEnableDisable = async (userId, isEnabled) => {
     setErrorMessage("");
     setRegisterObj({ ...registerObj, [updateType]: value });
     console.log("registerObj ", registerObj);
-   
   };
 
   const handleClick = (userId) => {

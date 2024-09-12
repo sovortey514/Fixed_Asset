@@ -11,6 +11,8 @@ import {
   Table,
   notification,
   Upload,
+  Col,
+  Row,
 } from "antd";
 import {
   DownOutlined,
@@ -58,7 +60,6 @@ const TotalAsset = () => {
   const [assetById, setAssetById] = useState([]);
   const [file, setFile] = useState(null);
 
- 
   const columns = (handleEdit, handleDelete, handleViewHide) => [
     {
       title: "No",
@@ -234,7 +235,6 @@ const TotalAsset = () => {
     data();
   }, [a]);
 
- 
   useEffect(() => {
     fetchCategories();
     fetchFixedAssets();
@@ -244,27 +244,26 @@ const TotalAsset = () => {
   const handleExport = () => {
     const headers = {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`, 
+      Authorization: `Bearer ${token}`,
     };
 
-    fetch("http://localhost:6060/admin/fixed-assets", { headers }) 
+    fetch("http://localhost:6060/admin/fixed-assets", { headers })
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-        return response.blob(); 
+        return response.blob();
       })
       .then((blob) => {
-        
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", "fixed_assets.xlsx"); 
+        link.setAttribute("download", "fixed_assets.xlsx");
         document.body.appendChild(link);
         link.click();
-      
+
         document.body.removeChild(link);
-        window.URL.revokeObjectURL(url); 
+        window.URL.revokeObjectURL(url);
       })
       .catch((error) => {
         console.error("Export failed:", error);
@@ -1026,101 +1025,154 @@ const TotalAsset = () => {
         onCancel={handleCancel}
         cancelText="Cancel"
       >
-        <Form form={form} layout="vertical" initialValues={{ remember: true }}>
+        <Form
+          form={form}
+          layout="vertical"
+          initialValues={{ remember: true }}
+          style={{
+            padding: "24px",
+            backgroundColor: "#f9f9f9",
+            borderRadius: "8px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+          }}
+        >
           {modalType === "fixedasset" && (
             <>
-              <Form.Item
-                name="name"
-                label="Asset Name"
-                rules={[
-                  { required: true, message: "Please input the asset name!" },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                name="categoryId"
-                label="Category"
-                rules={[
-                  { required: true, message: "Please select a category!" },
-                ]}
-              >
-                <Select>
-                  {categories.map((category) => (
-                    <Option key={category.id} value={category.id}>
-                      {category.name}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-              <Form.Item
-                name="model"
-                label="Model"
-                rules={[{ required: true, message: "Please input the model!" }]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                name="year"
-                label="Year"
-                rules={[{ required: true, message: "Please input the year!" }]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                name="serialNumber"
-                label="Serial Number"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input the serial number!",
-                  },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                name="purchaseDate"
-                label="Purchase Date"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select the purchase date!",
-                  },
-                ]}
-              >
-                <DatePicker />
-              </Form.Item>
-              <Form.Item
-                name="price"
-                label="Price"
-                rules={[{ required: true, message: "Please input the price!" }]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                name="unit"
-                label="Unit"
-                rules={[{ required: true, message: "Please input the unit!" }]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                name="quantity"
-                label="Quantity"
-                rules={[
-                  { required: true, message: "Please input the quantity!" },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item label="Upload Image">
-                <input
-                  type="file"
-                  multiple
-                  onChange={(e) => setImages([...e.target.files])}
-                />
-              </Form.Item>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    name="name"
+                    label="Asset Name"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input the asset name!",
+                      },
+                    ]}
+                  >
+                    <Input placeholder="Enter asset name" />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="categoryId"
+                    label="Category"
+                    rules={[
+                      { required: true, message: "Please select a category!" },
+                    ]}
+                  >
+                    <Select placeholder="Select a category">
+                      {categories.map((category) => (
+                        <Option key={category.id} value={category.id}>
+                          {category.name}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    name="model"
+                    label="Model"
+                    rules={[
+                      { required: true, message: "Please input the model!" },
+                    ]}
+                  >
+                    <Input placeholder="Enter model" />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="year"
+                    label="Year"
+                    rules={[
+                      { required: true, message: "Please input the year!" },
+                    ]}
+                  >
+                    <Input placeholder="Enter year" />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    name="serialNumber"
+                    label="Serial Number"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input the serial number!",
+                      },
+                    ]}
+                  >
+                    <Input placeholder="Enter serial number" />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="purchaseDate"
+                    label="Purchase Date"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please select the purchase date!",
+                      },
+                    ]}
+                  >
+                    <DatePicker
+                      style={{ width: "100%" }}
+                      placeholder="Select purchase date"
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
+
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    name="price"
+                    label="Price"
+                    rules={[
+                      { required: true, message: "Please input the price!" },
+                    ]}
+                  >
+                    <Input placeholder="Enter price" prefix="$" />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    name="unit"
+                    label="Unit"
+                    rules={[
+                      { required: true, message: "Please input the unit!" },
+                    ]}
+                  >
+                    <Input placeholder="Enter unit" />
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    name="quantity"
+                    label="Quantity"
+                    rules={[
+                      { required: true, message: "Please input the quantity!" },
+                    ]}
+                  >
+                    <Input placeholder="Enter quantity" />
+                  </Form.Item>
+                </Col>
+                <Form.Item label="Upload Image">
+                  <input
+                    type="file"
+                    multiple
+                    onChange={(e) => setImages([...e.target.files])}
+                  />
+                </Form.Item>
+              </Row>
             </>
           )}
           {modalType === "category" && (
@@ -1204,8 +1256,6 @@ const TotalAsset = () => {
             <p>Are you sure you want to return this asset?</p>
           )}
         </Form>
-
-        {/* } */}
       </Modal>
       <Modal
         visible={isViewModalVisible}
