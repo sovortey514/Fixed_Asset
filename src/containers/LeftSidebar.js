@@ -1,4 +1,4 @@
-import routes from '../routes/sidebar'
+import SidebarRoutes from '../routes/sidebar'
 import { NavLink,  Routes, Link , useLocation} from 'react-router-dom'
 import SidebarSubmenu from './SidebarSubmenu';
 import XMarkIcon  from '@heroicons/react/24/outline/XMarkIcon'
@@ -8,7 +8,10 @@ function LeftSidebar(){
     const location = useLocation();
 
     const dispatch = useDispatch()
+    const routes = SidebarRoutes();
 
+
+console.log(routes)
 
     const close = (e) => {
         document.getElementById('left-sidebar-drawer').click()

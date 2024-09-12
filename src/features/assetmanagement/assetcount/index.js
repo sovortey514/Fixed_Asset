@@ -57,13 +57,32 @@ const TotalAsset = () => {
   const [loading, setLoading] = useState(false);
   const [fixedAssetDetail, setFixedAssetDetail] = useState(null);
 
+  const [role, setRole] = useState("");
+
   const token = localStorage.getItem("token");
 
   useEffect(() => {
     fetchData();
     fetchAssetCount();
     fetchAssetDetails();
+    fetchUserByusername();
   }, []);
+
+  const fetchUserByusername = async () => {
+    try {
+      const user =localStorage.getItem("username");
+      const response = await fetch(`http://localhost:6060/auth/user/${user}`);
+      if (response.ok) {
+        const userData = await response.json();
+        
+        setRole(userData.role);
+      } else {
+        console.error('Failed to fetch user:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    }
+  };
 
   const columns = [
     {
@@ -659,7 +678,7 @@ const TotalAsset = () => {
 
             if (detailResponse.ok) {
               notification.success({
-              message: "Fixed Asset Count created successfully!",
+                message: "Fixed Asset Count created successfully!",
                 duration: 1,
               });
             } else {
@@ -1096,15 +1115,26 @@ const TotalAsset = () => {
               Create <DownOutlined />
             </Button>
           </Dropdown>
-
-          <Dropdown overlay={buildingMenu} placement="bottomLeft">
+          {role === "ADMIN" ? (
+            <Dropdown overlay={buildingMenu} placement="bottomLeft">
+              <Button
+                size="middle"
+                className="ml-2 text-gray-700 hover:bg-yellow-50"
+              >
+                Building <DownOutlined />
+              </Button>
+            </Dropdown>
+          ) : (
+            <></>
+          )}
+          {/* <Dropdown overlay={buildingMenu} placement="bottomLeft">
             <Button
               size="middle"
               className="ml-2 text-gray-700 hover:bg-yellow-50"
             >
               Building <DownOutlined />
             </Button>
-          </Dropdown>
+          </Dropdown> */}
 
           <Dropdown overlay={departmentMenu} placement="bottomLeft">
             <Button

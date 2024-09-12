@@ -478,6 +478,7 @@ const TotalAsset = () => {
 
             const createResult = await createResponse.json();
             if (createResponse.ok) {
+              fetchFixedAssets()
               if (images) {
                 let uploadResult;
                 let uploadResponse;
@@ -497,17 +498,13 @@ const TotalAsset = () => {
                     }
                   );
                 }
-                uploadResult = await uploadResponse.json();
-
+                console.log(uploadResponse)
+               console.log(uploadResult)
                 if (uploadResponse.ok) {
-                  notification.success({
-                    // message: "Image Uploaded",
-                    // description: `Image for Fixed Asset "${values.name}" has been uploaded successfully.`,
-                    duration: 1,
-                  });
+                  fetchFixedAssets()
                 } else {
                   throw new Error(
-                    uploadResult.message || "Failed to upload image."
+                    uploadResponse.message || "Failed to upload image."
                   );
                 }
               }

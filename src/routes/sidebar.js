@@ -8,76 +8,121 @@ import ArrowRightOnRectangleIcon from '@heroicons/react/24/outline/ArrowRightOnR
 import UserIcon from '@heroicons/react/24/outline/UserIcon'
 import Cog6ToothIcon from '@heroicons/react/24/outline/Cog6ToothIcon'
 import KeyIcon from '@heroicons/react/24/outline/KeyIcon'
+import { useEffect, useState } from 'react'
 
 const iconClasses = `h-6 w-6`
 const submenuIconClasses = `h-5 w-5`
 
-const routes = [
 
-  {
-    path: '/app/dashboard',
-    icon: <Squares2X2Icon className={iconClasses}/>, 
-    name: 'Dashboard',
-  },
-  {
-    path: '',
-    icon: <DocumentTextIcon className={`${iconClasses} inline` }/>, // icon component
-    name: 'Asset Mangement', 
-    submenu : [
-      {
-        path: '/app/assetmanagement-totalasset',
-        icon: <WalletIcon className={submenuIconClasses}/>,
-        name: 'Total Asset',
-      },
-      {
-        path: '/app/assetmanagement-assetcount', 
-        icon: <DocumentTextIcon className={submenuIconClasses}/>, 
-        name: 'Audit Asset',
-      },
-      {
-        path: '/app/assetmanagement-historyasset',
-        icon: <TableCellsIcon className={submenuIconClasses}/>, 
-        name: 'History',
-      },
-    ]
-  },
-  {
-    path: '/app/usermanagement',
-    icon: <UserIcon className={iconClasses}/>, 
-    name: 'User Management',
-  },
+const fetchUserById = async () => {
+  try {
+    const user =localStorage.getItem("username");
+    const response = await fetch(`http://localhost:6060/auth/user/${user}`);
+    if (response.ok) {
+      const userData = await response.json();
+      return userData.role
+    } else {
+      console.error('Failed to fetch user:', response.statusText);
+    }
+  } catch (error) {
+    console.error('Error fetching user:', error);
+  }
+};
+const SidebarRoutes = () => {
+  const [routes, setRoutes] = useState([]);
 
-  {
-    path: '', //no url needed as this has submenu
-    icon: <Cog6ToothIcon className={`${iconClasses} inline` }/>, // icon component
-    name: 'Settings', // name that appear in Sidebar
-    submenu : [
-      {
-        path: '/app/settings-profile', //url
-        icon: <UserIcon className={submenuIconClasses}/>, // icon component
-        name: 'Profile', // name that appear in Sidebar
-      },
-      // {
-      //   path: '/register', //url
-      //   icon: <UserIcon className={submenuIconClasses}/>, // icon component
-      //   name: 'Register', // name that appear in Sidebar
-      // },
-      {
-        path: '/login',
-        icon: <ArrowRightOnRectangleIcon className={submenuIconClasses}/>,
-        name: 'Logout',
-      },
-      // {
-      //   path: '/forgot-password',
-      //   icon: <KeyIcon className={submenuIconClasses}/>,
-      //   name: 'Forgot Password',
-      // },
-     
-    ]
-  },
-  
-]
+  useEffect(() => {
+    const fetchRoutes = async () => {
+      const userRole = await fetchUserById();
+      if (userRole === "ADMIN") {
+        setRoutes([
+          {
+            path: "/app/dashboard",
+            icon: <Squares2X2Icon className={iconClasses} />,
+            name: "Dashboard",
+          },
+          {
+            path: "",
+            icon: <DocumentTextIcon className={`${iconClasses} inline`} />,
+            name: "Asset Management",
+            submenu: [
+              {
+                path: "/app/assetmanagement-totalasset",
+                icon: <WalletIcon className={submenuIconClasses} />,
+                name: "Total Asset",
+              },
+              {
+                path: "/app/assetmanagement-assetcount",
+                icon: <DocumentTextIcon className={submenuIconClasses} />,
+                name: "Audit Asset",
+              },
+              {
+                path: "/app/assetmanagement-historyasset",
+                icon: <TableCellsIcon className={submenuIconClasses} />,
+                name: "History",
+              },
+            ],
+          },
+          {
+            path: "/app/usermanagement",
+            icon: <UserIcon className={iconClasses} />,
+            name: "User Management",
+          },
+          {
+            path: "",
+            icon: <Cog6ToothIcon className={`${iconClasses} inline`} />,
+            name: "Settings",
+            submenu: [
+              {
+                path: "/app/settings-profile",
+                icon: <UserIcon className={submenuIconClasses} />,
+                name: "Profile",
+              },
+              {
+                path: "/login",
+                icon: <ArrowRightOnRectangleIcon className={submenuIconClasses} />,
+                name: "Logout",
+              },
+            ],
+          }
+        ]);
+      }else{
+        setRoutes([
+          {
+            path: "/app/dashboard",
+            icon: <Squares2X2Icon className={iconClasses} />,
+            name: "Dashboard",
+          },
+          {
+            path: "",
+            icon: <DocumentTextIcon className={`${iconClasses} inline`} />,
+            name: "Asset Management",
+            submenu: [
+              // {
+              //   path: "/app/assetmanagement-totalasset",
+              //   icon: <WalletIcon className={submenuIconClasses} />,
+              //   name: "Total Asset",
+              // },
+              {
+                path: "/app/assetmanagement-assetcount",
+                icon: <DocumentTextIcon className={submenuIconClasses} />,
+                name: "Audit Asset",
+              },
+              // {
+              //   path: "/app/assetmanagement-historyasset",
+              //   icon: <TableCellsIcon className={submenuIconClasses} />,
+              //   name: "History",
+              // },
+            ],
+          },
+        ])
+      }
+    };
 
-export default routes
+    fetchRoutes();
+  }, []);
 
+  return routes; // This will contain the routes once the role is fetched
+};
 
+export default SidebarRoutes;
