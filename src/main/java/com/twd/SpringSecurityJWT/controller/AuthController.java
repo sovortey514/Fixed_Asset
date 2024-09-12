@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.util.List;
+import java.util.Optional;
 @RestController
 @RequestMapping("/auth")
 // @CrossOrigin(origins = "*")
@@ -78,5 +79,13 @@ public class AuthController {
         return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatusCode()));
     }
 
-
+    @GetMapping("/user/{username}")
+    public ResponseEntity<OurUsers> getUserByUsername(@PathVariable String username) {
+        Optional<OurUsers> userOptional = authService.getUserByUsername(username);
+        if (userOptional.isPresent()) {
+            return new ResponseEntity<>(userOptional.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }

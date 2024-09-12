@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.core.Authentication;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AuthService {
@@ -266,5 +267,9 @@ public class AuthService {
             response.setError("Enable error: " + e.getMessage());
         }
         return response;
+    }
+
+    public Optional<OurUsers> getUserByUsername(String username) {
+        return ourUserRepo.findByUsername(username);
     }
 }
