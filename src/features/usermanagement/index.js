@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Modal, Space } from "antd";
+import { Table, Button, Modal, Space,notification  } from "antd";
 import {
   PlusOutlined,
   EyeOutlined,
@@ -282,10 +282,21 @@ function TotalUser() {
       console.log(response);
       const responseData = await response.json();
       if (response.ok) {
+        notification.success({
+          message: "Create Successful",
+          description: "The user has been registered successfully.",
+          duration: 1
+        });
         setRegisterObj({ name: "", username: "", password: "", role: "" });
         fetchUser();
         setIsModalVisible(false);
-      } else {
+
+      } else if (response.status === 400 ){
+        notification.error({
+          message: "Create failed",
+          description: "User name is already in use.",
+          duration: 1
+        });
         setErrorMessage(responseData.message || "Registration failed");
       }
     } catch (error) {

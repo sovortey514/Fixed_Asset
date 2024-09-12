@@ -181,7 +181,6 @@ const TotalAsset = () => {
           </Dropdown>
           {record.statustext === "In Use" && (
             <Button
-              // Uncomment and define handleDownload if needed
               onClick={() => {
                 setIsModalVisible(true);
                 setModalType("return");
@@ -478,7 +477,7 @@ const TotalAsset = () => {
 
             const createResult = await createResponse.json();
             if (createResponse.ok) {
-              fetchFixedAssets()
+              fetchFixedAssets();
               if (images) {
                 let uploadResult;
                 let uploadResponse;
@@ -498,10 +497,10 @@ const TotalAsset = () => {
                     }
                   );
                 }
-                console.log(uploadResponse)
-               console.log(uploadResult)
+                console.log(uploadResponse);
+                console.log(uploadResult);
                 if (uploadResponse.ok) {
-                  fetchFixedAssets()
+                  fetchFixedAssets();
                 } else {
                   throw new Error(
                     uploadResponse.message || "Failed to upload image."
