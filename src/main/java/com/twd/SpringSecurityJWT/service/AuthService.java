@@ -41,13 +41,20 @@ public class AuthService {
             var authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.getAuthorities().stream()
                     .anyMatch(auth -> auth.getAuthority().equals("ADMIN"))) {
-                response.setMessage("Only admins can register new users.");
+                response.setMessage("Only admins can create new users.");
                 response.setStatusCode(403);
                 return response;
             }
 
             if (!VALID_ROLES.contains(registrationRequest.getRole())) {
                 response.setMessage("Invalid role specified.");
+                response.setStatusCode(400);
+                return response;
+            }
+
+            Optional<OurUsers> existingUser = ourUserRepo.findByUsername((registrationRequest.getUsername()));
+            if (existingUser.isPresent()) {
+                response.setMessage("User name is already in use.");
                 response.setStatusCode(400);
                 return response;
             }
