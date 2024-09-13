@@ -221,9 +221,12 @@ function TotalUser() {
     setIsModalVisible(false);
     setSelectedUser(null);
     setUserData([]);
-    setRegisterObj({username: ""});
+    setRegisterObj({name: "",
+      username: "",
+      password: "",
+      role: "",});
   };
-console.log('registerObj',registerObj);
+
   const [profile, setProfile] = useState({
     name: "",
     username: "",

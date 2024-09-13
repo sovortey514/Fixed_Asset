@@ -673,6 +673,13 @@ const TotalAsset = () => {
   };
 
   const handleCancel = () => {
+    form.resetFields();
+    form.resetFields();
+    setIsModalVisible(false);
+    setEditCategory(false);
+    setEditKey(false);
+    setIsViewModalVisible(false);
+    setViewAsset(null);
     setIsModalVisible(false);
     setIsViewModalVisible(false);
   };
@@ -994,7 +1001,7 @@ const TotalAsset = () => {
           </div>
         </div>
 
-        {/* Table */}
+      
         <div className="flex-1 overflow-auto">
           <Table
             columns={columns(handleEdit, handleDelete, handleViewHide)}
