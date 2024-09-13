@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Modal, Space,notification  } from "antd";
+import { Table, Button, Modal, Space,notification ,Popconfirm } from "antd";
 import {
   PlusOutlined,
   EyeOutlined,
@@ -62,8 +62,13 @@ function TotalUser() {
       dataIndex: "enabled",
       render: (enabled, user) => (
         <Space size="middle">
+          <Popconfirm  title={`Are you sure you want to ${enabled ? 'disable' : 'enable'} this user?`}
+        onConfirm={() => handleEnableDisable(user.id, enabled)} // If confirmed
+        okText="Yes"
+        cancelText="No"
+        >
           <Button
-            onClick={() => handleEnableDisable(user.id, enabled)}
+            
             className={`${
               enabled
                 ? " bg-green-200 text-green-800 "
@@ -72,6 +77,7 @@ function TotalUser() {
           >
             {enabled ? "Enable" : "Disable"}
           </Button>
+          </Popconfirm>
         </Space>
       ),
     },
