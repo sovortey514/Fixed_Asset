@@ -109,26 +109,23 @@ public class AuthService {
     public ReqRes signIn(ReqRes signinRequest) {
         ReqRes response = new ReqRes();
         try {
-            // Authenticate the user
+
+            @SuppressWarnings("unused")
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(signinRequest.getUsername(), signinRequest.getPassword()));
-    
-            // Retrieve the user from the repository
+
             OurUsers user = ourUserRepo.findByUsername(signinRequest.getUsername())
                     .orElseThrow(() -> new RuntimeException("User not found"));
-    
-            // Check if the user account is enabled
+
             if (!user.isEnabled()) {
                 response.setStatusCode(403);
                 response.setError("User account is disabled.");
                 return response;
             }
-    
-            // Generate JWT and refresh token
+
             String jwt = jwtUtils.generateToken(user);
             String refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), user);
-    
-            // Set the successful response
+
             response.setStatusCode(200);
             response.setToken(jwt);
             response.setRefreshToken(refreshToken);
@@ -143,8 +140,6 @@ public class AuthService {
         }
         return response;
     }
-    
-
     public ReqRes refreshToken(ReqRes refreshTokenRequest) {
         ReqRes response = new ReqRes();
         try {
@@ -169,7 +164,6 @@ public class AuthService {
         }
         return response;
     }
-
     @Transactional
     public ReqRes updateUser(Long userId, RegisterRequest updateRequest) {
         ReqRes response = new ReqRes();
@@ -190,14 +184,11 @@ public class AuthService {
             if (updateRequest.getRole() != null) {
                 user.setRole(updateRequest.getRole());
             }
-
-            // Save the updated user to the database
             OurUsers updatedUser = ourUserRepo.save(user);
             response.setOurUsers(updatedUser);
             response.setMessage("User updated successfully.");
             response.setStatusCode(200);
         } catch (Exception e) {
-            // Handle any exceptions that occur during the update process
             response.setStatusCode(500);
             response.setError("Update error: " + e.getMessage());
         }
@@ -208,11 +199,12 @@ public class AuthService {
         return ourUserRepo.findById(userId).orElse(null);
     }
 
+    @SuppressWarnings("unlikely-arg-type")
     @Transactional
     public ReqRes disableUser(Long userId) {
         ReqRes response = new ReqRes();
         try {
-            // Ensure the admin cannot disable themselves
+         
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             OurUsers currentAdmin = (OurUsers) authentication.getPrincipal();
 
@@ -242,6 +234,7 @@ public class AuthService {
         return response;
     }
 
+    @SuppressWarnings("unlikely-arg-type")
     @Transactional
     public ReqRes enableUser(Long userId) {
         ReqRes response = new ReqRes();
