@@ -125,21 +125,25 @@ const ProfileSettings = ({ userId }) => {
           <InputText
             labelTitle="Name"
             defaultValue={profile.name}
+            readOnly={true} 
             updateFormValue={updateFormValue}
           />
           <InputText
             labelTitle="User name"
             defaultValue={username}
+            readOnly={true} 
             updateFormValue={updateFormValue}
           />
           <InputText
             labelTitle="Department"
             defaultValue={profile.department}
+            readOnly={true} 
             updateFormValue={updateFormValue}
           />
           <InputText
             labelTitle="Language"
             defaultValue={profile.language}
+            readOnly={true} 
             updateFormValue={updateFormValue}
           />
         </div>

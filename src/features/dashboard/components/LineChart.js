@@ -155,8 +155,10 @@ function LineChart() {
 
   return (
     <TitleCard title="Monthly Asset Data">
+    <div style={{ height: "250px" }}>
       <Line data={chartData} options={options} />
-    </TitleCard>
+    </div>
+  </TitleCard>
   );
 }
 

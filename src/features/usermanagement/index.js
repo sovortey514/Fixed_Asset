@@ -17,6 +17,13 @@ import ErrorText from "../../components/Typography/ErrorText";
 const token = localStorage.getItem("token");
 
 function TotalUser() {
+  const INITIAL_REGISTER_OBJ = {
+    name: "",
+    username: "",
+    password: "",
+    role: "",
+  };
+
   const navigate = useNavigate();
   const [user, setUser] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -26,10 +33,11 @@ function TotalUser() {
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKJQp8ndvEkIa-u1rMgJxVc7BBsR11uSLHGA&s";
   const department = "OFL";
   const language = "English";
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [registerObj, setRegisterObj] = useState(INITIAL_REGISTER_OBJ);
 
-  useEffect(() => {
-    fetchUser();
-  }, []);
+ 
 
   const columns = (handleUserDelete, handleClick, handleEdit) => [
     {
@@ -118,6 +126,10 @@ function TotalUser() {
       console.error("Error fetching user:", error);
     }
   };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   const handleUserDelete = async (userId) => {
     try {
@@ -209,8 +221,9 @@ function TotalUser() {
     setIsModalVisible(false);
     setSelectedUser(null);
     setUserData([]);
+    setRegisterObj({username: ""});
   };
-
+console.log('registerObj',registerObj);
   const [profile, setProfile] = useState({
     name: "",
     username: "",
@@ -245,16 +258,7 @@ function TotalUser() {
     }
   };
 
-  const INITIAL_REGISTER_OBJ = {
-    name: "",
-    username: "",
-    password: "",
-    role: "",
-  };
 
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [registerObj, setRegisterObj] = useState(INITIAL_REGISTER_OBJ);
 
   const token = localStorage.getItem("token");
 
@@ -281,23 +285,26 @@ function TotalUser() {
       });
       console.log(response);
       const responseData = await response.json();
-      if (response.ok) {
+      console.log(responseData)
+      if (responseData.statusCode===200) {
         notification.success({
           message: "Create Successful",
           description: "The user has been registered successfully.",
-          duration: 1
+          duration: 3
         });
         setRegisterObj({ name: "", username: "", password: "", role: "" });
         fetchUser();
         setIsModalVisible(false);
+        setUserData([])
 
-      } else if (response.status === 400 ){
+      } else if (responseData.statusCode === 400 ){
         notification.error({
           message: "Create failed",
-          description: "User name is already in use.",
-          duration: 1
+          description: responseData.message,
+          duration: 3
         });
-        setErrorMessage(responseData.message || "Registration failed");
+        console.log(responseData)
+        setErrorMessage(response.message || "Registration failed");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -554,7 +561,7 @@ function TotalUser() {
                   type="text"
                   updateType="username"
                   labelTitle="Username"
-                  updateFormValue={updateFormValue}
+                  updateFormValue={(e)=>(setRegisterObj({username: e.value}),console.log(e.value))}
                 />
                 <InputText
                   type="password"

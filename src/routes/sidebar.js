@@ -98,23 +98,32 @@ const SidebarRoutes = () => {
             icon: <DocumentTextIcon className={`${iconClasses} inline`} />,
             name: "Asset Management",
             submenu: [
-              // {
-              //   path: "/app/assetmanagement-totalasset",
-              //   icon: <WalletIcon className={submenuIconClasses} />,
-              //   name: "Total Asset",
-              // },
+            
               {
                 path: "/app/assetmanagement-assetcount",
                 icon: <DocumentTextIcon className={submenuIconClasses} />,
                 name: "Audit Asset",
               },
-              // {
-              //   path: "/app/assetmanagement-historyasset",
-              //   icon: <TableCellsIcon className={submenuIconClasses} />,
-              //   name: "History",
-              // },
+            
             ],
           },
+          {
+            path: "",
+            icon: <Cog6ToothIcon className={`${iconClasses} inline`} />,
+            name: "Settings",
+            submenu: [
+              {
+                path: "/app/settings-profile",
+                icon: <UserIcon className={submenuIconClasses} />,
+                name: "Profile",
+              },
+              {
+                path: "/login",
+                icon: <ArrowRightOnRectangleIcon className={submenuIconClasses} />,
+                name: "Logout",
+              },
+            ],
+          }
         ])
       }
     };
@@ -122,7 +131,7 @@ const SidebarRoutes = () => {
     fetchRoutes();
   }, []);
 
-  return routes; // This will contain the routes once the role is fetched
+  return routes; 
 };
 
 export default SidebarRoutes;

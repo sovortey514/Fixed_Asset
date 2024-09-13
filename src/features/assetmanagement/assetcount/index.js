@@ -1107,7 +1107,9 @@ const TotalAsset = () => {
     <>
       <div className="flex justify-between items-center">
         <div className="flex">
-          <Dropdown overlay={createMenu} placement="bottomLeft">
+          
+          {role === "ADMIN" ? (
+            <Dropdown overlay={createMenu} placement="bottomLeft">
             <Button
               size="middle"
               className="bg-yellow-500 text-white hover:bg-white hover:text-yellow-500 border-none"
@@ -1115,6 +1117,9 @@ const TotalAsset = () => {
               Create <DownOutlined />
             </Button>
           </Dropdown>
+          ) : (
+            <></>
+          )}
           {role === "ADMIN" ? (
             <Dropdown overlay={buildingMenu} placement="bottomLeft">
               <Button
@@ -1127,25 +1132,23 @@ const TotalAsset = () => {
           ) : (
             <></>
           )}
-          {/* <Dropdown overlay={buildingMenu} placement="bottomLeft">
-            <Button
-              size="middle"
-              className="ml-2 text-gray-700 hover:bg-yellow-50"
-            >
-              Building <DownOutlined />
-            </Button>
-          </Dropdown> */}
-
+         
+          {role === "ADMIN" ? (
+            
           <Dropdown overlay={departmentMenu} placement="bottomLeft">
-            <Button
-              size="middle"
-              className="ml-2 text-gray-700 hover:bg-yellow-50"
-            >
-              Department <DownOutlined />
-            </Button>
-          </Dropdown>
-
-          <Dropdown overlay={roomMenu} placement="bottomLeft">
+          <Button
+            size="middle"
+            className="ml-2 text-gray-700 hover:bg-yellow-50"
+          >
+            Department <DownOutlined />
+          </Button>
+        </Dropdown>
+          ) : (
+            <></>
+          )}
+          {role === "ADMIN" ? (
+            
+            <Dropdown overlay={roomMenu} placement="bottomLeft">
             <Button
               size="middle"
               className="ml-2 text-gray-700 hover:bg-yellow-50"
@@ -1153,8 +1156,12 @@ const TotalAsset = () => {
               Room <DownOutlined />
             </Button>
           </Dropdown>
+            ) : (
+              <></>
+            )}
 
-          <Dropdown overlay={assetholderMenu} placement="bottomLeft">
+{role === "ADMIN" ? (
+            <Dropdown overlay={assetholderMenu} placement="bottomLeft">
             <Button
               size="middle"
               className="ml-2 text-gray-700 hover:bg-yellow-50"
@@ -1162,6 +1169,11 @@ const TotalAsset = () => {
               AssetHolder <DownOutlined />
             </Button>
           </Dropdown>
+            ) : (
+              <></>
+            )}
+          
+          
 
           <Button
             size="middle"
