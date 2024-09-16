@@ -16,8 +16,10 @@ import com.twd.SpringSecurityJWT.dto.FileDataDTO;
 import com.twd.SpringSecurityJWT.dto.FixedAssetFileResponseDTO;
 import com.twd.SpringSecurityJWT.entity.FileData;
 import com.twd.SpringSecurityJWT.entity.FixedAsset;
+import com.twd.SpringSecurityJWT.entity.OurUsers;
 import com.twd.SpringSecurityJWT.repository.FileDataRepository;
 import com.twd.SpringSecurityJWT.repository.FixedAssetRepository;
+import com.twd.SpringSecurityJWT.repository.OurUserRepo;
 import com.twd.SpringSecurityJWT.service.FileDataService;
 
 @Service
@@ -28,6 +30,9 @@ public class FileDataServiceImpl implements FileDataService {
 
     @Autowired
     private FixedAssetRepository fixedAssetRepository;
+
+    @Autowired
+    private OurUserRepo ourUserRepo;
 
     private final String FILE_PATH = "D:\\Year4\\project_Intern\\Fixed_Asset\\src\\Uploads\\";
 
@@ -90,6 +95,44 @@ public class FileDataServiceImpl implements FileDataService {
     }
 
     @Override
+    public String uploadFileToUserDirectory(MultipartFile file, Long userId) throws IOException {
+        // Check if userId is provided
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID must not be null");
+        }
+
+        // Retrieve User from the database
+        Optional<OurUsers> userOpt = ourUserRepo.findById(userId);
+        if (!userOpt.isPresent()) {
+            throw new IOException("User not found with ID: " + userId);
+        }
+
+        OurUsers user = userOpt.get();
+        String filePath = FILE_PATH + file.getOriginalFilename(); // Absolute path
+
+        // Create and save FileData with the user association
+        FileData fileData = FileData.builder()
+                .name(file.getOriginalFilename())
+                .type(file.getContentType())
+                .filePath(filePath)
+                .user(user) // Associate the file with the user
+                .build();
+
+        // Save file data to the database
+        FileData savedFileData = fileDataRepository.save(fileData);
+
+        // Save the file to the file system
+        file.transferTo(new java.io.File(filePath));
+
+        if (savedFileData != null) {
+            return "User profile image uploaded successfully: " + file.getOriginalFilename() + " and Files uploaded path is: "
+                    + filePath;
+        } else {
+            throw new IOException("Failed to save file data to the database");
+        }
+    }
+
+    @Override
     public FixedAssetFileResponseDTO downloadAllFilesByFixedAssetId(Long fixedAssetId) throws IOException {
         // Check if fixedAssetId is provided
         if (fixedAssetId == null) {
@@ -142,7 +185,6 @@ public class FileDataServiceImpl implements FileDataService {
         responseDTO.setFixedAssetBuilding(fixedAsset.getBuilding() != null ? fixedAsset.getBuilding().getName() : null);
         responseDTO.setFixedAssetAssetHolder(
                 fixedAsset.getAssetHolder() != null ? fixedAsset.getAssetHolder().getName() : null);
-        // Adjust based on your FixedAsset entity
         responseDTO.setFiles(fileDataDTOs);
         return responseDTO;
     }

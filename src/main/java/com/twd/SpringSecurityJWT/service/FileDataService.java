@@ -10,6 +10,8 @@ public interface FileDataService {
 
     String uploadFileToFileDirectory(MultipartFile file, Long fixedAssetId) throws IOException;
 
+    String uploadFileToUserDirectory(MultipartFile file, Long userId) throws IOException;
+
     byte[] downloadFileFromFileDirectory(String fileName) throws IOException;
 
     FixedAssetFileResponseDTO downloadAllFilesByFixedAssetId(Long fixedAssetId) throws IOException;

@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -22,6 +23,9 @@ public class OurUsers implements UserDetails {
     private String role;
     private String name;
     private boolean enabled;
+
+    @OneToMany(mappedBy = "user")
+    private Set<FileData> files; 
     
 
     @Override
