@@ -145,11 +145,11 @@ const TotalAsset = () => {
     {
       title: "Action",
       key: "action",
-      render: (_, record) => (
+      render: (_, assetDetails) => (
         <Space size="middle">
           <Button
             icon={<EditOutlined />}
-            onClick={() => (handleEdit(record), setItem(record))}
+            onClick={() => (handleEdit(assetDetails), setItem(assetDetails))}
             className="bg-green-600 hover:bg-green-700 text-white border-none rounded-md p-2 shadow-md"
           />
           <Dropdown
@@ -158,7 +158,7 @@ const TotalAsset = () => {
                 <Menu.Item key="view">
                   <Button
                     type="link"
-                    onClick={() => handleViewHide(record, "view")}
+                    onClick={() => handleViewHide(assetDetails, "view")}
                   >
                     View
                   </Button>
@@ -167,7 +167,7 @@ const TotalAsset = () => {
                   <Button
                     type="link"
                     onClick={() => (
-                      handleViewHide(record, "hide"), setItem(record)
+                      handleViewHide(assetDetails, "hide"), setItem(assetDetails)
                     )}
                   >
                     Remove
@@ -181,13 +181,13 @@ const TotalAsset = () => {
               className="bg-white hover:bg-yellow-500 text-yellow-500 border-none rounded-full p-2 shadow-md"
             />
           </Dropdown>
-          {record.statustext === "In Use" && (
+          {assetDetails.statustext === "In Use" && (
             <Button
               onClick={() => {
                 setIsModalVisible(true);
                 setModalType("return");
-                setAssetId(record.id);
-                setA(record.id);
+                setAssetId(assetDetails.id);
+                setA(assetDetails.id);
               }}
               className="bg-white hover:bg-yellow-500 text-yellow-500 border-none rounded-full p-1 text-xs shadow-sm"
             >
@@ -408,8 +408,7 @@ const TotalAsset = () => {
           const result = await response.json();
 
           if (response.ok) {
-            // Successfully created category
-            // setCategories((prevCategories) => [...prevCategories, result.category]);
+            
             if (result.statusCode === 400) {
               notification.error({
                 message: "Failed",
@@ -427,7 +426,7 @@ const TotalAsset = () => {
 
             fetchCategories();
           } else {
-            // Handle error response from server
+           
             notification.error({
               message: "Can not create with the same name category",
               description:
@@ -439,6 +438,7 @@ const TotalAsset = () => {
       } else if (modalType === "fixedasset") {
         try {
           if (editKey !== null) {
+            
             // Edit existing asset
             const updateResponse = await fetch(
               `http://localhost:6060/admin/updateFixedAsset/${editKey.id}`,
@@ -452,7 +452,7 @@ const TotalAsset = () => {
                 }),
               }
             );
-
+            console.log(values);
             if (updateResponse.ok) {
               notification.success({
                 message: "Asset Updated",
@@ -691,40 +691,42 @@ const TotalAsset = () => {
     setIsViewModalVisible(false);
   };
 
-  const handleEdit = (record) => {
-    console.log(record.category.name);
+  const handleEdit = (assetDetails) => {
+    console.log(assetDetails.category.name);
+    // console.log(assetDetails.files.fileName)
+    console.log(assetDetails)
     setModalType("fixedasset");
-    setEditKey(record);
+    setEditKey(assetDetails);
 
     form.setFieldsValue({
-      name: record.name,
-      categoryId: record.category.name,
-      model: record.model,
-      year: record.year,
-      serialNumber: record.serialNumber,
-      purchaseDate: record.purchaseDate ? moment(record.purchaseDate) : null,
-      price: record.price,
-      unit: record.unit,
-      quantity: record.quantity,
-      file: record.file,
+      name: assetDetails.name,
+      categoryId: assetDetails.category.name,
+      model: assetDetails.model,
+      year: assetDetails.year,
+      serialNumber: assetDetails.serialNumber,
+      purchaseDate: assetDetails.purchaseDate ? moment(assetDetails.purchaseDate) : null,
+      price: assetDetails.price,
+      unit: assetDetails.unit,
+      quantity: assetDetails.quantity,
+      files: assetDetails.files
     });
     setIsModalVisible(true);
   };
 
-  const handleDelete = async (record) => {
-    console.log("Deleting asset with key:", record.id);
+  const handleDelete = async (assetDetails) => {
+    console.log("Deleting asset with key:", assetDetails.id);
     try {
       const token = localStorage.getItem("token");
       const headers = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       };
-      await fetch(`http://localhost:6060/admin/deleteFixeAsset/${record.id}`, {
+      await fetch(`http://localhost:6060/admin/deleteFixeAsset/${assetDetails.id}`, {
         method: "DELETE",
         headers,
       });
-      console.log("Deleting asset with key:", record.key);
-      setData((prevData) => prevData.filter((item) => item.id !== record.id));
+      console.log("Deleting asset with key:", assetDetails.key);
+      setData((prevData) => prevData.filter((item) => item.id !== assetDetails.id));
       notification.success({
         message: "Asset Deleted",
         description: "Fixed asset has been deleted successfully.",
@@ -810,10 +812,13 @@ const TotalAsset = () => {
         ? item.category.id === selectedCategory
         : true;
 
+        const searchLower = searchTerm.toLowerCase();
+
       const searchMatch =
         item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.serialNumber.toLowerCase().includes(searchTerm.toLowerCase());
+        (item.purchaseDate && new Date(item.purchaseDate).toLocaleDateString().toLowerCase().includes(searchLower));
 
       return statusMatch && categoryMatch && searchMatch;
     });
@@ -854,17 +859,17 @@ const TotalAsset = () => {
       ))}
     </Menu>
   );
-  const handleViewHide = async (record, type) => {
+  const handleViewHide = async (assetDetails, type) => {
     if (type === "view") {
       try {
         const headers = {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         };
-        console.log(record);
+        console.log(assetDetails);
         const response = await fetch(
-          // `http://localhost:6060/admin/getFixedAssetById/${record.id}`,
-          `http://localhost:6060/admin/get_images_by_asset/${record.id}`,
+          // `http://localhost:6060/admin/getFixedAssetById/${assetDetails.id}`,
+          `http://localhost:6060/admin/get_images_by_asset/${assetDetails.id}`,
           {
             method: "GET",
             headers,
@@ -895,7 +900,7 @@ const TotalAsset = () => {
     }
     // useEffect(() => {
     //   if (assetDetails && token) {
-    //     handleViewHide(assetDetails, 'view', token); // Assuming you want to view asset details when record or token changes
+    //     handleViewHide(assetDetails, 'view', token); // Assuming you want to view asset details when assetDetails or token changes
     //   }
     // }, [assetDetails, token]);
     else if (type === "hide") {
@@ -905,13 +910,13 @@ const TotalAsset = () => {
           Authorization: `Bearer ${token}`,
         };
         const response = await fetch(
-          `http://localhost:6060/admin/updateFixedAsset/${record.id}`,
+          `http://localhost:6060/admin/updateFixedAsset/${assetDetails.id}`,
           {
             method: "PUT",
             headers,
             body: JSON.stringify({
-              ...record,
-              categoryId: record.category.id,
+              ...assetDetails,
+              categoryId: assetDetails.category.id,
               status: "0",
             }),
           }
@@ -919,7 +924,7 @@ const TotalAsset = () => {
 
         if (response.ok) {
           const updatedRecord = await response.json();
-          // console.log('Updated Record:', updatedRecord);
+          // console.log('Updated assetDetails:', updatedRecord);
           await fetchFixedAssets();
 
           notification.success({

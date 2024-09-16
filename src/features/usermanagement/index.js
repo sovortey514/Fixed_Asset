@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Modal, Space,notification ,Popconfirm, Avatar } from "antd";
+import {
+  Table,
+  Button,
+  Modal,
+  Space,
+  notification,
+  Popconfirm,
+  Avatar,
+} from "antd";
 import {
   PlusOutlined,
   EyeOutlined,
   EditOutlined,
   DeleteOutlined,
- UserOutlined 
+  UserOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import Register from "../user/Register";
@@ -16,7 +24,8 @@ import InputText from "../../components/Input/InputText";
 import ErrorText from "../../components/Typography/ErrorText";
 
 const token = localStorage.getItem("token");
-const url = 'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg';
+const url =
+  "https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg";
 function TotalUser() {
   const INITIAL_REGISTER_OBJ = {
     name: "",
@@ -38,7 +47,51 @@ function TotalUser() {
   const [errorMessage, setErrorMessage] = useState("");
   const [registerObj, setRegisterObj] = useState(INITIAL_REGISTER_OBJ);
 
- 
+  const handleImageUpload = async (event, userId) => {
+    const files = event.target.files;
+    if (files.length > 0) {
+      await handleFileUpload(files, userId);
+    }
+  };
+  const handleFileUpload = async (files, userId) => {
+    if (files.length > 0) {
+      try {
+        for (let i = 0; i < files.length; i++) {
+          const formData = new FormData();
+          formData.append("file", files[i]);
+          formData.append("userId", userId);
+
+          console.log("Uploading file:", files[i].name); 
+
+          const uploadResponse = await fetch(
+            "http://localhost:6060/admin/upload_image",
+            {
+              method: "POST",
+              body: formData,
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (!uploadResponse.ok) {
+            const errorData = await uploadResponse.json();
+            throw new Error(errorData.message || "Failed to upload image.");
+          }
+        }
+
+        // Refresh data after successful uploads
+        fetchUser();
+      } catch (error) {
+        console.error("Error during file upload:", error);
+        notification.error({
+          message: "Upload Failed",
+          description: error.message,
+          duration: 3,
+        });
+      }
+    }
+  };
 
   const columns = (handleUserDelete, handleClick, handleEdit) => [
     {
@@ -50,15 +103,35 @@ function TotalUser() {
       title: "Profile Image",
       dataIndex: "profileImage",
       key: "profileImage",
-      render: (image) => (
-        <Avatar
-          src={image} 
-          icon={!image && <UserOutlined />}
-          size={40} 
-          className="rounded-full object-cover"
-        />
-      ),
+      render: (image, record) => {
+        
+        const fileInputRef = React.createRef();
+
+        const handleAvatarClick = () => {
+          fileInputRef.current.click();
+        };
+
+        return (
+          <div className="relative inline-block">
+            <Avatar
+              src={image}
+              icon={!image && <UserOutlined />}
+              size={40}
+              className="rounded-full object-cover cursor-pointer"
+              onClick={handleAvatarClick}
+            />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleImageUpload(e, record.id)}
+              style={{ display: "none" }}
+            />
+          </div>
+        );
+      },
     },
+
     {
       title: "Name",
       dataIndex: "name",
@@ -243,10 +316,7 @@ function TotalUser() {
     setIsModalVisible(false);
     setSelectedUser(null);
     setUserData([]);
-    setRegisterObj({name: "",
-      username: "",
-      password: "",
-      role: "",});
+    setRegisterObj({ name: "", username: "", password: "", role: "" });
   };
 
   const [profile, setProfile] = useState({
@@ -283,8 +353,6 @@ function TotalUser() {
     }
   };
 
-
-
   const token = localStorage.getItem("token");
 
   const submitForm = async (e) => {
@@ -310,25 +378,24 @@ function TotalUser() {
       });
       console.log(response);
       const responseData = await response.json();
-      console.log(responseData)
-      if (responseData.statusCode===200) {
+      console.log(responseData);
+      if (responseData.statusCode === 200) {
         notification.success({
           message: "Create Successful",
           description: "The user has been registered successfully.",
-          duration: 3
+          duration: 3,
         });
         setRegisterObj({ name: "", username: "", password: "", role: "" });
         fetchUser();
         setIsModalVisible(false);
-        setUserData([])
-
-      } else if (responseData.statusCode === 400 ){
+        setUserData([]);
+      } else if (responseData.statusCode === 400) {
         notification.error({
           message: "Create failed",
           description: responseData.message,
-          duration: 3
+          duration: 3,
         });
-        console.log(responseData)
+        console.log(responseData);
         setErrorMessage(response.message || "Registration failed");
       }
     } catch (error) {
@@ -586,7 +653,9 @@ function TotalUser() {
                   type="text"
                   updateType="username"
                   labelTitle="Username"
-                  updateFormValue={(e)=>(setRegisterObj({username: e.value}),console.log(e.value))}
+                  updateFormValue={(e) => (
+                    setRegisterObj({ username: e.value }), console.log(e.value)
+                  )}
                 />
                 <InputText
                   type="password"
