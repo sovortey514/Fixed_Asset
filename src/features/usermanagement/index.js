@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Modal, Space,notification ,Popconfirm } from "antd";
+import { Table, Button, Modal, Space,notification ,Popconfirm, Avatar } from "antd";
 import {
   PlusOutlined,
   EyeOutlined,
   EditOutlined,
   DeleteOutlined,
+ UserOutlined 
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import Register from "../user/Register";
@@ -15,7 +16,7 @@ import InputText from "../../components/Input/InputText";
 import ErrorText from "../../components/Typography/ErrorText";
 
 const token = localStorage.getItem("token");
-
+const url = 'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg';
 function TotalUser() {
   const INITIAL_REGISTER_OBJ = {
     name: "",
@@ -46,6 +47,19 @@ function TotalUser() {
       render: (_, __, index) => index + 1,
     },
     {
+      title: "Profile Image",
+      dataIndex: "profileImage",
+      key: "profileImage",
+      render: (image) => (
+        <Avatar
+          src={image} 
+          icon={!image && <UserOutlined />}
+          size={40} 
+          className="rounded-full object-cover"
+        />
+      ),
+    },
+    {
       title: "Name",
       dataIndex: "name",
       key: "name",
@@ -62,21 +76,23 @@ function TotalUser() {
       dataIndex: "enabled",
       render: (enabled, user) => (
         <Space size="middle">
-          <Popconfirm  title={`Are you sure you want to ${enabled ? 'disable' : 'enable'} this user?`}
-        onConfirm={() => handleEnableDisable(user.id, enabled)} // If confirmed
-        okText="Yes"
-        cancelText="No"
-        >
-          <Button
-            
-            className={`${
-              enabled
-                ? " bg-green-200 text-green-800 "
-                : " bg-red-200 text-red-800"
-            } border-none rounded-lg p-3 shadow-lg transition-transform duration-300 ease-in-out transform hover:scale-105 focus:outline-none`}
+          <Popconfirm
+            title={`Are you sure you want to ${
+              enabled ? "disable" : "enable"
+            } this user?`}
+            onConfirm={() => handleEnableDisable(user.id, enabled)} // If confirmed
+            okText="Yes"
+            cancelText="No"
           >
-            {enabled ? "Enable" : "Disable"}
-          </Button>
+            <Button
+              className={`${
+                enabled
+                  ? "bg-green-200 text-green-800"
+                  : "bg-red-200 text-red-800"
+              } border-none rounded-lg p-3 shadow-lg transition-transform duration-300 ease-in-out transform hover:scale-105 focus:outline-none`}
+            >
+              {enabled ? "Enable" : "Disable"}
+            </Button>
           </Popconfirm>
         </Space>
       ),

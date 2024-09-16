@@ -28,7 +28,7 @@ import { DatePicker } from "antd";
 import moment from "moment";
 import { PlusOutlined } from "@ant-design/icons";
 import { SearchOutlined } from "@ant-design/icons";
-// import { select } from '@nextui-org/react';
+
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -59,7 +59,7 @@ const TotalAsset = () => {
   const [a, setA] = useState(0);
   const [assetById, setAssetById] = useState([]);
   const [file, setFile] = useState(null);
-
+  const [filteredData, setFilteredData] = useState(data);
   const columns = (handleEdit, handleDelete, handleViewHide) => [
     {
       title: "No",
@@ -239,6 +239,7 @@ const TotalAsset = () => {
     fetchFixedAssets();
     fetchAssetHolder();
   }, []);
+
 
   const handleExport = () => {
     const headers = {
@@ -794,15 +795,14 @@ const TotalAsset = () => {
     setSelectedCategory(categoryId);
   };
 
-  const filteredData = data.filter((item) => {
-    const statusMatch = selectedStatus
-      ? item.statustext === selectedStatus
-      : true;
-    const categoryMatch = selectedCategory
-      ? item.category.id === selectedCategory
-      : true;
-    return statusMatch && categoryMatch;
-  });
+  useEffect(() => {
+    const filtered = data.filter((item) => {
+      const statusMatch = selectedStatus ? item.statustext === selectedStatus : true;
+      const categoryMatch = selectedCategory ? item.category.id === selectedCategory : true;
+      return statusMatch && categoryMatch;
+    });
+    setFilteredData(filtered);
+  }, [selectedStatus, selectedCategory, data]);
 
   const statusMenu = (
     <Menu onClick={handleMenuClick}>
@@ -930,6 +930,8 @@ const TotalAsset = () => {
   const handleRefresh = async () => {
     setLoading(true);
     try {
+      setSelectedStatus(null);
+      setSelectedCategory(null);
       await fetchFixedAssets();
     } catch (error) {
       console.error("Failed to refresh data", error);
