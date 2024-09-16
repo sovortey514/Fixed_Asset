@@ -29,7 +29,6 @@ import moment from "moment";
 import { PlusOutlined } from "@ant-design/icons";
 import { SearchOutlined } from "@ant-design/icons";
 
-
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
@@ -60,6 +59,9 @@ const TotalAsset = () => {
   const [assetById, setAssetById] = useState([]);
   const [file, setFile] = useState(null);
   const [filteredData, setFilteredData] = useState(data);
+
+
+  const [searchTerm, setSearchTerm] = useState("");
   const columns = (handleEdit, handleDelete, handleViewHide) => [
     {
       title: "No",
@@ -240,6 +242,10 @@ const TotalAsset = () => {
     fetchAssetHolder();
   }, []);
 
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+  };
 
   const handleExport = () => {
     const headers = {
@@ -795,14 +801,25 @@ const TotalAsset = () => {
     setSelectedCategory(categoryId);
   };
 
-  useEffect(() => {
+   useEffect(() => {
     const filtered = data.filter((item) => {
-      const statusMatch = selectedStatus ? item.statustext === selectedStatus : true;
-      const categoryMatch = selectedCategory ? item.category.id === selectedCategory : true;
-      return statusMatch && categoryMatch;
+      const statusMatch = selectedStatus
+        ? item.statustext === selectedStatus
+        : true;
+      const categoryMatch = selectedCategory
+        ? item.category.id === selectedCategory
+        : true;
+
+      const searchMatch =
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.serialNumber.toLowerCase().includes(searchTerm.toLowerCase());
+
+      return statusMatch && categoryMatch && searchMatch;
     });
+
     setFilteredData(filtered);
-  }, [selectedStatus, selectedCategory, data]);
+  }, [selectedStatus, selectedCategory, searchTerm, data]);
 
   const statusMenu = (
     <Menu onClick={handleMenuClick}>
@@ -950,10 +967,22 @@ const TotalAsset = () => {
               <Button
                 size="middle"
                 className="bg-yellow-500 hover:bg-white text-white"
+                style={{ marginRight: 8 }} // Ensure margin consistency
               >
                 Create <DownOutlined />
               </Button>
             </Dropdown>
+
+            <Button
+              size="middle"
+              onClick={() => {
+                setIsModalVisible(true);
+                setModalType("assign");
+              }}
+              className="bg-yellow-500 hover:bg-white text-white"
+            >
+              Assign <PlusOutlined />
+            </Button>
 
             <Dropdown overlay={categoryMenu} placement="bottomLeft">
               <Button size="middle" style={{ marginLeft: 8 }}>
@@ -971,15 +1000,13 @@ const TotalAsset = () => {
               </Button>
             </Dropdown>
 
-            <Button
+            <Input
+              placeholder="Search..."
               size="middle"
-              style={{ marginLeft: 8 }}
-              shape="circle"
-              icon={<PlusOutlined />}
-              onClick={() => {
-                setIsModalVisible(true);
-                setModalType("assign");
-              }}
+              value={searchTerm}
+              onChange={handleSearch} // Handle search as the user types
+              suffix={<SearchOutlined />}
+              style={{ width: 200, marginLeft: 8 }}
             />
           </div>
 
@@ -1003,7 +1030,6 @@ const TotalAsset = () => {
           </div>
         </div>
 
-      
         <div className="flex-1 overflow-auto">
           <Table
             columns={columns(handleEdit, handleDelete, handleViewHide)}

@@ -70,17 +70,17 @@ const TotalAsset = () => {
 
   const fetchUserByusername = async () => {
     try {
-      const user =localStorage.getItem("username");
+      const user = localStorage.getItem("username");
       const response = await fetch(`http://localhost:6060/auth/user/${user}`);
       if (response.ok) {
         const userData = await response.json();
-        
+
         setRole(userData.role);
       } else {
-        console.error('Failed to fetch user:', response.statusText);
+        console.error("Failed to fetch user:", response.statusText);
       }
     } catch (error) {
-      console.error('Error fetching user:', error);
+      console.error("Error fetching user:", error);
     }
   };
 
@@ -1107,16 +1107,15 @@ const TotalAsset = () => {
     <>
       <div className="flex justify-between items-center">
         <div className="flex">
-          
           {role === "ADMIN" ? (
             <Dropdown overlay={createMenu} placement="bottomLeft">
-            <Button
-              size="middle"
-              className="bg-yellow-500 text-white hover:bg-white hover:text-yellow-500 border-none"
-            >
-              Create <DownOutlined />
-            </Button>
-          </Dropdown>
+              <Button
+                size="middle"
+                className="bg-yellow-500 text-white hover:bg-white hover:text-yellow-500 border-none"
+              >
+                Create <DownOutlined />
+              </Button>
+            </Dropdown>
           ) : (
             <></>
           )}
@@ -1132,48 +1131,44 @@ const TotalAsset = () => {
           ) : (
             <></>
           )}
-         
+
           {role === "ADMIN" ? (
-            
-          <Dropdown overlay={departmentMenu} placement="bottomLeft">
-          <Button
-            size="middle"
-            className="ml-2 text-gray-700 hover:bg-yellow-50"
-          >
-            Department <DownOutlined />
-          </Button>
-        </Dropdown>
+            <Dropdown overlay={departmentMenu} placement="bottomLeft">
+              <Button
+                size="middle"
+                className="ml-2 text-gray-700 hover:bg-yellow-50"
+              >
+                Department <DownOutlined />
+              </Button>
+            </Dropdown>
           ) : (
             <></>
           )}
           {role === "ADMIN" ? (
-            
             <Dropdown overlay={roomMenu} placement="bottomLeft">
-            <Button
-              size="middle"
-              className="ml-2 text-gray-700 hover:bg-yellow-50"
-            >
-              Room <DownOutlined />
-            </Button>
-          </Dropdown>
-            ) : (
-              <></>
-            )}
+              <Button
+                size="middle"
+                className="ml-2 text-gray-700 hover:bg-yellow-50"
+              >
+                Room <DownOutlined />
+              </Button>
+            </Dropdown>
+          ) : (
+            <></>
+          )}
 
-{role === "ADMIN" ? (
+          {role === "ADMIN" ? (
             <Dropdown overlay={assetholderMenu} placement="bottomLeft">
-            <Button
-              size="middle"
-              className="ml-2 text-gray-700 hover:bg-yellow-50"
-            >
-              AssetHolder <DownOutlined />
-            </Button>
-          </Dropdown>
-            ) : (
-              <></>
-            )}
-          
-          
+              <Button
+                size="middle"
+                className="ml-2 text-gray-700 hover:bg-yellow-50"
+              >
+                AssetHolder <DownOutlined />
+              </Button>
+            </Dropdown>
+          ) : (
+            <></>
+          )}
 
           <Button
             size="middle"
