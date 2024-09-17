@@ -1302,6 +1302,7 @@ const TotalAsset = () => {
         visible={isViewModalVisible}
         onOk={handleCancel}
         onCancel={handleCancel}
+        footer= {null}
         cancelText="Cancel"
         width={800}
       >

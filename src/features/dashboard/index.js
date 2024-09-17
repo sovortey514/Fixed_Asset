@@ -14,6 +14,7 @@ import { showNotification } from "../common/headerSlice";
 import PlusCircleIcon from "@heroicons/react/24/outline/PlusCircleIcon";
 import CogIcon from "@heroicons/react/24/outline/CogIcon";
 import CheckCircleIcon from "@heroicons/react/24/outline/CheckCircleIcon";
+import { DatePicker } from "antd";
 const token = localStorage.getItem("token");
 
 function Dashboard() {
@@ -99,10 +100,14 @@ function Dashboard() {
   return (
     <>
       {/** ---------------------- Select Period Content ------------------------- */}
-      <DashboardTopBar updateDashboardPeriod={updateDashboardPeriod} />
+      <DatePicker
+        className="border border-gray-300 rounded-lg p-2 text-gray-700 placeholder-gray-500 w-1/4 md:w-1/6 lg:w-1/8 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 ease-in-out mt-3"
+        placeholderText="Select purchase date"
+      />
+      {/* <DashboardTopBar updateDashboardPeriod={updateDashboardPeriod} /> */}
 
       {/** ---------------------- Different stats content 1 ------------------------- */}
-      <div className="grid lg:grid-cols-4 mt-2 md:grid-cols-2 grid-cols-1 gap-6">
+      <div className="grid lg:grid-cols-4 mt-7 md:grid-cols-2 grid-cols-1 gap-6">
         {statsData.map((item, index) => (
           <DashboardStats
             key={index}
@@ -115,7 +120,7 @@ function Dashboard() {
       </div>
 
       {/** ---------------------- Different charts ------------------------- */}
-      <div className="flex flex-wrap mt-4 gap-6">
+      <div className="flex flex-wrap mt-2 gap-6">
         <div className="flex-1 min-w-[300px]">
           <LineChart />
           {/* <BarChart /> */}
