@@ -185,7 +185,7 @@ function TotalUser() {
             onClick={() => (handleClick(user), fetchUserById(user.id))}
           />
            <Popconfirm
-          title="Are you sure you want to delete this user? "
+          title="Are you sure you want to delete this user?"
           onConfirm={() => handleUserDelete(user.id)}
           okText="Yes"
           cancelText="No"
@@ -229,7 +229,9 @@ function TotalUser() {
 
   useEffect(() => {
     fetchUser();
+    
   }, []);
+  
 
   const handleUserDelete = async (userId) => {
     try {
@@ -358,6 +360,7 @@ function TotalUser() {
     }
   };
 
+
   const token = localStorage.getItem("token");
 
   const submitForm = async (e) => {
@@ -472,6 +475,7 @@ function TotalUser() {
     setSelectedUser(userId);
     setIsModalVisible(true);
   };
+  
 
   // const handleDelete = (userId) => {
   //   Modal.confirm({
@@ -611,7 +615,7 @@ function TotalUser() {
                   <InputText
                     type="text"
                     updateType="name"
-                    defaultValue={userData.length !== 0 ? userData.name : ""}
+                    defaultValue={userData.name ?? ""}
                     labelTitle="Name"
                     updateFormValue={updateFormValue}
                   />
@@ -658,9 +662,7 @@ function TotalUser() {
                   type="text"
                   updateType="username"
                   labelTitle="Username"
-                  updateFormValue={(e) => (
-                    setRegisterObj({ username: e.value }), console.log(e.value)
-                  )}
+                  updateFormValue={updateFormValue}
                 />
                 <InputText
                   type="password"
