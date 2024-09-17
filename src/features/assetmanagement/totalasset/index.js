@@ -692,8 +692,7 @@ const TotalAsset = () => {
   };
 
   const handleEdit = (assetDetails) => {
-    console.log(assetDetails.category.name);
-    // console.log(assetDetails.files.fileName)
+    console.log(assetDetails.category.name)
     console.log(assetDetails)
     setModalType("fixedasset");
     setEditKey(assetDetails);
@@ -708,8 +707,14 @@ const TotalAsset = () => {
       price: assetDetails.price,
       unit: assetDetails.unit,
       quantity: assetDetails.quantity,
-      files: assetDetails.files
+      // files: assetDetails.files
     });
+
+    if (Array.isArray(assetDetails.files)) {
+      setImages(assetDetails.files.map(file => file.fileUrl));
+    } else {
+      setImages([]);
+    }
     setIsModalVisible(true);
   };
 

@@ -61,7 +61,7 @@ function TotalUser() {
           formData.append("file", files[i]);
           formData.append("userId", userId);
 
-          console.log("Uploading file:", files[i].name); 
+          console.log("Uploading file:", files[i].name);
 
           const uploadResponse = await fetch(
             "http://localhost:6060/admin/upload_image",
@@ -104,7 +104,6 @@ function TotalUser() {
       dataIndex: "profileImage",
       key: "profileImage",
       render: (image, record) => {
-        
         const fileInputRef = React.createRef();
 
         const handleAvatarClick = () => {
@@ -485,11 +484,11 @@ function TotalUser() {
     });
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    console.log("onchange", e);
-    setRegisterObj((prev) => ({ ...prev, [name]: value }));
-  };
+  // const handleInputChange = (e) => {
+  //   const { name, value } = e.target;
+  //   console.log("onchange", e);
+  //   setRegisterObj((prev) => ({ ...prev, [name]: value }));
+  // };
   return (
     <>
       <div className="flex justify-between mb-4">
@@ -666,6 +665,10 @@ function TotalUser() {
                 <InputText
                   updateType="role"
                   labelTitle="Role"
+                  options={[
+                    { value: "USER", label: "USER" },
+                    { value: "ADMIN", label: "ADMIN" },
+                  ]}
                   updateFormValue={updateFormValue}
                 />
                 <ErrorText>{errorMessage}</ErrorText>
