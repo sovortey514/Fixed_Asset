@@ -68,10 +68,6 @@ public class FixedAssetServiceImpl implements FixedAssetService {
         if (fixedAsset.getStatustext() == null) {
             throw new RuntimeException("Statustext is required");
         }
-
-        
-        
-     
     }
 
     //

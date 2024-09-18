@@ -70,4 +70,15 @@ public class FileDataRestController {
         }
     }
 
+    @GetMapping("/get_all_assets_with_images")
+    public ResponseEntity<?> getAllAssetsWithImages() {
+        try {
+            List<FixedAssetFileResponseDTO> assetsWithImages = fileDataService.getAllAssetsWithImages();
+            return ResponseEntity.status(HttpStatus.OK).body(assetsWithImages);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error retrieving assets: " + e.getMessage());
+        }
+    }
+
 }

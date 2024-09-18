@@ -125,7 +125,8 @@ public class FileDataServiceImpl implements FileDataService {
         file.transferTo(new java.io.File(filePath));
 
         if (savedFileData != null) {
-            return "User profile image uploaded successfully: " + file.getOriginalFilename() + " and Files uploaded path is: "
+            return "User profile image uploaded successfully: " + file.getOriginalFilename()
+                    + " and Files uploaded path is: "
                     + filePath;
         } else {
             throw new IOException("Failed to save file data to the database");
@@ -187,6 +188,58 @@ public class FileDataServiceImpl implements FileDataService {
                 fixedAsset.getAssetHolder() != null ? fixedAsset.getAssetHolder().getName() : null);
         responseDTO.setFiles(fileDataDTOs);
         return responseDTO;
+    }
+
+    @Override
+    public List<FixedAssetFileResponseDTO> getAllAssetsWithImages() throws IOException {
+        List<FixedAsset> fixedAssets = fixedAssetRepository.findAll();
+        List<FixedAssetFileResponseDTO> responseList = new ArrayList<>();
+
+        for (FixedAsset fixedAsset : fixedAssets) {
+            List<FileData> fileDataList = fileDataRepository.findByFixedAsset(fixedAsset);
+
+            List<FileDataDTO> fileDataDTOs = new ArrayList<>();
+            for (FileData fileData : fileDataList) {
+                Path path = Paths.get(fileData.getFilePath());
+                if (Files.exists(path)) {
+                    FileDataDTO fileDataDTO = new FileDataDTO();
+                    fileDataDTO.setFileName(fileData.getName());
+                    fileDataDTO.setFileType(fileData.getType());
+
+                    String fileUrl = "http://localhost:6060/admin/get_image/" + fileData.getName();
+                    fileDataDTO.setFileUrl(fileUrl);
+
+                    fileDataDTOs.add(fileDataDTO);
+                } else {
+                    throw new IOException("File not found at path: " + fileData.getFilePath());
+                }
+            }
+
+            // Create the response DTO for each asset
+            FixedAssetFileResponseDTO responseDTO = new FixedAssetFileResponseDTO();
+            responseDTO.setFixedAssetId(fixedAsset.getId());
+            responseDTO.setFixedAssetName(fixedAsset.getName());
+            responseDTO.setFixedAssetCategory(fixedAsset.getCategory().getName());
+            responseDTO.setFixedAssetModel(fixedAsset.getModel());
+            responseDTO.setFixedAssetYear(fixedAsset.getYear());
+            responseDTO.setFixedAssetPrice(fixedAsset.getPrice());
+            responseDTO.setFixedAssetSerialNumber(fixedAsset.getSerialNumber());
+            responseDTO.setFixedAssetPurchaseDate(fixedAsset.getPurchaseDate());
+            responseDTO.setFixedAssetUnit(fixedAsset.getUnit());
+            responseDTO.setFixedAssetQuantity(fixedAsset.getQuantity());
+            responseDTO.setFixedAssetRemarks(fixedAsset.getRemarks());
+            responseDTO.setFixedAssetStatus(fixedAsset.getStatus());
+            responseDTO.setFixedAssetStatusText(fixedAsset.getStatustext());
+            responseDTO.setFixedAssetBuilding(
+                    fixedAsset.getBuilding() != null ? fixedAsset.getBuilding().getName() : null);
+            responseDTO.setFixedAssetAssetHolder(
+                    fixedAsset.getAssetHolder() != null ? fixedAsset.getAssetHolder().getName() : null);
+            responseDTO.setFiles(fileDataDTOs);
+
+            responseList.add(responseDTO);
+        }
+
+        return responseList;
     }
 
 }

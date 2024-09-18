@@ -15,4 +15,6 @@ public interface FileDataService {
     byte[] downloadFileFromFileDirectory(String fileName) throws IOException;
 
     FixedAssetFileResponseDTO downloadAllFilesByFixedAssetId(Long fixedAssetId) throws IOException;
+
+    List<FixedAssetFileResponseDTO> getAllAssetsWithImages() throws IOException;
 }
