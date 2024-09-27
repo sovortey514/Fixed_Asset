@@ -88,11 +88,11 @@ const SidebarRoutes = () => {
         ]);
       }else{
         setRoutes([
-          {
-            path: "/app/dashboard",
-            icon: <Squares2X2Icon className={iconClasses} />,
-            name: "Dashboard",
-          },
+          // {
+          //   path: "/app/dashboard",
+          //   icon: <Squares2X2Icon className={iconClasses} />,
+          //   name: "Dashboard",
+          // },
           {
             path: "",
             icon: <DocumentTextIcon className={`${iconClasses} inline`} />,

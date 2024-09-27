@@ -31,6 +31,7 @@ import { SearchOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
+const { confirm } = Modal;
 
 const TotalAsset = () => {
   const [size, setSize] = useState("large");
@@ -60,7 +61,6 @@ const TotalAsset = () => {
   const [file, setFile] = useState(null);
   const [filteredData, setFilteredData] = useState(data);
 
-
   const [searchTerm, setSearchTerm] = useState("");
   const columns = (handleEdit, handleDelete, handleViewHide) => [
     {
@@ -70,59 +70,59 @@ const TotalAsset = () => {
     },
     {
       title: "Name",
-      dataIndex: "name",
-      key: "name",
+      dataIndex: "fixedAssetName",
+      key: "fixedAssetName",
       render: (text) => <a>{text}</a>,
     },
     {
       title: "Category",
-      dataIndex: "categoryId",
-      key: "categoryId",
-      render: (_, categoryId) => {
-        return categoryId.category.name;
-      },
+      dataIndex: "fixedAssetCategory",
+      key: "fixedAssetCategory",
+      // render: (_, categoryId) => {
+      //   return categoryId.category.name;
+      // },
     },
     {
       title: "Model",
-      dataIndex: "model",
-      key: "model",
+      dataIndex: "fixedAssetModel",
+      key: "fixedAssetModel",
     },
     {
       title: "Year",
-      dataIndex: "year",
-      key: "year",
+      dataIndex: "fixedAssetYear",
+      key: "fixedAssetYear",
     },
     {
       title: "Serial Number",
-      dataIndex: "serialNumber",
-      key: "serialNumber",
+      dataIndex: "fixedAssetSerialNumber",
+      key: "fixedAssetSerialNumber",
     },
     {
       title: "Purchase Date",
-      dataIndex: "purchaseDate",
-      key: "purchaseDate",
-      render: (date) => (date ? new Date(date).toLocaleDateString() : "N/A"),
+      dataIndex: "fixedAssetPurchaseDate",
+      key: "fixedAssetPurchaseDate",
+      render: (date) => (date ? date : "N/A"),
     },
     {
       title: "Price",
-      dataIndex: "price",
-      key: "price",
+      dataIndex: "fixedAssetPrice",
+      key: "fixedAssetPrice",
       render: (price) => `$${price.toFixed(2)}`,
     },
     {
       title: "Unit",
-      dataIndex: "unit",
-      key: "unit",
+      dataIndex: "fixedAssetUnit",
+      key: "fixedAssetUnit",
     },
     {
       title: "Quantity",
-      dataIndex: "quantity",
-      key: "quantity",
+      dataIndex: "fixedAssetQuantity",
+      key: "fixedAssetQuantity",
     },
     {
       title: "Status",
-      dataIndex: "statustext",
-      key: "statustext",
+      dataIndex: "fixedAssetStatusText",
+      key: "fixedAssetStatusText",
       render: (statustext) => {
         const status = statustext || "Available";
 
@@ -167,7 +167,8 @@ const TotalAsset = () => {
                   <Button
                     type="link"
                     onClick={() => (
-                      handleViewHide(assetDetails, "hide"), setItem(assetDetails)
+                      handleViewHide(assetDetails, "hide"),
+                      setItem(assetDetails)
                     )}
                   >
                     Remove
@@ -181,13 +182,13 @@ const TotalAsset = () => {
               className="bg-white hover:bg-yellow-500 text-yellow-500 border-none rounded-full p-2 shadow-md"
             />
           </Dropdown>
-          {assetDetails.statustext === "In Use" && (
+          {assetDetails.fixedAssetStatusText === "In Use" && (
             <Button
               onClick={() => {
                 setIsModalVisible(true);
                 setModalType("return");
-                setAssetId(assetDetails.id);
-                setA(assetDetails.id);
+                setAssetId(assetDetails.fixedAssetId);
+                setA(assetDetails.fixedAssetId);
               }}
               className="bg-white hover:bg-yellow-500 text-yellow-500 border-none rounded-full p-1 text-xs shadow-sm"
             >
@@ -240,6 +241,7 @@ const TotalAsset = () => {
     fetchCategories();
     fetchFixedAssets();
     fetchAssetHolder();
+    fetchFixedAssetswithimage();
   }, []);
 
   const handleSearch = (e) => {
@@ -335,18 +337,43 @@ const TotalAsset = () => {
         Authorization: `Bearer ${token}`,
       };
       const response = await fetch(
-        "http://localhost:6060/admin/getAllFixedAssets",
+        "http://localhost:6060/admin/get_all_assets_with_images",
         { headers }
       );
       const result = await response.json();
-      if (result.statusCode === 200) {
-        console.log(result.fixedAssets);
-        setData(result.fixedAssets || []);
+      if (result) {
+        const list = result.filter(i=>i.fixedAssetStatus === "1")
+        setData(list);
       } else {
         notification.error({
           message: "Failed to fetch fixed assets",
           description: result.error,
         });
+      }
+    } catch (error) {
+      console.error("Error fetching fixed assets:", error);
+    }
+  };
+
+  const fetchFixedAssetswithimage = async () => {
+    try {
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+      const response = await fetch(
+        "http://localhost:6060/admin/get_all_assets_with_images",
+        { headers }
+      );
+      const result = await response.json();
+      if (result.ok) {
+        console.log(result.fixedAssets);
+        setData(result.data || []);
+      } else {
+        // notification.error({
+        //   message: "Failed to fetch fixed assets",
+        //   description: result.error,
+        // });
       }
     } catch (error) {
       console.error("Error fetching fixed assets:", error);
@@ -408,7 +435,6 @@ const TotalAsset = () => {
           const result = await response.json();
 
           if (response.ok) {
-            
             if (result.statusCode === 400) {
               notification.error({
                 message: "Failed",
@@ -426,7 +452,6 @@ const TotalAsset = () => {
 
             fetchCategories();
           } else {
-           
             notification.error({
               message: "Can not create with the same name category",
               description:
@@ -438,10 +463,10 @@ const TotalAsset = () => {
       } else if (modalType === "fixedasset") {
         try {
           if (editKey !== null) {
-            
+            console.log('editKey',editKey)
             // Edit existing asset
             const updateResponse = await fetch(
-              `http://localhost:6060/admin/updateFixedAsset/${editKey.id}`,
+              `http://localhost:6060/admin/updateFixedAsset/${editKey.fixedAssetId}`,
               {
                 method: "PUT",
                 headers,
@@ -692,26 +717,28 @@ const TotalAsset = () => {
   };
 
   const handleEdit = (assetDetails) => {
-    console.log(assetDetails.category.name)
-    console.log(assetDetails)
+    // console.log(assetDetails.category.name);
+    console.log(assetDetails);
     setModalType("fixedasset");
     setEditKey(assetDetails);
 
     form.setFieldsValue({
-      name: assetDetails.name,
-      categoryId: assetDetails.category.name,
-      model: assetDetails.model,
-      year: assetDetails.year,
-      serialNumber: assetDetails.serialNumber,
-      purchaseDate: assetDetails.purchaseDate ? moment(assetDetails.purchaseDate) : null,
-      price: assetDetails.price,
-      unit: assetDetails.unit,
-      quantity: assetDetails.quantity,
+      name: assetDetails.fixedAssetName,
+      categoryId: assetDetails.fixedAssetCategory,
+      model: assetDetails.fixedAssetModel,
+      year: assetDetails.fixedAssetYear,
+      serialNumber: assetDetails.fixedAssetSerialNumber,
+      purchaseDate: assetDetails.fixedAssetPurchaseDate
+        ? moment(assetDetails.purchaseDate)
+        : null,
+      price: assetDetails.fixedAssetPrice,
+      unit: assetDetails.fixedAssetUnit,
+      quantity: assetDetails.fixedAssetQuantity,
       // files: assetDetails.files
     });
 
     if (Array.isArray(assetDetails.files)) {
-      setImages(assetDetails.files.map(file => file.fileUrl));
+      setImages(assetDetails.files.map((file) => file.fileUrl));
     } else {
       setImages([]);
     }
@@ -719,19 +746,24 @@ const TotalAsset = () => {
   };
 
   const handleDelete = async (assetDetails) => {
-    console.log("Deleting asset with key:", assetDetails.id);
+    console.log("Deleting asset with key:", assetDetails.fixedAssetId);
     try {
       const token = localStorage.getItem("token");
       const headers = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       };
-      await fetch(`http://localhost:6060/admin/deleteFixeAsset/${assetDetails.id}`, {
-        method: "DELETE",
-        headers,
-      });
+      await fetch(
+        `http://localhost:6060/admin/deleteFixeAsset/${assetDetails.fixedAssetId}`,
+        {
+          method: "DELETE",
+          headers,
+        }
+      );
       console.log("Deleting asset with key:", assetDetails.key);
-      setData((prevData) => prevData.filter((item) => item.id !== assetDetails.id));
+      setData((prevData) =>
+        prevData.filter((item) => item.id !== assetDetails.fixedAssetId)
+      );
       notification.success({
         message: "Asset Deleted",
         description: "Fixed asset has been deleted successfully.",
@@ -808,22 +840,34 @@ const TotalAsset = () => {
     setSelectedCategory(categoryId);
   };
 
-   useEffect(() => {
+  useEffect(() => {
+    console.log(
+      "item",
+      data.filter((item) => item)
+    );
     const filtered = data.filter((item) => {
       const statusMatch = selectedStatus
-        ? item.statustext === selectedStatus
+        ? item.fixedAssetStatusText === selectedStatus
         : true;
       const categoryMatch = selectedCategory
-        ? item.category.id === selectedCategory
+        ? item.fixedAssetCategory === selectedCategory
         : true;
 
-        const searchLower = searchTerm.toLowerCase();
+      const searchLower = searchTerm.toLowerCase();
 
       const searchMatch =
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.serialNumber.toLowerCase().includes(searchTerm.toLowerCase());
-        (item.purchaseDate && new Date(item.purchaseDate).toLocaleDateString().toLowerCase().includes(searchLower));
+        item.fixedAssetName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.fixedAssetCategory
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        item.fixedAssetSerialNumber
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+      item.fixedAssetPurchaseDate &&
+        new Date(item.fixedAssetPurchaseDate)
+          .toLocaleDateString()
+          .toLowerCase()
+          .includes(searchLower);
 
       return statusMatch && categoryMatch && searchMatch;
     });
@@ -843,7 +887,7 @@ const TotalAsset = () => {
       {categories.map((category) => (
         <Menu.Item
           key={category.id}
-          onClick={() => handleCategorySelect(category.id)}
+          onClick={() => handleCategorySelect(category.name)}
         >
           <div className="flex justify-between items-center w-full">
             <span>{category.name}</span>
@@ -874,7 +918,7 @@ const TotalAsset = () => {
         console.log(assetDetails);
         const response = await fetch(
           // `http://localhost:6060/admin/getFixedAssetById/${assetDetails.id}`,
-          `http://localhost:6060/admin/get_images_by_asset/${assetDetails.id}`,
+          `http://localhost:6060/admin/get_images_by_asset/${assetDetails.fixedAssetId}`,
           {
             method: "GET",
             headers,
@@ -909,48 +953,69 @@ const TotalAsset = () => {
     //   }
     // }, [assetDetails, token]);
     else if (type === "hide") {
-      try {
-        const headers = {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        };
-        const response = await fetch(
-          `http://localhost:6060/admin/updateFixedAsset/${assetDetails.id}`,
-          {
-            method: "PUT",
-            headers,
-            body: JSON.stringify({
-              ...assetDetails,
-              categoryId: assetDetails.category.id,
-              status: "0",
-            }),
+      confirm({
+        title: "Are you sure you want to hide this asset?",
+        content: `Asset: ${assetDetails.fixedAssetName}`,
+        okText: "Yes",
+        okType: "danger",
+        cancelText: "No",
+        onOk: async () => {
+          try {
+            const headers = {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            };
+            const response = await fetch(
+              `http://localhost:6060/admin/updateFixedAsset/${assetDetails.fixedAssetId}`,
+              {
+                method: "PUT",
+                headers,
+                body: JSON.stringify({
+                  // ...assetDetails,
+                  status: "0",
+                  statustext: "Avaliable",
+                  id: assetDetails.fixedAssetId,
+                  categoryId:1,
+                  model: assetDetails.fixedAssetModel,
+                  name: assetDetails.fixedAssetName,
+                  price: assetDetails.fixedAssetPrice,
+                  purchaseDate: assetDetails.fixedAssetPurchaseDate,
+                  quantity: assetDetails.fixedAssetQuantity,
+                  serialNumber: assetDetails.fixedAssetSerialNumber,
+                  unit: assetDetails.fixedAssetUnit,
+                  year: assetDetails.fixedAssetYear, // Hiding the asset by updating its status
+                }),
+              }
+            );
+
+            if (response.ok) {
+              const updatedRecord = await response.json();
+              await fetchFixedAssets(); // Refresh the asset list after hiding
+
+              notification.success({
+                message: "Asset Updated",
+                description: `Asset "${updatedRecord.fixedAsset.name}" has been updated.`,
+              });
+            } else {
+              const errorData = await response.json();
+              notification.error({
+                message: "Failed to Update Asset",
+                description:
+                  errorData.message || "There was an error updating the asset.",
+              });
+            }
+          } catch (error) {
+            notification.error({
+              message: "Failed to Update Asset",
+              description: "There was an error updating the asset.",
+            });
+            console.error("Error updating asset:", error);
           }
-        );
-
-        if (response.ok) {
-          const updatedRecord = await response.json();
-          // console.log('Updated assetDetails:', updatedRecord);
-          await fetchFixedAssets();
-
-          notification.success({
-            message: "Asset  Updated",
-            description: `Asset "${updatedRecord.fixedAsset.name}" has been updated.`,
-          });
-        } else {
-          const errorData = await response.json();
-          notification.error({
-            message: "Failed to Update asset",
-            description:
-              errorData.message || "There was an error updating the asset .",
-          });
-        }
-      } catch (error) {
-        notification.error({
-          message: "Failed to Update asset",
-          description: "There was an error updating the asset.",
-        });
-        console.error("Error updating visibility:", error);
-      }
+        },
+        onCancel() {
+          console.log("Hide operation cancelled");
+        },
+      });
     }
   };
 
@@ -1014,7 +1079,7 @@ const TotalAsset = () => {
               placeholder="Search..."
               size="middle"
               value={searchTerm}
-              onChange={handleSearch} // Handle search as the user types
+              onChange={handleSearch}
               suffix={<SearchOutlined />}
               style={{ width: 200, marginLeft: 8 }}
             />
@@ -1247,8 +1312,11 @@ const TotalAsset = () => {
                   suffixIcon={<SearchOutlined />}
                 >
                   {data.map((fixedAsset) => (
-                    <Option key={fixedAsset.id} value={fixedAsset.id}>
-                      {fixedAsset.name}
+                    <Option
+                      key={fixedAsset.fixedAssetId}
+                      value={fixedAsset.fixedAssetId}
+                    >
+                      {fixedAsset.fixedAssetName}
                     </Option>
                   ))}
                 </Select>
@@ -1302,7 +1370,7 @@ const TotalAsset = () => {
         visible={isViewModalVisible}
         onOk={handleCancel}
         onCancel={handleCancel}
-        footer= {null}
+        footer={null}
         cancelText="Cancel"
         width={800}
       >

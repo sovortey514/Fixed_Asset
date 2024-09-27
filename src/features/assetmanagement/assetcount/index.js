@@ -16,7 +16,7 @@ import {
   Card,
   DatePicker,
 } from "antd";
-import { DownOutlined, EyeOutlined } from "@ant-design/icons";
+import { DownOutlined, EyeOutlined, SearchOutlined } from "@ant-design/icons";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { PlusOutlined } from "@ant-design/icons";
 import {
@@ -58,7 +58,10 @@ const TotalAsset = () => {
   const [fixedAssetDetail, setFixedAssetDetail] = useState(null);
 
   const [role, setRole] = useState("");
-
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredAssetHolders, setFilteredAssetHolders] =
+    useState(assetHolders); // Assume assetHolders is an array of asset holder objects
+  // const [selectedAssetHolder, setSelectedAssetHolder] = useState(null);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -67,6 +70,18 @@ const TotalAsset = () => {
     fetchAssetDetails();
     fetchUserByusername();
   }, []);
+
+  useEffect(() => {
+    const filtered = assetHolders.filter((assetHolder) =>
+      assetHolder.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredAssetHolders(filtered);
+  }, [searchTerm, assetHolders]);
+
+  const handleSelectAssetHolder = (assetHolder) => {
+    setSelectedAssetHolder(assetHolder);
+    setSearchTerm(assetHolder.name); // Set the input value to the selected asset holder name
+  };
 
   const fetchUserByusername = async () => {
     try {
@@ -124,6 +139,10 @@ const TotalAsset = () => {
     fetchAssetDetails(record.id); // Fetch details for the selected asset
   };
 
+  const handleSearchClick = () => {
+    console.log("Search Term:", searchTerm);
+  };
+
   useEffect(() => {
     if (departmentId) {
       const fetchAssets = async () => {
@@ -145,17 +164,9 @@ const TotalAsset = () => {
               headers,
             }
           );
-          console.log("Raw Response:", response);
 
           if (response.ok) {
             const assetDetails = await response.json();
-            console.log("API Response:", assetDetails);
-            console.log("Fixed Assets:", assetDetails.fixedAssets);
-            console.log(
-              "Editable Row Keys:",
-              assetDetails.fixedAssets.map((item) => item.id)
-            );
-
             setAssetById(assetDetails.fixedAssets || []);
             setEditableRowKeys(assetDetails.fixedAssets.map((item) => item.id));
           } else {
@@ -185,6 +196,32 @@ const TotalAsset = () => {
       fetchAssets();
     }
   }, [departmentId, token]);
+
+  // useEffect(() => {
+  //   const lowercasedTerm = searchTerm.toLowerCase();
+  //   const filtered = assetHolders.filter((holder) =>
+  //     holder.name.toLowerCase().includes(lowercasedTerm)
+  //   );
+  //   const filteruser = fixedAssetDetail?.map((r) =>
+  //     r.assetHolder.name.toLowerCase().includes(lowercasedTerm)
+  //   );
+
+  //   // Log the original asset holder names for debugging
+  //   console.log(
+  //     "Original asset holder names:",
+  //     fixedAssetDetail?.map((r) => r.assetHolder.name.toLowerCase())
+  //   );
+
+  //   // Filter the fixedAssetDetail array
+  //   const filteredUsers = fixedAssetDetail?.filter((r) =>
+  //     r.assetHolder.name.toLowerCase().includes(lowercasedTerm)
+  //   );
+
+  //   // Log the filtered results
+  //   console.log("Filtered users:", filteredUsers);
+  //   setFilteredAssetHolders(filtered);
+  //   setFixedAssetDetail(filteredUsers);
+  // }, [searchTerm, assetHolders]);
 
   const [fixedAssetCountData, setFixedAssetCountData] = useState([]);
   const fetchAssetCount = async () => {
@@ -950,9 +987,34 @@ const TotalAsset = () => {
       ))}
     </Menu>
   );
+
+  const handleSearchChange = async(e) => {
+    const value = e.target.value;
+    const lowercasedTerm = value.toLowerCase();
+    setSearchTerm(value);
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
+    const response = await fetch(
+      `http://localhost:6060/admin/getFixedAssetsByDepartment/${departmentId}`,
+      {
+        method: "GET",
+        headers,
+      }
+    );
+
+    if (response.ok) {
+      const assetDetails = await response.json();
+      const filteredUsers = assetDetails.fixedAssets?.filter((r) =>
+        r.assetHolder.name.toLowerCase().includes(lowercasedTerm)
+      );
+      setAssetById(filteredUsers);
+  }
+  };
   const assetholderMenu = (
     <Menu>
-      {assetHolders.map((assetHolder) => (
+      {filteredAssetHolders.map((assetHolder) => (
         <Menu.Item key={assetHolder.id}>
           <div
             style={{
@@ -1059,6 +1121,13 @@ const TotalAsset = () => {
       render: (text, record) => (
         <span className="text-sm">{record.assetHolder ? text : "N/A"}</span>
       ),
+      editable: false,
+    },
+    {
+      title: "Quantity",
+      dataIndex: "quantity",
+      key: "quantity",
+      render: (text) => <span className="text-sm">{text}</span>,
       editable: false,
     },
     {
@@ -1195,6 +1264,8 @@ const TotalAsset = () => {
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
+        cancelText='Cancel'
+        okText='Ok'
         width={
           modalType === "Audit" || modalType === "fixedAssetDetail" ? 1400 : 500
         }
@@ -1390,6 +1461,32 @@ const TotalAsset = () => {
                 >
                   <DatePicker className="w-full" />
                 </Form.Item>
+                <Form.Item
+                  name="Assetholder"
+                  label="Asset Holder"
+                  style={{ width: "200px" }}
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please select an asset holder!",
+                    },
+                  ]}
+                >
+                  <Dropdown overlay={assetholderMenu} trigger={["click"]}>
+                    <Input
+                      placeholder="Search..."
+                      value={searchTerm}
+                      onChange={handleSearchChange}
+                      suffix={
+                        <SearchOutlined
+                          onClick={handleSearchClick}
+                          style={{ cursor: "pointer" }}
+                        />
+                      }
+                      style={{ width: 200, marginLeft: 8 }}
+                    />
+                  </Dropdown>
+                </Form.Item>
               </div>
               <div className="text-sm">
                 {assetById.length > 0 ? (
@@ -1433,6 +1530,7 @@ const TotalAsset = () => {
                     <th className="px-4 py-2 border">serialNumber</th>
                     <th className="px-4 py-2 border">purchaseDate</th>
                     <th className="px-4 py-2 border">price</th>
+                    {/* <th className="px-4 py-2 border">price</th> */}
 
                     <th className="px-4 py-2 border">Quantity Counted</th>
                     <th className="px-4 py-2 border">Conditions</th>
@@ -1442,6 +1540,9 @@ const TotalAsset = () => {
                   </tr>
                 </thead>
                 <tbody>
+                  {fixedAssetDetail == [] ?  <td className="px-4 py-2 border">
+                        hiiiiiiiiiiiiiiiiiiiiiiiii
+                      </td>:<></>}
                   {fixedAssetDetail.map((detail) => (
                     <tr
                       key={detail.id}
