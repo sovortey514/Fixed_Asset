@@ -17,6 +17,7 @@ public interface FileDataRepository extends JpaRepository<FileData, Long>{
 
     // Optional<FileData> findByFixedAsset(FixedAsset fixedAsset);
 
+    
     List<FileData> findByFixedAsset(FixedAsset fixedAsset);
 
 }
