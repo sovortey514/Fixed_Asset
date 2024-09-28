@@ -75,6 +75,25 @@ const TotalAsset = () => {
       render: (text) => <a>{text}</a>,
     },
     {
+      title: "Images",
+      dataIndex: "files", // Assuming your data has an array of file objects here
+      key: "files",
+      render: (files) => (
+        <div style={{ display: 'flex', gap: '10px' }}>
+          {files?.map((file, index) => (
+            <img
+              key={index}
+              src={file.fileUrl}
+              alt={file.fileName}
+              style={{ width: 50, height: 50, objectFit: "cover", borderRadius: "4px" }}
+              className="border border-gray-300 shadow-md"
+              onError={(e) => { e.target.src = '/default-image.png'; }} // Fallback image
+            />
+          ))}
+        </div>
+      ),
+    },
+    {
       title: "Category",
       dataIndex: "fixedAssetCategory",
       key: "fixedAssetCategory",
@@ -342,7 +361,7 @@ const TotalAsset = () => {
       );
       const result = await response.json();
       if (result) {
-        const list = result.filter(i=>i.fixedAssetStatus === "1")
+        const list = result.filter((i) => i.fixedAssetStatus === "1");
         setData(list);
       } else {
         notification.error({
@@ -463,7 +482,7 @@ const TotalAsset = () => {
       } else if (modalType === "fixedasset") {
         try {
           if (editKey !== null) {
-            console.log('editKey',editKey)
+            console.log("editKey", editKey);
             // Edit existing asset
             const updateResponse = await fetch(
               `http://localhost:6060/admin/updateFixedAsset/${editKey.fixedAssetId}`,
@@ -975,7 +994,7 @@ const TotalAsset = () => {
                   status: "0",
                   statustext: "Avaliable",
                   id: assetDetails.fixedAssetId,
-                  categoryId:1,
+                  categoryId: 1,
                   model: assetDetails.fixedAssetModel,
                   name: assetDetails.fixedAssetName,
                   price: assetDetails.fixedAssetPrice,

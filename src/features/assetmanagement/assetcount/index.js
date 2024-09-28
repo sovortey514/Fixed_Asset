@@ -154,8 +154,8 @@ const TotalAsset = () => {
           };
 
           // Log the departmentId and headers for debugging
-          console.log("Fetching assets for departmentId:", departmentId);
-          console.log("Headers:", headers);
+          // console.log("Fetching assets for departmentId:", departmentId);
+          // console.log("Headers:", headers);
 
           const response = await fetch(
             `http://localhost:6060/admin/getFixedAssetsByDepartment/${departmentId}`,
@@ -1058,6 +1058,31 @@ const TotalAsset = () => {
       render: (_, __, index) => <span className="text-sm">{index + 1}</span>,
       editable: false,
     },
+    // {
+    //   title: "Images",
+    //   dataIndex: "files", // Assuming your data has an array of file objects here
+    //   key: "files",
+    //   editable: false,
+    //   render: (files) => (
+    //     <div style={{ display: 'flex', gap: '10px' }}>
+    //       {files?.map((file, index) => (
+    //         <img
+    //           key={index}
+    //           src={file.fileUrl}
+    //           alt={file.fileName}
+    //           style={{
+    //             width: "50px",
+    //             height: "50px",
+    //             objectFit: "cover",
+    //             borderRadius: "4px",
+    //           }}
+    //           className="border border-gray-300 shadow-md"
+    //           onError={(e) => { e.target.src = '/default-image.png'; }} // Fallback image
+    //         />
+    //       ))}
+    //     </div>
+    //   ),
+    // },
     {
       title: "Fixed Asset Name",
       dataIndex: "name",
